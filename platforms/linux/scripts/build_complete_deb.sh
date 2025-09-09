@@ -5,8 +5,8 @@
 
 set -e
 
-echo "🔨 Building COMPLETE Cred Manager for Linux..."
-echo "📦 This will include BOTH Go backend AND Flutter frontend"
+echo "🔨 Building SECURE Cred Manager for Linux..."
+echo "📦 Local-only app with integrated Argon2 security (no network ports)"
 echo
 
 # Colors
@@ -68,23 +68,10 @@ check_dependencies() {
     print_status "All dependencies found"
 }
 
-# Build Go backend
+# Build Go backend - REMOVED: Backend no longer needed
 build_backend() {
-    print_info "Building Go backend server..."
-
-    cd "$BACKEND_DIR"
-
-    # Clean previous build
-    rm -f server
-
-    # Build for Linux
-    if go build -o server ./cmd/server; then
-        print_status "Go backend built successfully"
-        ls -la server
-    else
-        print_error "Go backend build failed"
-        exit 1
-    fi
+    print_info "Skipping Go backend build - app is now fully local with integrated Argon2 security"
+    print_status "Backend removal completed - no network ports opened"
 }
 
 # Build Flutter frontend
@@ -135,9 +122,8 @@ create_package_structure() {
 copy_files() {
     print_info "Copying files to package..."
 
-    # Copy Go backend
-    cp "$BACKEND_DIR/server" "$PACKAGE_DIR/usr/bin/$APP_NAME-server"
-    print_status "Go backend copied"
+    # Skip Go backend - REMOVED: App is fully local
+    print_info "Skipping Go backend copy - app is fully local with integrated security"
 
     # Copy Flutter frontend
     cp -r "$FRONTEND_DIR/build/linux/x64/release/bundle/"* "$PACKAGE_DIR/usr/lib/$APP_NAME/"
@@ -209,48 +195,15 @@ create_startup_script() {
 #!/bin/bash
 
 # Cred Manager Startup Script
-# Launches both Go backend and Flutter frontend
+# Launches Flutter frontend (fully local with integrated Argon2 security)
 
 APP_NAME="cred-manager"
 APP_DIR="/usr/lib/$APP_NAME"
-DATA_DIR="/var/lib/$APP_NAME"
-LOG_DIR="/var/log"
 
-# Ensure data directory exists
-mkdir -p "$DATA_DIR"
-mkdir -p "$LOG_DIR"
-
-# Set permissions
-chmod 755 "$APP_DIR"
-chmod 644 "$DATA_DIR"/*.sql 2>/dev/null || true
-
-# Start Go backend server in background
-echo "Starting Cred Manager backend server..."
-/usr/bin/$APP_NAME-server \
-    --data-dir="$DATA_DIR" \
-    --port=8080 \
-    --log-file="$LOG_DIR/$APP_NAME.log" &
-
-BACKEND_PID=$!
-
-# Wait a moment for server to start
-sleep 2
-
-# Check if backend started successfully
-if kill -0 $BACKEND_PID 2>/dev/null; then
-    echo "Backend server started (PID: $BACKEND_PID)"
-
-    # Launch Flutter frontend
-    echo "Starting Cred Manager frontend..."
-    cd "$APP_DIR"
-    exec ./cred-manager
-
-    # When frontend exits, stop backend
-    kill $BACKEND_PID 2>/dev/null || true
-else
-    echo "Failed to start backend server"
-    exit 1
-fi
+# Launch Flutter frontend
+echo "Starting Cred Manager (local-only with Argon2 security)..."
+cd "$APP_DIR"
+exec ./cred-manager
 EOF
 
     # Make startup script executable
@@ -334,8 +287,9 @@ build_deb() {
         dpkg-deb -c "$BINARIES_DIR/$PACKAGE_NAME" | head -20
 
         echo
-        print_status "COMPLETE PACKAGE CREATED: $BINARIES_DIR/$PACKAGE_NAME"
-        print_info "This package includes BOTH Go backend AND Flutter frontend!"
+        print_status "SECURE PACKAGE CREATED: $BINARIES_DIR/$PACKAGE_NAME"
+        print_info "This package includes Flutter frontend with integrated Argon2 security!"
+        print_info "Local-only operation - NO network ports opened!"
         print_info "Users can install with: sudo dpkg -i $PACKAGE_NAME"
 
     else
@@ -372,8 +326,9 @@ main() {
     echo
 
     echo "=========================================="
-    print_status "BUILD COMPLETE!"
-    print_info "Your COMPLETE Cred Manager package is ready for distribution!"
+    print_status "SECURE BUILD COMPLETE!"
+    print_info "Your Cred Manager package is ready for distribution!"
+    print_info "Features: Local-only operation with Argon2 security"
     print_info "Location: $BINARIES_DIR/${APP_NAME}_${VERSION}_${ARCH}.deb"
     echo "=========================================="
 }

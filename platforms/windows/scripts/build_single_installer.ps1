@@ -54,31 +54,10 @@ function Test-Prerequisites {
     Write-Success "All prerequisites found"
 }
 
-# Build Go backend
+# Build Go backend - REMOVED: Backend no longer needed, app is fully local
 function Build-GoBackend {
-    Write-Info "Building Go backend server..."
-
-    Push-Location ..\..\..\backend
-
-    try {
-        # Clean previous build
-        if (Test-Path "server.exe") { Remove-Item "server.exe" }
-
-        # Build for Windows
-        $env:GOOS = "windows"
-        $env:GOARCH = "amd64"
-        go build -o server.exe ./cmd/server
-
-        if ($LASTEXITCODE -eq 0) {
-            Write-Success "Go backend built successfully"
-            Write-Info "Backend size: $((Get-Item server.exe).Length / 1MB) MB"
-        } else {
-            Write-Error "Go backend build failed"
-            exit 1
-        }
-    } finally {
-        Pop-Location
-    }
+    Write-Info "Skipping Go backend build - app is now fully local with integrated security"
+    Write-Success "Backend removal completed - no network ports opened"
 }
 
 # Build Flutter frontend
@@ -121,9 +100,8 @@ function New-InstallerStructure {
     }
     New-Item -ItemType Directory -Path $installerDir | Out-Null
 
-    # Copy Go backend
-    Write-Info "Copying Go backend..."
-    Copy-Item "..\..\..\backend\server.exe" "$installerDir\" -Force
+    # Skip Go backend - REMOVED: App is fully local
+    Write-Info "Skipping Go backend copy - app is fully local with integrated security"
 
     # Copy Flutter frontend
     Write-Info "Copying Flutter frontend..."
@@ -155,7 +133,7 @@ function New-StartupScript {
     $startupScript = @"
 @echo off
 REM Cred Manager Startup Script
-REM Launches both Go backend and Flutter frontend
+REM Launches Flutter frontend (fully local with integrated security)
 
 echo Starting Cred Manager...
 echo.
@@ -163,23 +141,8 @@ echo.
 REM Set working directory to installation path
 cd /d "%~dp0"
 
-REM Start Go backend server in background
-echo Starting backend server...
-start /B "CredManager-Backend" "server.exe"
-
-REM Wait for backend to start
-timeout /t 3 /nobreak > nul
-
-REM Check if backend started
-tasklist /FI "IMAGENAME eq server.exe" 2>NUL | find /I /N "server.exe">NUL
-if "%ERRORLEVEL%"=="0" (
-    echo Backend server started successfully
-) else (
-    echo Warning: Backend server may not have started properly
-)
-
 REM Start Flutter frontend
-echo Starting frontend application...
+echo Starting Cred Manager application...
 start "" "cred-manager.exe"
 
 REM Exit this script
@@ -271,7 +234,6 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Filename: "{app}\create-shortcut.bat"; Description: "Create desktop shortcut"; Flags: postinstall skipifsilent runhidden
 
 [UninstallRun]
-Filename: "taskkill"; Parameters: "/f /im server.exe"; Flags: runhidden
 Filename: "taskkill"; Parameters: "/f /im cred-manager.exe"; Flags: runhidden
 
 [Code]
@@ -328,8 +290,8 @@ function New-Installer {
         }
 
         Write-Info "Installer contents:"
-        Write-Info "- ✅ Go backend server (server.exe)"
-        Write-Info "- ✅ Flutter frontend (cred-manager.exe + DLLs)"
+        Write-Info "- ✅ Flutter frontend with integrated Argon2 security (cred-manager.exe + DLLs)"
+        Write-Info "- ✅ Local-only operation (no network ports)"
         Write-Info "- ✅ Startup script (start-cred-manager.bat)"
         Write-Info "- ✅ Desktop shortcut creator"
         Write-Info "- ✅ Uninstaller"
@@ -373,15 +335,16 @@ function Main {
 
     Write-Host ""
     Write-Info "What this installer includes:"
-    Write-Host "  ✅ Go Backend Server" -ForegroundColor Green
-    Write-Host "  ✅ Flutter Frontend App" -ForegroundColor Green
+    Write-Host "  ✅ Flutter Frontend with Argon2 Security" -ForegroundColor Green
+    Write-Host "  ✅ Local-Only Operation (Zero Network Exposure)" -ForegroundColor Green
+    Write-Host "  ✅ Military-Grade Password Hashing" -ForegroundColor Green
     Write-Host "  ✅ Automatic Startup Script" -ForegroundColor Green
     Write-Host "  ✅ Desktop Shortcuts" -ForegroundColor Green
     Write-Host "  ✅ Windows Integration" -ForegroundColor Green
     Write-Host "  ✅ Professional Uninstaller" -ForegroundColor Green
 
     Write-Host ""
-    Write-Success "ONE installer, complete application! 🚀"
+    Write-Success "SECURE local-only installer! 🔐 No network ports opened!"
 }
 
 # Run main function
