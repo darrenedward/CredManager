@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Implement a secure local authentication system with passphrase-only login for first-time users and comprehensive passphrase recovery using a mix of predefined and custom security questions. This feature provides secure access control with user-friendly recovery options, including first-time setup wizard, secure login flow, and forgotten passphrase recovery through security question verification. All functionality runs locally with no server or API dependencies.

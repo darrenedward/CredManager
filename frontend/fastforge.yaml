@@ -1,0 +1,43 @@
+# FastForge Configuration for Cred Manager
+name: "Cred Manager"
+version: "1.0.0"
+description: "Secure credential management application"
+
+# Linux .deb package configuration
+linux:
+  deb:
+    enabled: true
+    maintainer: "Darren Edward House of Jones"
+    homepage: "https://github.com/yourusername/cred-manager"
+    license: "MIT"
+    depends:
+      - libgtk-3-0
+      - libblkid1
+      - liblzma5
+      - libgtk-3-0
+      - libx11-xcb1
+      - libxss1
+      - libasound2
+      - libdrm2
+      - libxcomposite1
+      - libxdamage1
+      - libxrandr2
+      - libgbm1
+      - libxkbcommon0
+      - libatspi2.0-0
+    section: "utils"
+    priority: "optional"
+    architecture: "amd64"
+
+# Build configuration
+build:
+  output: "dist/"
+  clean: true
+
+# Flutter build arguments
+flutter:
+  platforms:
+    - linux
+  build_mode: release
+  build_args:
+    - "--release"
