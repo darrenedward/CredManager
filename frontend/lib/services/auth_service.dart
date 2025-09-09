@@ -47,7 +47,6 @@ class AuthService {
     if (!storedHash.contains('\$salt:')) return false;
 
     final parts = storedHash.split('\$salt:');
-    final hashPart = parts[0];
     final salt = parts[1];
 
     // Hash the input passphrase with the extracted salt (legacy method)
@@ -249,7 +248,6 @@ class AuthService {
     if (!storedHash.contains('\$salt:')) return false;
 
     final parts = storedHash.split('\$salt:');
-    final hashPart = parts[0];
     final salt = parts[1];
 
     // Hash the input answer with the extracted salt (legacy method, lowercase for case-insensitive comparison)

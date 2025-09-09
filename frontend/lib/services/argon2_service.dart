@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
+import 'package:crypto/crypto.dart';
 
 class Argon2Service {
   static const int _saltLength = 32;
@@ -103,7 +104,6 @@ class Argon2Service {
     }
 
     final parts = oldSha256Hash.split('\$salt:');
-    final hashPart = parts[0];
     final salt = parts[1];
 
     // Verify the password matches the old hash
@@ -119,6 +119,3 @@ class Argon2Service {
     return null;
   }
 }
-
-// Import for SHA-256 (for migration)
-import 'package:crypto/crypto.dart';
