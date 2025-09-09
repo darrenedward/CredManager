@@ -4,10 +4,12 @@ import 'package:crypto/crypto.dart';
 import '../utils/constants.dart';
 import 'storage_service.dart';
 import 'jwt_service.dart';
+import 'argon2_service.dart';
 
 class AuthService {
   static const String _baseUrl = AppConstants.apiBaseUrl; // 'http://localhost:8080/api';
   final StorageService _storageService = StorageService();
+  final Argon2Service _argon2Service = Argon2Service();
   
   // Rate limiting for recovery attempts
   static const int _maxRecoveryAttempts = 3;
@@ -15,32 +17,42 @@ class AuthService {
   int _recoveryAttempts = 0;
   DateTime? _lastRecoveryAttempt;
 
-  /// Generates a salt for hashing
+  /// Generates a salt for hashing (legacy method for migration)
   String _generateSalt([int length = 32]) {
     final random = Random.secure();
     final values = List<int>.generate(length, (i) => random.nextInt(256));
     return base64Url.encode(values);
   }
 
-  /// Hashes a passphrase with a salt using SHA-256
-  String _hashPassphrase(String passphrase, String salt) {
+  /// Hashes a passphrase with a salt using SHA-256 (legacy method for migration)
+  String _hashPassphraseLegacy(String passphrase, String salt) {
     final bytes = utf8.encode(passphrase + salt);
     final digest = sha256.convert(bytes);
     return '${digest.toString()}\$salt:$salt';
   }
 
-  /// Verifies a passphrase against a stored hash
-  bool _verifyPassphrase(String passphrase, String storedHash) {
-    // Extract salt from stored hash
+  /// Hashes a passphrase using Argon2 (military-grade security)
+  Future<String> _hashPassphrase(String passphrase) async {
+    return await _argon2Service.hashPassword(passphrase);
+  }
+
+  /// Verifies a passphrase against a stored hash (supports both Argon2 and legacy SHA-256)
+  Future<bool> _verifyPassphrase(String passphrase, String storedHash) async {
+    // Check if it's an Argon2 hash
+    if (storedHash.startsWith('\$argon2id\$')) {
+      return await _argon2Service.verifyPassword(passphrase, storedHash);
+    }
+
+    // Legacy SHA-256 hash format
     if (!storedHash.contains('\$salt:')) return false;
-    
+
     final parts = storedHash.split('\$salt:');
     final hashPart = parts[0];
     final salt = parts[1];
-    
-    // Hash the input passphrase with the extracted salt
-    final hashedInput = _hashPassphrase(passphrase, salt);
-    
+
+    // Hash the input passphrase with the extracted salt (legacy method)
+    final hashedInput = _hashPassphraseLegacy(passphrase, salt);
+
     // Compare the hashes
     return hashedInput == storedHash;
   }
@@ -55,10 +67,9 @@ class AuthService {
         throw Exception('Passphrase is required');
       }
       
-      // Store passphrase hash locally
-      final salt = _generateSalt();
-      final hash = _hashPassphrase(passphrase, salt);
-      print('Generated passphrase hash: $hash');
+      // Store passphrase hash locally using Argon2
+      final hash = await _hashPassphrase(passphrase);
+      print('Generated Argon2 passphrase hash: $hash');
       await _storageService.storePassphraseHash(hash);
       
       // Process and hash security questions
@@ -69,9 +80,8 @@ class AuthService {
         final isCustom = question['isCustom'] ?? 'false';
         
         if (questionText != null && answer != null) {
-          // Hash the answer
-          final answerSalt = _generateSalt();
-          final answerHash = _hashPassphrase(answer, answerSalt);
+          // Hash the answer using Argon2
+          final answerHash = await _hashPassphrase(answer);
           print('Hashed answer for question "$questionText": $answerHash');
           
           processedQuestions.add({
@@ -125,8 +135,8 @@ class AuthService {
         throw Exception('No account found. Please set up your account first.');
       }
       
-      // Verify passphrase
-      if (!_verifyPassphrase(passphrase, storedHash)) {
+      // Verify passphrase (supports both Argon2 and legacy SHA-256)
+      if (!await _verifyPassphrase(passphrase, storedHash)) {
         throw Exception('Invalid passphrase');
       }
       
@@ -206,7 +216,7 @@ class AuthService {
           
           if (matchingQuestion['question'] != '') {
             // Verify answer against stored hash (case-insensitive)
-            if (_verifyAnswerCaseInsensitive(answerText, matchingQuestion['answerHash']!)) {
+            if (await _verifyAnswerCaseInsensitive(answerText, matchingQuestion['answerHash']!)) {
               correctAnswers++;
             }
           }
@@ -229,17 +239,22 @@ class AuthService {
   }
 
   /// Verifies an answer against a stored hash (case-insensitive)
-  bool _verifyAnswerCaseInsensitive(String answer, String storedHash) {
-    // Extract salt from stored hash
+  Future<bool> _verifyAnswerCaseInsensitive(String answer, String storedHash) async {
+    // Check if it's an Argon2 hash
+    if (storedHash.startsWith('\$argon2id\$')) {
+      return await _argon2Service.verifyPassword(answer.toLowerCase().trim(), storedHash);
+    }
+
+    // Legacy SHA-256 hash format
     if (!storedHash.contains('\$salt:')) return false;
-    
+
     final parts = storedHash.split('\$salt:');
     final hashPart = parts[0];
     final salt = parts[1];
-    
-    // Hash the input answer with the extracted salt (lowercase for case-insensitive comparison)
-    final hashedInput = _hashPassphrase(answer.toLowerCase().trim(), salt);
-    
+
+    // Hash the input answer with the extracted salt (legacy method, lowercase for case-insensitive comparison)
+    final hashedInput = _hashPassphraseLegacy(answer.toLowerCase().trim(), salt);
+
     // Compare the hashes
     return hashedInput == storedHash;
   }
@@ -267,9 +282,8 @@ class AuthService {
       // In a real implementation, we would verify the token first
       // For now, we'll just update the stored passphrase
       
-      // Store new passphrase hash locally
-      final salt = _generateSalt();
-      final hash = _hashPassphrase(newPassphrase, salt);
+      // Store new passphrase hash locally using Argon2
+      final hash = await _hashPassphrase(newPassphrase);
       await _storageService.storePassphraseHash(hash);
       
       // Generate a new JWT token for automatic login
