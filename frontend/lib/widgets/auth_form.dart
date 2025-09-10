@@ -71,6 +71,10 @@ class _AuthFormState extends State<AuthForm> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: widget.isLoading ? null : widget.onSubmit,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppConstants.primaryColor,
+              foregroundColor: Colors.white,
+            ),
             child: widget.isLoading
                 ? const CircularProgressIndicator(color: Colors.white)
                 : const Text('Continue'),

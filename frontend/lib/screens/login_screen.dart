@@ -144,10 +144,24 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.lock_outline,
-              size: 80,
-              color: Colors.blue,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.security,
+                  size: 32,
+                  color: AppConstants.accentColor,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  AppConstants.appName,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.primaryColor,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             const Text(

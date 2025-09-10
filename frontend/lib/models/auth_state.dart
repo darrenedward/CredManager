@@ -5,6 +5,7 @@ import '../services/storage_service.dart';
 import '../services/auth_service.dart';
 import '../services/jwt_service.dart';
 import '../services/settings_service.dart';
+import '../services/credential_storage_service.dart';
 import '../utils/constants.dart';
 
 class AuthState extends ChangeNotifier {
@@ -36,10 +37,12 @@ class AuthState extends ChangeNotifier {
   int get sessionTimeoutMinutes => _sessionTimeoutMinutes;
   DateTime? get sessionStartTime => _sessionStartTime;
   DateTime? get lastActivityTime => _lastActivityTime;
+  CredentialStorageService get credentialStorage => _credentialStorage;
 
   final StorageService _storageService = StorageService();
   final AuthService _authService = AuthService();
   final SettingsService _settingsService = SettingsService();
+  final CredentialStorageService _credentialStorage = CredentialStorageService();
 
   AuthState() {
     _startInactivityMonitoring();
@@ -124,6 +127,9 @@ class AuthState extends ChangeNotifier {
         await _storageService.storeToken(token); // Store the JWT token
         await _storageService.setLoggedIn(true); // Mark as logged in
 
+        // Initialize credential storage with user's passphrase
+        _credentialStorage.setPassphrase(passphrase);
+
         // Establish session
         _establishSession(token);
         _updateLastActivity(); // Update activity on login
@@ -152,6 +158,9 @@ class AuthState extends ChangeNotifier {
         _user = User(isFirstTime: false);
         await _storageService.storeToken(token);
         await _storageService.setLoggedIn(true);
+
+        // Initialize credential storage with user's passphrase
+        _credentialStorage.setPassphrase(passphrase);
 
         // Establish session
         _establishSession(token);
@@ -199,7 +208,10 @@ class AuthState extends ChangeNotifier {
     _sessionTimer = null;
     _inactivityTimer?.cancel();
     _inactivityTimer = null;
-    
+
+    // Clear credential storage passphrase for security
+    _credentialStorage.clearPassphrase();
+
     await _storageService.deleteToken();
     await _storageService.setLoggedIn(false);
     notifyListeners();

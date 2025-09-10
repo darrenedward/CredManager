@@ -1,135 +1,118 @@
 # Windows Platform Documentation
 
 ## 📦 **Distribution Formats**
-- **Primary**: `CredManager-Setup-1.0.0.exe` (SINGLE installer with everything)
-- **Alternative**: `CredManager-Portable.zip` (portable ZIP)
-- **Single EXE**: `cred-manager.exe` (requires DLLs)
+- **Primary**: `cred-manager-windows-x64-v1.0.0.zip` (Portable application bundle)
+- **Alternative**: `cred_manager.exe` (Single executable with dependencies)
+- **Future**: `CredManager-Setup-1.0.0.exe` (Windows installer)
 
-## 🎯 **ONE INSTALLER - COMPLETE APPLICATION**
+## 🎯 **SELF-CONTAINED APPLICATION**
 
-**❌ NO MULTIPLE INSTALLATIONS!**
-**✅ ONE installer includes:**
-- Go backend server
-- Flutter frontend application
-- Startup automation
-- Desktop shortcuts
-- Professional uninstaller
+**✅ Application bundle includes:**
+- Flutter Windows executable
+- Flutter engine DLL
+- Application assets and resources
+- Build metadata and version info
 
-**Users run ONE installer and get a COMPLETE, WORKING application!**
+**Users extract and run - COMPLETE, WORKING application with encrypted storage!**
 
 ## 🛠️ **Build Requirements**
 - **OS**: Windows 10/11 (64-bit)
-- **Flutter**: Latest stable version
+- **Flutter**: 3.10.0 or higher
 - **Visual Studio**: 2022 with Desktop C++ workload
 - **Windows SDK**: 10.0.19041.0 or later
-- **Optional**: Inno Setup (for installer creation)
+- **Optional**: Windows Installer XML (WiX) for MSI creation
 
 ## 🚀 **Quick Build (On Windows)**
 
-### **PowerShell (Recommended) - SINGLE INSTALLER**
-```powershell
-# Navigate to Windows build directory
-cd platforms\windows\scripts
-
-# Run SINGLE installer build (includes both Go + Flutter)
-.\build_single_installer.ps1
-
-# Result: ONE complete installer!
-```
-
-### **Command Prompt**
+### **Command Prompt/PowerShell**
 ```cmd
 # Navigate to Windows build directory
 cd platforms\windows\scripts
 
-# Run SINGLE installer build
-powershell -ExecutionPolicy Bypass -File build_single_installer.ps1
+# Run Windows build script
+.\build.bat
+
+# Result: Complete Windows application bundle!
+```
+
+### **PowerShell Alternative**
+```powershell
+# Navigate to Windows build directory
+cd platforms\windows\scripts
+
+# Run Windows build script
+.\build.bat
 ```
 
 ## 📁 **Build Output Structure**
 
 ```
-platforms/windows/
-├── builds/
-│   ├── installer.iss          # Inno Setup script (auto-generated)
-│   └── installer/             # Complete app files (auto-generated)
-│       ├── server.exe         # Go backend
-│       ├── cred-manager.exe   # Flutter frontend
-│       ├── *.dll              # Dependencies
-│       ├── start-cred-manager.bat  # Startup script
-│       └── create-shortcut.bat     # Desktop shortcut
-├── scripts/
-│   └── build_single_installer.ps1   # ⭐ SINGLE installer build script
-└── binaries/
-    └── CredManager-Setup-1.0.0.exe  # ⭐ ONE complete installer
+platforms/windows/builds/release_[timestamp]/
+├── cred_manager.exe           # Main executable
+├── flutter_windows.dll       # Flutter engine
+├── data/                      # Application resources
+│   ├── icudtl.dat            # ICU data
+│   ├── flutter_assets/       # Flutter assets
+│   └── [app_resources]       # Application-specific assets
+└── build_info.txt            # Build metadata and version info
 ```
 
 ## 🔧 **Manual Build Steps**
 
 ### **Step 1: Enable Windows Desktop**
-```powershell
+```cmd
 flutter config --enable-windows-desktop
 ```
 
-### **Step 2: Build Go Backend**
-```powershell
-cd backend
-$env:GOOS="windows"
-$env:GOARCH="amd64"
-go build -o server.exe ./cmd/server
-```
-
-### **Step 3: Build Flutter Frontend**
-```powershell
+### **Step 2: Build Flutter Application**
+```cmd
 cd frontend
 flutter build windows --release
 ```
 
-### **Step 4: Create Complete Package**
-```powershell
-# Copy files to distribution
-mkdir dist\windows
-copy "backend\server.exe" "dist\windows\"
-copy "frontend\build\windows\x64\runner\Release\*" "dist\windows\"
-
-# Create portable ZIP
-Compress-Archive -Path "dist\windows\*" -DestinationPath "CredManager-Portable.zip"
-```
-
-## 📦 **Creating Professional Installer**
-
-### **Using Inno Setup (Recommended)**
-1. **Download Inno Setup**: https://jrsoftware.org/isinfo.php
-2. **Update installer script**: `platforms/windows/builds/installer.iss`
-3. **Convert icon**: `magick assets/icons/shield_icon.png assets/icons/shield_icon.ico`
-4. **Compile installer**:
-   ```cmd
-   "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" platforms\windows\builds\installer.iss
-   ```
-
-### **Using NSIS (Alternative)**
+### **Step 3: Package Application**
 ```cmd
-# Create NSIS installer
-makensis platforms\windows\builds\installer.nsi
+# Navigate to build script directory
+cd platforms\windows\scripts
+
+# Run the build script
+build.bat
 ```
 
-## 🧪 **Testing Windows Package**
+## 📦 **Creating Distribution Package**
+
+### **Portable ZIP (Current)**
+The build script automatically creates a portable ZIP package:
+```
+cred-manager-windows-x64-v1.0.0.zip
+├── cred_manager.exe           # Main executable
+├── flutter_windows.dll       # Flutter engine
+├── data/                      # Application assets
+└── README.txt                 # Usage instructions
+```
+
+### **Windows Installer (Future Enhancement)**
+For professional distribution, consider creating:
+- **MSI Installer** using WiX Toolset
+- **NSIS Installer** for custom installation experience
+- **Inno Setup** for simple installer creation
+
+## 🧪 **Testing Windows Application**
 
 ### **Test Portable Version**
 ```cmd
-# Extract ZIP
-# Run cred-manager.exe
-# Verify backend starts automatically
-# Test login and dashboard
+# Extract ZIP to desired location
+# Double-click cred_manager.exe
+# Verify application starts correctly
+# Test authentication and credential management
 ```
 
-### **Test Installer Version**
+### **Test System Integration**
 ```cmd
-# Run CredManager-Setup-1.0.0.exe
-# Follow installation wizard
-# Launch from Start Menu
-# Verify all features work
-# Test uninstaller
+# Extract ZIP to test location
+# Run cred_manager.exe
+# Verify application starts correctly
+# Test all features and functionality
 ```
 
 ## 🔧 **Troubleshooting**
@@ -147,100 +130,90 @@ makensis platforms\windows\builds\installer.nsi
 winget install Microsoft.VisualStudio.2022.BuildTools --override "--wait --quiet --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
 ```
 
-**❌ Go build fails**
-```powershell
-# Set correct environment
-$env:GOOS="windows"
-$env:GOARCH="amd64"
-$env:CGO_ENABLED="1"
-go build -o server.exe ./cmd/server
-```
-
 **❌ Application won't start**
-- Check antivirus/firewall
-- Run as administrator
+- Check antivirus/firewall (may block executable)
+- Verify all DLL files are present
 - Check Windows Event Viewer for errors
+- Try running from command prompt to see error messages
 
-## 📋 **Package Contents Checklist**
+**❌ Database issues**
+- Check user data directory: `%APPDATA%\cred_manager\`
+- Verify SQLite libraries are available
+- Check file permissions
 
-### **✅ Must Include:**
-- [ ] Go backend server (server.exe)
-- [ ] Flutter frontend (cred-manager.exe + DLLs)
-- [ ] Startup script (startup.bat)
-- [ ] Configuration files
-- [ ] Database migrations
-- [ ] Desktop shortcuts
-- [ ] Uninstaller
+## 📋 **Application Features**
 
-### **✅ Must Configure:**
-- [ ] Correct API endpoints (localhost:8080)
-- [ ] Database file paths
-- [ ] Windows-specific paths
-- [ ] Registry entries (optional)
+### **✅ Windows-Specific Features:**
+- Native Windows executable
+- Encrypted SQLite database storage
+- Windows-style file paths and data locations
+- High DPI support for modern displays
+- Windows 10/11 theme integration
+
+### **✅ Security Features:**
+- AES-256-GCM encryption for all credentials
+- Argon2 key derivation from user passphrase
+- No network dependencies (local-only operation)
+- Secure memory handling
 
 ## 📤 **Distribution**
 
-### **Installer Package**
+### **Portable Package**
+- **File**: `cred-manager-windows-x64-v1.0.0.zip`
+- **Size**: ~30-50MB (includes Flutter runtime)
+- **Installation**: Extract and run
+- **No admin rights required**
+- **User data**: Stored in `%APPDATA%\cred_manager\`
+
+### **Future Installer Package**
 - **File**: `CredManager-Setup-1.0.0.exe`
-- **Size**: ~50-100MB (includes all dependencies)
 - **Installation**: Standard Windows installer
 - **Uninstallation**: Add/Remove Programs
+- **System integration**: Start Menu, desktop shortcuts
 
-### **Portable Package**
-- **File**: `CredManager-Portable.zip`
-- **Size**: ~30-80MB
-- **Installation**: Just extract and run
-- **No admin rights required**
+## 🎯 **Windows Integration**
 
-## 🎯 **Windows-Specific Features**
+### **✅ Current Features:**
+- Portable executable (no installation required)
+- Windows-native UI with Material 3 design
+- Proper Windows file system integration
+- Windows-style keyboard shortcuts
 
-### **✅ Windows Integration:**
+### **✅ Future Enhancements:**
 - Start Menu shortcuts
 - Desktop icons
-- File associations
-- Registry integration
-- Windows Event Log
-- Task Scheduler integration
-
-### **✅ Windows Optimization:**
-- Windows Defender compatibility
-- UAC compatibility
-- Windows 10/11 optimization
-- Dark mode support
-- High DPI support
+- File associations for credential files
+- Windows Defender SmartScreen compatibility
 
 ## 📞 **Support**
 
 ### **Debug Commands**
 ```cmd
 # Check running processes
-tasklist | findstr cred-manager
+tasklist | findstr cred_manager
 
-# Check Windows services
-sc query cred-manager
+# Run with verbose output
+cred_manager.exe --verbose
 
-# Check Event Viewer
-eventvwr.msc
-
-# Check firewall
-wf.msc
+# Check application data
+dir "%APPDATA%\cred_manager"
 ```
 
-### **Log Locations**
-- **Application logs**: `%APPDATA%\Cred Manager\logs\`
-- **Windows Event Logs**: `Windows Logs > Application`
-- **Flutter logs**: Console output when running
+### **Data Locations**
+- **Application data**: `%APPDATA%\cred_manager\`
+- **Database**: `%APPDATA%\cred_manager\database.db`
+- **Logs**: Console output (when run from command prompt)
 
 ---
 
 ## 🎉 **Success Checklist**
 
-- [ ] Package builds without errors
-- [ ] Both Go backend and Flutter frontend included
-- [ ] Startup script launches both components
-- [ ] Windows integration works (shortcuts, uninstaller)
-- [ ] Application functions completely
-- [ ] Can be installed/uninstalled cleanly
-- [ ] Works on target Windows versions
+- [ ] Application builds without errors
+- [ ] Executable runs on target Windows systems
+- [ ] Database encryption works correctly
+- [ ] All UI features functional
+- [ ] Data persists between sessions
+- [ ] Export/import functionality works
+- [ ] Performance is acceptable
 
-**Now you have COMPLETE, WORKING Windows packages!** 🚀
+**Now you have a COMPLETE, SECURE Windows application!** 🚀

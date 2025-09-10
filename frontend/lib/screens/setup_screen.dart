@@ -382,8 +382,12 @@ class _SetupScreenState extends State<SetupScreen> {
                           child: const Text('Back'),
                         ),
                       const SizedBox(width: 10),
-                      TextButton(
+                      ElevatedButton(
                         onPressed: details.onStepContinue,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppConstants.primaryColor,
+                          foregroundColor: Colors.white,
+                        ),
                         child: const Text('Continue'),
                       ),
                     ],

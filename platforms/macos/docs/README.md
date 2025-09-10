@@ -9,7 +9,7 @@
 - **OS**: macOS 10.15+ (Catalina or later)
 - **Flutter**: Latest stable version
 - **Xcode**: 12+ with command line tools
-- **Go**: Latest version for backend
+- **CocoaPods**: For iOS/macOS dependencies
 - **Optional**: create-dmg (for DMG creation)
 
 ## 🚀 **Quick Build (On macOS)**
@@ -43,9 +43,7 @@ platforms/macos/
 │   ├── build_macos.sh         # Automated build script
 │   └── create_universal_app.sh # Universal binary creator
 └── binaries/
-    ├── Cred Manager.app/      # Complete app bundle ⭐
-    ├── server                 # Go backend binary
-    └── startup.sh             # Launch script
+    └── Cred Manager.app/      # Complete app bundle ⭐
 ```
 
 ## 🔧 **Manual Build Steps**
@@ -55,18 +53,17 @@ platforms/macos/
 flutter config --enable-macos-desktop
 ```
 
-### **Step 2: Build Go Backend**
+### **Step 2: Configure macOS Build**
 ```bash
-cd backend
+cd frontend
 
-# For current architecture
-go build -o server ./cmd/server
+# Ensure macOS is enabled
+flutter config --enable-macos-desktop
 
-# For Intel (x86_64)
-GOARCH=amd64 go build -o server-intel ./cmd/server
-
-# For Apple Silicon (arm64)
-GOARCH=arm64 go build -o server-arm64 ./cmd/server
+# Install CocoaPods dependencies
+cd macos
+pod install
+cd ..
 ```
 
 ### **Step 3: Build Flutter Frontend**
@@ -77,14 +74,10 @@ flutter build macos --release
 
 ### **Step 4: Create App Bundle**
 ```bash
-# Copy Flutter app
+# Copy Flutter app bundle to distribution
 cp -r frontend/build/macos/Build/Products/Release/Cred\ Manager.app dist/
 
-# Copy Go backend
-cp backend/server dist/Cred\ Manager.app/Contents/MacOS/
-
-# Create startup script
-# (Handled by build script)
+# App bundle is complete and self-contained with encrypted SQLite storage
 ```
 
 ## 📦 **Creating Professional Distribution**
@@ -161,21 +154,23 @@ xattr -rd com.apple.quarantine "Cred Manager.app"
 # Or right-click and select "Open"
 ```
 
-**❌ Go build fails**
+**❌ CocoaPods issues**
 ```bash
-# Check architecture
-uname -m  # Should show arm64 or x86_64
+# Update CocoaPods
+sudo gem install cocoapods
 
-# Build for correct architecture
-GOARCH=arm64 go build -o server ./cmd/server
+# Clean and reinstall pods
+cd frontend/macos
+rm -rf Pods Podfile.lock
+pod install
 ```
 
 ## 📋 **Package Contents Checklist**
 
 ### **✅ Must Include:**
-- [ ] Go backend server binary
-- [ ] Flutter app bundle (.app)
-- [ ] Startup script
+- [ ] Flutter app bundle (.app) with encrypted SQLite storage
+- [ ] All required frameworks and libraries
+- [ ] Application assets and resources
 - [ ] Configuration files
 - [ ] Database migrations
 - [ ] Icon files
@@ -277,9 +272,9 @@ log stream --predicate 'process == "Cred Manager"'
 ## 🎉 **Success Checklist**
 
 - [ ] App bundle builds without errors
-- [ ] Both Go backend and Flutter frontend included
-- [ ] Startup script launches both components
-- [ ] macOS integration works (Dock, menus)
+- [ ] Application launches and runs correctly
+- [ ] Encrypted database storage works
+- [ ] macOS integration works (Dock, menus, notifications)
 - [ ] Application functions completely
 - [ ] Works on target macOS versions
 - [ ] Code signing works (if enabled)

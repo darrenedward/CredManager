@@ -6,13 +6,32 @@ import 'screens/recovery_screen.dart';
 import 'screens/reset_passphrase_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/main_dashboard_screen.dart';
+import 'screens/theme_test_screen.dart';
 import 'models/auth_state.dart';
+import 'models/dashboard_state.dart';
 import 'utils/constants.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthState()),
+        ChangeNotifierProxyProvider<AuthState, DashboardState>(
+          create: (context) => DashboardState(
+            Provider.of<AuthState>(context, listen: false).credentialStorage,
+          ),
+          update: (context, authState, dashboardState) {
+            // Update dashboard state when auth state changes
+            if (authState.hasValidSession) {
+              // User logged in - ensure dashboard has access to credential storage
+              return dashboardState ?? DashboardState(authState.credentialStorage);
+            } else {
+              // User logged out - return new dashboard state
+              return DashboardState(authState.credentialStorage);
+            }
+          },
+        ),
+      ],
       child: const ApiKeyManagerApp(),
     ),
   );
@@ -26,23 +45,33 @@ class ApiKeyManagerApp extends StatelessWidget {
     return MaterialApp(
       title: AppConstants.appName,
       theme: ThemeData(
-        primaryColor: AppConstants.primaryColor,
-        primarySwatch: const MaterialColor(
-          0xFF0f172a,
-          <int, Color>{
-            50: Color(0xFFF1F5F9),
-            100: Color(0xFFE2E8F0),
-            200: Color(0xFFCBD5E1),
-            300: Color(0xFF94A3B8),
-            400: Color(0xFF64748B),
-            500: Color(0xFF0f172a),
-            600: Color(0xFF0F172A),
-            700: Color(0xFF0F172A),
-            800: Color(0xFF0F172A),
-            900: Color(0xFF0F172A),
-          },
-        ),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppConstants.primarySeed,
+          secondary: AppConstants.secondarySeed,
+          brightness: Brightness.light,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppConstants.surfaceColor,
+          foregroundColor: AppConstants.primaryColor,
+          elevation: 0,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppConstants.primaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        cardTheme: CardThemeData(
+          color: AppConstants.surfaceColor,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
       home: const AuthWrapper(),
       routes: {
@@ -52,6 +81,7 @@ class ApiKeyManagerApp extends StatelessWidget {
         '/reset-passphrase': (context) => const ResetPassphraseScreen(recoveryToken: ''),
         '/settings': (context) => const SettingsScreen(),
         '/dashboard': (context) => const MainDashboardScreen(),
+        '/theme-test': (context) => const ThemeTestScreen(),
       },
     );
   }

@@ -171,10 +171,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.security,
               size: 80,
-              color: Colors.orange,
+              color: AppConstants.accentColor,
             ),
             const SizedBox(height: 20),
             const Text(

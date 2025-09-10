@@ -266,9 +266,9 @@ idevicesyslog
 ## 📋 **Package Contents Checklist**
 
 ### **✅ Must Include:**
-- [ ] Flutter iOS app
-- [ ] Go backend (if iOS version needed)
-- [ ] Proper code signing
+- [ ] Flutter iOS app with encrypted SQLite storage
+- [ ] Proper code signing for App Store distribution
+- [ ] All required iOS frameworks and permissions
 - [ ] App icons (all sizes)
 - [ ] Launch screen
 - [ ] Info.plist configured
@@ -394,8 +394,8 @@ xcrun simctl launch booted com.yourcompany.credmanager
 - [ ] App builds without errors for iOS
 - [ ] Code signing works correctly
 - [ ] App installs and runs on target devices
-- [ ] Both Go backend and Flutter frontend work (if applicable)
-- [ ] Network calls succeed
+- [ ] Encrypted database storage works correctly
+- [ ] Authentication and credential management functional
 - [ ] UI displays correctly on different screen sizes
 - [ ] App handles iOS lifecycle properly
 - [ ] App Store Connect requirements met

@@ -1,249 +1,260 @@
-# Cred Manager Platform Builds
+# Credential Manager - Platform Builds
 
-## 🏗️ **Clean Project Structure**
+## 🏗️ **Project Structure**
 
 ```
 APIKeyManager/
-├── backend/           # Go backend server
-├── frontend/          # Flutter frontend
-├── platforms/         # Platform-specific builds ⭐
+├── frontend/          # Flutter application with encrypted SQLite storage
+├── platforms/         # Platform-specific builds & deployment ⭐
+│   ├── build_all.sh   # Master build script for all platforms
 │   ├── linux/
-│   │   ├── docs/      # Linux documentation
-│   │   ├── builds/    # Build artifacts & configs
-│   │   ├── binaries/  # Compiled binaries
-│   │   └── scripts/   # Build scripts
+│   │   ├── docs/      # Linux documentation & deployment guides
+│   │   ├── builds/    # Build artifacts & release packages
+│   │   ├── binaries/  # Final executables & installers
+│   │   └── scripts/   # Platform-specific build scripts
 │   ├── windows/
-│   │   ├── docs/      # Windows documentation
-│   │   ├── builds/    # Build artifacts & configs
-│   │   ├── binaries/  # Compiled binaries
-│   │   └── scripts/   # Build scripts
+│   │   ├── docs/      # Windows documentation & deployment guides
+│   │   ├── builds/    # Build artifacts & release packages
+│   │   ├── binaries/  # Final executables & installers
+│   │   └── scripts/   # Platform-specific build scripts
 │   ├── macos/
-│   │   ├── docs/      # macOS documentation
-│   │   ├── builds/    # Build artifacts & configs
-│   │   ├── binaries/  # Compiled binaries
-│   │   └── scripts/   # Build scripts
+│   │   ├── docs/      # macOS documentation & deployment guides
+│   │   ├── builds/    # Build artifacts & release packages
+│   │   ├── binaries/  # Final executables & installers
+│   │   └── scripts/   # Platform-specific build scripts
 │   ├── iphone/
-│   │   ├── docs/      # iOS documentation
-│   │   ├── builds/    # Build artifacts & configs
-│   │   ├── binaries/  # Compiled binaries
-│   │   └── scripts/   # Build scripts
+│   │   ├── docs/      # iOS documentation & deployment guides
+│   │   ├── builds/    # Build artifacts & release packages
+│   │   ├── binaries/  # Final executables & installers
+│   │   └── scripts/   # Platform-specific build scripts
 │   └── android/
-│       ├── docs/      # Android documentation
-│       ├── builds/    # Build artifacts & configs
-│       ├── binaries/  # Compiled binaries
-│       └── scripts/   # Build scripts
+│       ├── docs/      # Android documentation & deployment guides
+│       ├── builds/    # Build artifacts & release packages
+│       ├── binaries/  # Final executables & installers
+│       └── scripts/   # Platform-specific build scripts
 └── docs/             # General documentation
 ```
 
-## 🚨 **CRITICAL: Complete Package Requirements**
+## � **Architecture: Local-Only Encrypted Credential Manager**
 
-**❌ WRONG:** Previous builds only included Flutter frontend
-**✅ CORRECT:** Each package must include BOTH:
+**✅ CURRENT ARCHITECTURE:** Self-contained Flutter application with:
 
-1. **Go Backend Server** - API, authentication, database
-2. **Flutter Frontend** - GUI application
-3. **Startup Script** - Launches both components
-4. **Configuration** - Proper paths and ports
+1. **Encrypted SQLite Database** - Local storage with AES-256-GCM encryption
+2. **Argon2 Key Derivation** - Secure passphrase-based encryption keys
+3. **Cross-Platform Support** - Single codebase for all platforms
+4. **No Network Dependencies** - Completely offline, local-only operation
 
-### **Why Previous Builds Failed:**
-- Flutter app calls `http://localhost:8080/api` for backend
-- Without Go server running, app shows connection errors
-- Users get broken, non-functional application
+### **Security Features:**
+- All credentials encrypted at rest using military-grade encryption
+- Zero plaintext storage of sensitive data
+- Secure memory handling and key lifecycle management
+- No network communication required (similar to KeePass model)
 
-## 🛠️ **Building Complete Packages**
+## 🛠️ **Building for All Platforms**
 
-### **Step 1: Build Go Backend**
+### **Quick Start - Build All Platforms**
 ```bash
-# Build Go server for target platform
-cd backend
-GOOS=linux GOARCH=amd64 go build -o server ./cmd/server  # Linux
-GOOS=windows GOARCH=amd64 go build -o server.exe ./cmd/server  # Windows
-GOOS=darwin GOARCH=amd64 go build -o server ./cmd/server  # macOS Intel
-GOOS=darwin GOARCH=arm64 go build -o server-arm64 ./cmd/server  # macOS Apple Silicon
+# From the platforms directory
+./build_all.sh
+
+# Or build specific platforms
+./build_all.sh --linux --android
+./build_all.sh --windows
+./build_all.sh --macos --ios
 ```
 
-### **Step 2: Build Flutter Frontend**
+### **Manual Platform Builds**
 ```bash
-# Build Flutter for target platform
-cd frontend
-flutter build linux --release   # Linux
-flutter build windows --release # Windows (on Windows)
-flutter build macos --release   # macOS (on macOS)
+# Linux
+./linux/scripts/build.sh
+
+# Windows (run on Windows or with Wine)
+./windows/scripts/build.bat
+
+# macOS (requires macOS)
+./macos/scripts/build.sh
+
+# Android
+./android/scripts/build.sh
+
+# iOS (requires macOS + Xcode)
+./iphone/scripts/build.sh
 ```
 
-### **Step 3: Create Complete Package**
-Each platform needs:
-- Go backend binary
-- Flutter frontend binary/bundle
-- Startup script that launches both
-- Configuration files
-- Desktop integration (shortcuts, icons)
-
-## 📦 **Platform-Specific Instructions**
-
-### **Linux (.deb Package)**
+### **Build Output Structure**
+Each build creates timestamped releases:
 ```
-platforms/linux/
-├── builds/
-│   ├── control/           # DEB control files
-│   ├── postinst           # Post-install script
-│   └── prerm             # Pre-remove script
-├── scripts/
-│   ├── build_deb.sh      # Build complete DEB
-│   └── create_package.sh # Package creation
-└── binaries/
-    ├── cred-manager      # Flutter binary
-    ├── cred-manager-server # Go server
-    └── startup.sh        # Launch script
+platforms/[platform]/builds/
+├── release_20240310_143022/    # Timestamped build
+│   ├── [platform_files]       # Platform-specific executables
+│   └── build_info.txt         # Build metadata
+└── latest -> release_20240310_143022/  # Symlink to latest
 ```
 
-### **Windows (.exe + Installer)**
+## 📦 **Platform-Specific Outputs**
+
+### **Linux (Executable Bundle)**
 ```
-platforms/windows/
-├── builds/
-│   ├── installer.iss     # Inno Setup script
-│   └── nsis/            # NSIS installer files
-├── scripts/
-│   ├── build_windows.ps1 # PowerShell build
-│   └── create_installer.ps1 # Installer creation
-└── binaries/
-    ├── CredManager.exe   # Flutter exe
-    ├── server.exe        # Go server
-    └── startup.bat       # Launch script
+platforms/linux/builds/release_[timestamp]/
+├── cred_manager                    # Main executable
+├── lib/                           # Flutter engine libraries
+├── data/                          # Flutter assets & resources
+└── build_info.txt                 # Build metadata
 ```
 
-### **macOS (.app + .dmg)**
+### **Windows (Executable Bundle)**
 ```
-platforms/macos/
-├── builds/
-│   ├── app_template/     # App bundle template
-│   └── dmg_config/      # DMG creation config
-├── scripts/
-│   ├── build_app.sh     # Create .app bundle
-│   └── create_dmg.sh    # Create DMG installer
-└── binaries/
-    ├── Cred Manager.app/ # Complete app bundle
-    ├── server           # Go server
-    └── startup.sh       # Launch script
+platforms/windows/builds/release_[timestamp]/
+├── cred_manager.exe               # Main executable
+├── flutter_windows.dll           # Flutter engine
+├── data/                          # Flutter assets & resources
+└── build_info.txt                # Build metadata
+```
+
+### **macOS (App Bundle)**
+```
+platforms/macos/builds/release_[timestamp]/
+├── Cred Manager.app/              # Complete macOS app bundle
+│   ├── Contents/
+│   │   ├── MacOS/cred_manager     # Executable
+│   │   ├── Frameworks/            # Flutter framework
+│   │   └── Resources/             # App resources
+└── build_info.txt                # Build metadata
+```
+
+### **Android (APK + App Bundle)**
+```
+platforms/android/builds/release_[timestamp]/
+├── cred_manager_[timestamp].apk   # Android APK for sideloading
+├── cred_manager_[timestamp].aab   # App Bundle for Play Store
+└── build_info.txt                # Build metadata
+```
+
+### **iOS (App Bundle)**
+```
+platforms/iphone/builds/release_[timestamp]/
+├── Runner.app/                    # iOS app bundle (unsigned)
+└── build_info.txt                # Build metadata
 ```
 
 ## 🚀 **Quick Start Guide**
 
-### **For Linux:**
+### **Build All Platforms (Recommended):**
 ```bash
-# 1. Build Go backend
-cd backend && go build -o server ./cmd/server
-
-# 2. Build Flutter frontend
-cd frontend && flutter build linux --release
-
-# 3. Create complete package
-cd platforms/linux/scripts
-./build_deb.sh
+cd platforms
+./build_all.sh
 ```
 
-### **For Windows (on Windows):**
-```powershell
-# 1. Build Go backend
-cd backend
-$env:GOOS="windows"; $env:GOARCH="amd64"; go build -o server.exe ./cmd/server
-
-# 2. Build Flutter frontend
-cd frontend
-flutter build windows --release
-
-# 3. Create complete package
-cd platforms\windows\scripts
-.\build_windows.ps1
-```
-
-### **For macOS (on macOS):**
+### **Build Specific Platform:**
 ```bash
-# 1. Build Go backend
-cd backend && go build -o server ./cmd/server
+cd platforms
 
-# 2. Build Flutter frontend
-cd frontend && flutter build macos --release
+# Linux
+./linux/scripts/build.sh
 
-# 3. Create complete package
-cd platforms/macos/scripts
-./build_app.sh
+# Windows (requires Windows or Wine)
+./windows/scripts/build.bat
+
+# macOS (requires macOS)
+./macos/scripts/build.sh
+
+# Android
+./android/scripts/build.sh
+
+# iOS (requires macOS + Xcode)
+./iphone/scripts/build.sh
 ```
 
-## 📋 **Package Contents Checklist**
+### **Prerequisites:**
+- **Flutter SDK** (3.10.0 or higher)
+- **Platform-specific tools:**
+  - Linux: Standard build tools
+  - Windows: Visual Studio Build Tools
+  - macOS: Xcode Command Line Tools
+  - Android: Android SDK
+  - iOS: Xcode (macOS only)
 
-### **✅ Must Include:**
-- [ ] Go backend server binary
-- [ ] Flutter frontend binary/bundle
-- [ ] Startup script (launches both)
-- [ ] Configuration files
-- [ ] Database migration files
-- [ ] Desktop shortcuts/icons
-- [ ] Uninstaller (optional)
+## 📋 **Build Verification Checklist**
 
-### **✅ Must Configure:**
-- [ ] Correct API endpoints
-- [ ] Database paths
-- [ ] Port configurations
-- [ ] File permissions
-- [ ] Auto-startup (optional)
+### **✅ Build Artifacts:**
+- [ ] Platform-specific executable created
+- [ ] Flutter engine libraries included
+- [ ] App assets and resources bundled
+- [ ] Build metadata generated
+- [ ] Timestamped build directory created
+- [ ] Latest symlink updated
+
+### **✅ Functionality Test:**
+- [ ] Application launches successfully
+- [ ] Authentication system works
+- [ ] Database encryption functional
+- [ ] CRUD operations for credentials work
+- [ ] Export/import functionality works
+- [ ] UI responsive and functional
 
 ## 🔧 **Common Issues & Solutions**
 
-### **Connection Refused Errors:**
-- **Problem:** Flutter can't connect to Go server
-- **Solution:** Ensure startup script launches Go server first
-- **Check:** `netstat -tlnp | grep 8080`
+### **Build Failures:**
+- **Problem:** Flutter build fails
+- **Solution:** Ensure Flutter SDK is properly installed and updated
+- **Check:** `flutter doctor -v`
 
 ### **Permission Denied:**
-- **Problem:** Can't execute binaries
-- **Solution:** Set proper permissions in package
-- **Fix:** `chmod +x /usr/bin/cred-manager*`
+- **Problem:** Can't execute build scripts
+- **Solution:** Make scripts executable
+- **Fix:** `chmod +x platforms/*/scripts/*.sh`
 
-### **Missing Dependencies:**
-- **Problem:** Go server needs certain libraries
-- **Solution:** Use static linking or include dependencies
-- **Check:** `ldd server` (Linux) or `otool -L server` (macOS)
+### **Missing Platform Tools:**
+- **Problem:** Platform-specific build tools not found
+- **Solution:** Install required development tools for target platform
+- **Check:** Platform-specific documentation in each platform's docs/ folder
 
-## 🎯 **Testing Complete Packages**
+### **Database Issues:**
+- **Problem:** SQLite database errors
+- **Solution:** Ensure proper file permissions and storage paths
+- **Check:** Application logs and database file accessibility
+
+## 🎯 **Testing Built Applications**
 
 ### **Test Checklist:**
-1. **Install package** on clean system
-2. **Launch application** from desktop/menu
-3. **Verify backend starts** (check port 8080)
-4. **Test login functionality**
-5. **Test all features** (projects, keys, settings)
-6. **Test uninstall** (if applicable)
+1. **Launch application** - Verify executable starts correctly
+2. **Test authentication** - Create account and login
+3. **Test encryption** - Verify data is encrypted in database
+4. **Test CRUD operations** - Create, read, update, delete credentials
+5. **Test export/import** - Verify data portability
+6. **Test UI responsiveness** - Check all screens and interactions
 
 ### **Debug Commands:**
 ```bash
-# Check if backend is running
-curl http://localhost:8080/api/health
+# Check application processes
+ps aux | grep cred_manager
 
-# Check processes
-ps aux | grep cred-manager
+# Check database file (should be encrypted)
+file ~/.local/share/cred_manager/database.db
 
-# Check logs
-tail -f /var/log/cred-manager.log
+# Check application logs (if available)
+tail -f ~/.local/share/cred_manager/logs/app.log
 ```
 
-## 📤 **Distribution Ready**
+## 📤 **Distribution Ready Builds**
 
-Once built, each platform will have:
-- **Linux:** `cred-manager_1.0.0_amd64.deb`
-- **Windows:** `CredManager-Setup-1.0.0.exe`
-- **macOS:** `CredManager-macOS-1.0.0.dmg`
+After successful builds, you'll have:
+- **Linux:** `platforms/linux/builds/latest/` - Executable bundle
+- **Windows:** `platforms/windows/builds/latest/` - Executable bundle
+- **macOS:** `platforms/macos/builds/latest/` - App bundle
+- **Android:** `platforms/android/builds/latest/` - APK and App Bundle
+- **iOS:** `platforms/iphone/builds/latest/` - App bundle (unsigned)
 
-**These packages will be COMPLETE and FUNCTIONAL!** 🎉
+**These builds are COMPLETE, SECURE, and FUNCTIONAL!** 🎉
 
 ---
 
 ## 🚨 **Important Notes**
 
-1. **Always build both components** - Go backend + Flutter frontend
-2. **Test on clean systems** - Don't assume dependencies
-3. **Include startup scripts** - Users shouldn't need to manually start services
-4. **Configure paths correctly** - Use relative paths in packages
-5. **Test thoroughly** - Complete user journey from install to use
+1. **Local-only operation** - No network dependencies or server requirements
+2. **Encrypted storage** - All sensitive data encrypted with AES-256-GCM
+3. **Cross-platform** - Single codebase builds for all platforms
+4. **Self-contained** - No external dependencies beyond Flutter runtime
+5. **Test thoroughly** - Verify encryption and data persistence
 
-**Now we build COMPLETE, WORKING applications!** ✨
+**Production-ready encrypted credential manager!** ✨

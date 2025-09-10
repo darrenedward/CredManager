@@ -1,10 +1,55 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:api_key_manager/services/auth_service.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late AuthService authService;
 
   setUp(() {
+    // Mock method channels for flutter_secure_storage
+    const MethodChannel secureStorageChannel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+      secureStorageChannel,
+      (MethodCall methodCall) async {
+        switch (methodCall.method) {
+          case 'read':
+            return null; // Return null for reads in tests
+          case 'write':
+            return null; // Mock successful write
+          case 'delete':
+            return null; // Mock successful delete
+          case 'deleteAll':
+            return null; // Mock successful deleteAll
+          default:
+            return null;
+        }
+      },
+    );
+
+    // Mock method channels for shared_preferences
+    const MethodChannel sharedPrefsChannel = MethodChannel('plugins.flutter.io/shared_preferences');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+      sharedPrefsChannel,
+      (MethodCall methodCall) async {
+        switch (methodCall.method) {
+          case 'getAll':
+            return {}; // Return empty map for getAll
+          case 'setBool':
+            return true; // Mock successful setBool
+          case 'setString':
+            return true; // Mock successful setString
+          case 'remove':
+            return true; // Mock successful remove
+          case 'clear':
+            return true; // Mock successful clear
+          default:
+            return null;
+        }
+      },
+    );
+
     // We'll test the AuthService methods directly since they're now local
     authService = AuthService();
   });

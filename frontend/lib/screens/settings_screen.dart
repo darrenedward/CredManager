@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'dart:io';
 import '../models/auth_state.dart';
+import '../models/dashboard_state.dart';
 import '../utils/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -99,6 +103,210 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  List<Map<String, dynamic>> _getProjectsData() {
+    try {
+      final dashboardState = Provider.of<DashboardState>(context, listen: false);
+      return dashboardState.projects.map((p) => p.toJson()).toList();
+    } catch (e) {
+      print('Error getting projects data for export: $e');
+      return [];
+    }
+  }
+
+  List<Map<String, dynamic>> _getAiServicesData() {
+    try {
+      final dashboardState = Provider.of<DashboardState>(context, listen: false);
+      return dashboardState.aiServices.map((s) => s.toJson()).toList();
+    } catch (e) {
+      print('Error getting AI services data for export: $e');
+      return [];
+    }
+  }
+
+  Future<void> _exportData() async {
+    try {
+      // Create export data structure
+      final exportData = {
+        'version': '1.0',
+        'exportDate': DateTime.now().toIso8601String(),
+        'appName': AppConstants.appName,
+        'settings': {
+          'sessionTimeout': _selectedTimeout,
+          'biometricEnabled': _biometricEnabled,
+          'autoLockEnabled': _autoLockEnabled,
+          'passwordLength': _passwordLength,
+          'includeUppercase': _includeUppercase,
+          'includeLowercase': _includeLowercase,
+          'includeNumbers': _includeNumbers,
+          'includeSymbols': _includeSymbols,
+          'avoidAmbiguous': _avoidAmbiguous,
+          'minPassphraseLength': _minPassphraseLength,
+          'requireUppercase': _requireUppercase,
+          'requireLowercase': _requireLowercase,
+          'requireNumbers': _requireNumbers,
+          'requireSymbols': _requireSymbols,
+          'enableBackupPhrase': _enableBackupPhrase,
+          'autoBackup': _autoBackup,
+          'backupFrequency': _backupFrequency,
+          'darkMode': _darkMode,
+          'showWelcomeScreen': _showWelcomeScreen,
+          'autoCopyPasswords': _autoCopyPasswords,
+          'showPasswordStrength': _showPasswordStrength,
+          'enableQuickActions': _enableQuickActions,
+          'maxRecentItems': _maxRecentItems,
+        },
+        'projects': _getProjectsData(),
+        'aiServices': _getAiServicesData(),
+      };
+
+      // Convert to JSON
+      final jsonString = const JsonEncoder.withIndent('  ').convert(exportData);
+
+      // Copy to clipboard for now (in a real app, you'd save to file)
+      await Clipboard.setData(ClipboardData(text: jsonString));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Expanded(child: Text('Data exported to clipboard! Paste into a text file to save.')),
+              ],
+            ),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _importData() async {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Import Data'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Paste your exported JSON data below:'),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  maxLines: 10,
+                  decoration: const InputDecoration(
+                    hintText: 'Paste JSON data here...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  final jsonData = jsonDecode(controller.text);
+                  await _processImportData(jsonData);
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Import failed: Invalid JSON format'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Import'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _processImportData(Map<String, dynamic> data) async {
+    try {
+      // Validate data structure
+      if (data['version'] == null || data['settings'] == null) {
+        throw Exception('Invalid data format');
+      }
+
+      // Import settings
+      final settings = data['settings'] as Map<String, dynamic>;
+      setState(() {
+        _selectedTimeout = settings['sessionTimeout'] ?? _selectedTimeout;
+        _biometricEnabled = settings['biometricEnabled'] ?? _biometricEnabled;
+        _autoLockEnabled = settings['autoLockEnabled'] ?? _autoLockEnabled;
+        _passwordLength = settings['passwordLength'] ?? _passwordLength;
+        _includeUppercase = settings['includeUppercase'] ?? _includeUppercase;
+        _includeLowercase = settings['includeLowercase'] ?? _includeLowercase;
+        _includeNumbers = settings['includeNumbers'] ?? _includeNumbers;
+        _includeSymbols = settings['includeSymbols'] ?? _includeSymbols;
+        _avoidAmbiguous = settings['avoidAmbiguous'] ?? _avoidAmbiguous;
+        _minPassphraseLength = settings['minPassphraseLength'] ?? _minPassphraseLength;
+        _requireUppercase = settings['requireUppercase'] ?? _requireUppercase;
+        _requireLowercase = settings['requireLowercase'] ?? _requireLowercase;
+        _requireNumbers = settings['requireNumbers'] ?? _requireNumbers;
+        _requireSymbols = settings['requireSymbols'] ?? _requireSymbols;
+        _enableBackupPhrase = settings['enableBackupPhrase'] ?? _enableBackupPhrase;
+        _autoBackup = settings['autoBackup'] ?? _autoBackup;
+        _backupFrequency = settings['backupFrequency'] ?? _backupFrequency;
+        _darkMode = settings['darkMode'] ?? _darkMode;
+        _showWelcomeScreen = settings['showWelcomeScreen'] ?? _showWelcomeScreen;
+        _autoCopyPasswords = settings['autoCopyPasswords'] ?? _autoCopyPasswords;
+        _showPasswordStrength = settings['showPasswordStrength'] ?? _showPasswordStrength;
+        _enableQuickActions = settings['enableQuickActions'] ?? _enableQuickActions;
+        _maxRecentItems = settings['maxRecentItems'] ?? _maxRecentItems;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Settings imported successfully!'),
+              ],
+            ),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Import failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _showClearDataDialog() {
     showDialog(
       context: context,
@@ -120,7 +328,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Data clearing not yet implemented'),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: Colors.amber,
                   ),
                 );
               },
@@ -139,12 +347,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text(
           'Settings',
-          style: TextStyle(color: AppConstants.primaryColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
-        backgroundColor: AppConstants.surfaceColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: Container(
-        color: AppConstants.backgroundColor,
+        color: Theme.of(context).colorScheme.background,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
@@ -154,6 +362,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Security Settings',
               'Configure security preferences and authentication',
               Icons.security,
+              AppConstants.supportIconColor1,
               [
                 _buildSettingItem(
                   'Session Timeout',
@@ -185,6 +394,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Passphrase Requirements',
               'Set security requirements for passphrases',
               Icons.vpn_key,
+              AppConstants.supportIconColor2,
               [
                 _buildSliderSetting(
                   'Minimum Length',
@@ -233,6 +443,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Password Generation',
               'Configure default settings for password generation',
               Icons.password,
+              AppConstants.supportIconColor3,
               [
                 _buildSliderSetting(
                   'Default Length',
@@ -288,6 +499,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Appearance & Experience',
               'Customize the app look and behavior',
               Icons.palette,
+              AppConstants.supportIconColor4,
               [
                 _buildSwitchSetting(
                   'Dark Mode',
@@ -343,6 +555,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Backup & Recovery',
               'Configure data backup and recovery options',
               Icons.backup,
+              AppConstants.supportIconColor5,
               [
                 _buildSwitchSetting(
                   'Enable Backup Phrase',
@@ -372,7 +585,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   title: const Text('Generate Recovery Code'),
                   subtitle: const Text('Create a one-time recovery code'),
-                  leading: Icon(Icons.vpn_key, color: AppConstants.accentColor),
+                  leading: Icon(Icons.vpn_key, color: AppConstants.supportIconColor2),
                   onTap: () {
                     // TODO: Implement recovery code generation
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -391,29 +604,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Data Management',
               'Import, export, and manage your data',
               Icons.storage,
+              AppConstants.supportIconColor1,
               [
                 ListTile(
                   title: const Text('Export Data'),
-                  subtitle: const Text('Export all your data as JSON'),
-                  leading: Icon(Icons.download, color: AppConstants.primaryColor),
-                  onTap: () {
-                    // TODO: Implement export functionality
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Export functionality coming soon')),
-                    );
-                  },
+                  subtitle: const Text('Export all your settings as JSON'),
+                  leading: Icon(Icons.download, color: Theme.of(context).colorScheme.secondary),
+                  onTap: _exportData,
                 ),
                 const Divider(),
                 ListTile(
                   title: const Text('Import Data'),
-                  subtitle: const Text('Import data from JSON file'),
-                  leading: Icon(Icons.upload, color: AppConstants.secondaryColor),
-                  onTap: () {
-                    // TODO: Implement import functionality
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Import functionality coming soon')),
-                    );
-                  },
+                  subtitle: const Text('Import settings from JSON data'),
+                  leading: Icon(Icons.upload, color: Theme.of(context).colorScheme.secondary),
+                  onTap: _importData,
                 ),
                 const Divider(),
                 ListTile(
@@ -434,8 +638,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _saveSettings,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.primaryColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -470,7 +674,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: AppConstants.primaryColor,
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -478,7 +682,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildCard(List<Widget> children) {
     return Card(
       elevation: 2,
-      color: AppConstants.surfaceColor,
+      color: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -488,12 +692,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildExpandableCard(String key, String title, String subtitle, IconData icon, List<Widget> children) {
+  Widget _buildExpandableCard(String key, String title, String subtitle, IconData icon, Color iconColor, List<Widget> children) {
     final isExpanded = _expandedCard == key;
 
     return Card(
       elevation: isExpanded ? 4 : 2,
-      color: AppConstants.surfaceColor,
+      color: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -513,7 +717,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Icon(
                     icon,
-                    color: AppConstants.primaryColor,
+                    color: iconColor,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
@@ -526,7 +730,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppConstants.primaryColor,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         if (subtitle.isNotEmpty) ...[
@@ -535,7 +739,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             subtitle,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -544,7 +748,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   Icon(
                     isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                    color: AppConstants.primaryColor,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                 ],
               ),
@@ -576,7 +780,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppConstants.primaryColor,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           if (subtitle.isNotEmpty) ...[
@@ -585,7 +789,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -603,19 +807,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: AppConstants.primaryColor,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
       subtitle: Text(
         subtitle,
         style: TextStyle(
           fontSize: 14,
-          color: Colors.grey[600],
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
       value: value,
       onChanged: onChanged,
-      activeColor: AppConstants.secondaryColor,
+      activeColor: Theme.of(context).colorScheme.secondary,
     );
   }
 
@@ -631,13 +835,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: AppConstants.primaryColor,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: AppConstants.primaryColor.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
@@ -645,7 +849,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: AppConstants.primaryColor,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
             ),
@@ -657,7 +861,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -668,8 +872,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           max: max,
           divisions: (max - min).toInt(),
           onChanged: onChanged,
-          activeColor: AppConstants.secondaryColor,
-          inactiveColor: AppConstants.secondaryColor.withOpacity(0.3),
+          activeColor: Theme.of(context).colorScheme.secondary,
+          inactiveColor: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
         ),
       ],
     );
@@ -692,7 +896,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return RadioListTile<int>(
           title: Text(
             label,
-            style: TextStyle(color: AppConstants.primaryColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           value: value,
           groupValue: _selectedTimeout,
@@ -703,7 +907,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _selectedTimeout = value!;
                   });
                 },
-          activeColor: AppConstants.secondaryColor,
+          activeColor: Theme.of(context).colorScheme.secondary,
         );
       }).toList(),
     );

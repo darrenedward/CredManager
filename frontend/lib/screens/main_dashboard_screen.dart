@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
 import '../models/auth_state.dart';
+import '../models/dashboard_state.dart';
+import '../models/project.dart';
+import '../models/ai_service.dart';
 import '../utils/constants.dart';
 import 'settings_screen.dart';
 import 'support_screen.dart';
@@ -35,52 +38,21 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   // Track editing state (key id -> editing state)
   final Map<String, bool> _editingKeys = {};
 
-  // Data for projects - each project has a list of keys
-  final Map<String, Map<String, dynamic>> _projects = {
-    '1': {
-      'id': '1',
-      'name': 'E-commerce Platform',
-      'lastModified': DateTime.now().subtract(const Duration(hours: 2)),
-      'keys': [
-        {'id': '1-1', 'name': 'Database Connection String', 'value': 'postgresql://user:pass@host:5432/db', 'type': 'connection_string', 'lastModified': DateTime.now().subtract(const Duration(hours: 3))},
-        {'id': '1-2', 'name': 'Admin Password', 'value': 'supersecretpassword123', 'type': 'password', 'lastModified': DateTime.now().subtract(const Duration(hours: 1))},
-        {'id': '1-3', 'name': 'API Endpoint', 'value': 'https://api.myproject.com/v1', 'type': 'url', 'lastModified': DateTime.now().subtract(const Duration(minutes: 30))},
-      ]
-    },
-    '2': {
-      'id': '2',
-      'name': 'Mobile App Backend',
-      'lastModified': DateTime.now().subtract(const Duration(hours: 5)),
-      'keys': [
-        {'id': '2-1', 'name': 'Firebase API Key', 'value': 'AIzaSyB1234567890', 'type': 'api_key', 'lastModified': DateTime.now().subtract(const Duration(hours: 4))},
-        {'id': '2-2', 'name': 'Database Password', 'value': 'mobileappsecret', 'type': 'password', 'lastModified': DateTime.now().subtract(const Duration(hours: 2))},
-      ]
-    },
-  };
-
-  // Data for AI services - each service has API key information
-  final Map<String, Map<String, dynamic>> _aiServices = {
-    '1': {
-      'id': '1',
-      'name': 'OpenAI',
-      'lastModified': DateTime.now().subtract(const Duration(hours: 1)),
-      'keys': [
-        {'id': '1-1', 'name': 'API Key', 'value': 'sk-abcdefghijklmnopqrstuvwxyz1234567890', 'type': 'api_key', 'lastModified': DateTime.now().subtract(const Duration(hours: 1))},
-      ]
-    },
-    '2': {
-      'id': '2',
-      'name': 'Anthropic',
-      'lastModified': DateTime.now().subtract(const Duration(hours: 6)),
-      'keys': [
-        {'id': '2-1', 'name': 'API Key', 'value': 'claude-sk-abcdefghijklmnopqrstuvwxyz', 'type': 'api_key', 'lastModified': DateTime.now().subtract(const Duration(hours: 6))},
-      ]
-    },
-  };
+  @override
+  void initState() {
+    super.initState();
+    // Load data when the screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dashboardState = Provider.of<DashboardState>(context, listen: false);
+      dashboardState.loadData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Consumer2<AuthState, DashboardState>(
+      builder: (context, authState, dashboardState, child) {
+        return Scaffold(
       body: Column(
         children: [
           // Full-width header
@@ -120,6 +92,13 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 ),
                 const Spacer(),
                 IconButton(
+                  icon: const Icon(Icons.palette, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/theme-test');
+                  },
+                  tooltip: 'Theme Test',
+                ),
+                IconButton(
                   icon: const Icon(Icons.logout, color: Colors.white),
                   onPressed: () {
                     final authState = Provider.of<AuthState>(context, listen: false);
@@ -141,7 +120,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       // Full-height sidebar
                       Container(
                         width: 250,
-                        color: Colors.white,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppConstants.primaryColor, // Navy blue at top
+                              AppConstants.primaryColor.withValues(alpha: 0.95), // Slightly lighter navy at bottom
+                            ],
+                          ),
+                        ),
                         child: Column(
                           children: [
                             // Scrollable content with structured menu
@@ -150,55 +138,49 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // OVERVIEW Section
+                                    // Dashboard Link (moved from OVERVIEW section)
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'OVERVIEW',
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: dashboardState.currentView == 'overview'
+                                              ? AppConstants.primaryColor.withValues(alpha: 0.2)
+                                              : AppConstants.primaryColor.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: dashboardState.currentView == 'overview'
+                                              ? Border.all(color: AppConstants.accentColor.withValues(alpha: 0.5), width: 1)
+                                              : null,
+                                        ),
+                                        child: ListTile(
+                                          title: Text(
+                                            'Dashboard',
                                             style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.grey,
-                                              letterSpacing: 1.5,
+                                              fontWeight: dashboardState.currentView == 'overview' ? FontWeight.w600 : FontWeight.w500,
+                                              fontSize: 15,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: _currentView == 'dashboard' ? Colors.blue[50] : Colors.transparent,
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: ListTile(
-                                              title: const Text(
-                                                'Dashboard',
-                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-                                              ),
-                                              subtitle: const Text(
-                                                'Overview & Statistics',
-                                                style: TextStyle(fontSize: 12, color: Colors.grey),
-                                              ),
-                                              leading: Icon(
-                                                Icons.dashboard,
-                                                color: _currentView == 'dashboard' ? AppConstants.primaryColor : AppConstants.primaryLight,
-                                                size: 20,
-                                              ),
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                              dense: true,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              onTap: () {
-                                                setState(() {
-                                                  _currentView = 'dashboard';
-                                                  _currentSelectedItem = null;
-                                                });
-                                              },
+                                          subtitle: Text(
+                                            'Overview & Statistics',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white.withValues(alpha: 0.8),
                                             ),
                                           ),
-                                        ],
+                                          leading: Icon(
+                                            Icons.dashboard,
+                                            color: AppConstants.accentColor,
+                                            size: 22,
+                                          ),
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          dense: true,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          onTap: () {
+                                            dashboardState.showOverview();
+                                          },
+                                        ),
                                       ),
                                     ),
 
@@ -212,48 +194,59 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                         children: [
                                           InkWell(
                                             onTap: () {
+                                              dashboardState.showProjectsOverview();
                                               setState(() {
-                                                _currentView = 'projects_overview';
-                                                _currentSelectedItem = null;
                                                 _expandedSection = _expandedSection == 'projects' ? null : 'projects';
                                               });
                                             },
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                               decoration: BoxDecoration(
-                                                color: _currentView == 'projects_overview' ? Colors.blue[50] : Colors.transparent,
-                                                borderRadius: BorderRadius.circular(6),
+                                                color: dashboardState.currentView == 'projects_overview'
+                                                    ? AppConstants.primaryColor.withValues(alpha: 0.2)
+                                                    : AppConstants.primaryColor.withValues(alpha: 0.1),
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: dashboardState.currentView == 'projects_overview'
+                                                    ? Border.all(color: AppConstants.accentColor.withValues(alpha: 0.5), width: 1)
+                                                    : null,
                                               ),
                                               child: Row(
                                                 children: [
                                                   Icon(
                                                     Icons.folder,
-                                                    size: 16,
-                                                    color: _currentView == 'projects_overview' ? AppConstants.projectIconColor : AppConstants.primaryLight,
+                                                    size: 18,
+                                                    color: dashboardState.currentView == 'projects_overview' ? AppConstants.accentColor : Colors.white.withValues(alpha: 0.8),
                                                   ),
-                                                  const SizedBox(width: 8),
-                                                  const Text(
+                                                  const SizedBox(width: 10),
+                                                  Text(
                                                     'PROJECTS',
                                                     style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w600,
                                                       letterSpacing: 1.2,
+                                                      color: dashboardState.currentView == 'projects_overview'
+                                                          ? Colors.white
+                                                          : Colors.white.withValues(alpha: 0.9),
                                                     ),
                                                   ),
-                                                  const SizedBox(width: 4),
+                                                  const SizedBox(width: 6),
                                                   Text(
-                                                    '(${_projects.length})',
+                                                    '(${dashboardState.projects.length})',
                                                     style: TextStyle(
-                                                      fontSize: 11,
-                                                      color: _currentView == 'projects_overview' ? Colors.blue[700] : Colors.grey[600],
+                                                      fontSize: 12,
+                                                      color: dashboardState.currentView == 'projects_overview'
+                                                          ? Colors.white.withValues(alpha: 0.9)
+                                                          : Colors.white.withValues(alpha: 0.7),
                                                       fontWeight: FontWeight.w500,
                                                     ),
                                                   ),
                                                   const Spacer(),
                                                   Icon(
                                                     _expandedSection == 'projects' ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                                    size: 16,
-                                                    color: Colors.grey[600],
+                                                    size: 18,
+                                                    color: dashboardState.currentView == 'projects_overview'
+                                                        ? AppConstants.accentColor
+                                                        : Colors.white.withValues(alpha: 0.8),
                                                   ),
                                                 ],
                                               ),
@@ -261,29 +254,27 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                           ),
                                           const SizedBox(height: 8),
                                           if (_expandedSection == 'projects') ...[
-                                            ..._projects.values.map((project) {
-                                              final isSelected = _currentSelectedItem == project['id'];
+                                            ...dashboardState.projects.map((project) {
+                                              final isSelected = dashboardState.currentSelectedItem == project.id;
                                               return Container(
                                                 margin: const EdgeInsets.only(bottom: 4),
                                                 decoration: BoxDecoration(
-                                                  color: isSelected ? Colors.blue[50] : Colors.transparent,
+                                                  color: isSelected ? AppConstants.accentColor.withValues(alpha: 0.15) : AppConstants.primaryColor.withValues(alpha: 0.05),
                                                   borderRadius: BorderRadius.circular(8),
+                                                  border: isSelected ? Border.all(color: AppConstants.accentColor.withValues(alpha: 0.3), width: 1) : null,
                                                 ),
                                                 child: ListTile(
                                                   title: Text(
-                                                    project['name'],
+                                                    project.name,
                                                     style: TextStyle(
                                                       fontSize: 14,
                                                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                                      color: Colors.white,
                                                     ),
-                                                  ),
-                                                  subtitle: Text(
-                                                    '${project['keys'].length} API keys',
-                                                    style: const TextStyle(fontSize: 11, color: Colors.grey),
                                                   ),
                                                   leading: Icon(
                                                     Icons.folder,
-                                                    color: isSelected ? Colors.blue[700] : Colors.blue[600],
+                                                    color: isSelected ? AppConstants.accentColor : Colors.white.withValues(alpha: 0.8),
                                                     size: 18,
                                                   ),
                                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -292,11 +283,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                                     borderRadius: BorderRadius.circular(8),
                                                   ),
                                                   onTap: () {
-                                                    setState(() {
-                                                      _currentSelectedItem = project['id'];
-                                                      _currentSection = 'projects';
-                                                      _currentView = 'projects';
-                                                    });
+                                                    dashboardState.selectProject(project.id);
                                                   },
                                                 ),
                                               );
@@ -304,15 +291,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                             const SizedBox(height: 8),
                                             Container(
                                               decoration: BoxDecoration(
-                                                color: Colors.blue[50],
+                                                color: AppConstants.primaryColor.withValues(alpha: 0.15),
                                                 borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: AppConstants.accentColor.withValues(alpha: 0.3), width: 1),
                                               ),
                                               child: ListTile(
-                                                title: const Text(
+                                                title: Text(
                                                   'Add New Project',
-                                                  style: TextStyle(fontSize: 13, color: Color(0xFF0f172a), fontWeight: FontWeight.w500),
+                                                  style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
                                                 ),
-                                                leading: Icon(Icons.add, color: const Color(0xFF0f172a), size: 18),
+                                                leading: Icon(Icons.add, color: AppConstants.accentColor, size: 18),
                                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                                 dense: true,
                                                 shape: RoundedRectangleBorder(
@@ -336,48 +324,59 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                         children: [
                                           InkWell(
                                             onTap: () {
+                                              dashboardState.showAiServicesOverview();
                                               setState(() {
-                                                _currentView = 'ai_overview';
-                                                _currentSelectedItem = null;
                                                 _expandedSection = _expandedSection == 'ai' ? null : 'ai';
                                               });
                                             },
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                               decoration: BoxDecoration(
-                                                color: _currentView == 'ai_overview' ? const Color(0xFF0f172a).withOpacity(0.1) : Colors.transparent,
-                                                borderRadius: BorderRadius.circular(6),
+                                                color: dashboardState.currentView == 'ai_overview'
+                                                    ? AppConstants.primaryColor.withValues(alpha: 0.2)
+                                                    : AppConstants.primaryColor.withValues(alpha: 0.1),
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: dashboardState.currentView == 'ai_overview'
+                                                    ? Border.all(color: AppConstants.accentColor.withValues(alpha: 0.5), width: 1)
+                                                    : null,
                                               ),
                                               child: Row(
                                                 children: [
                                                   Icon(
                                                     Icons.auto_awesome,
-                                                    size: 16,
-                                                    color: _currentView == 'ai_overview' ? AppConstants.aiIconColor : AppConstants.secondaryLight,
+                                                    size: 18,
+                                                    color: dashboardState.currentView == 'ai_overview' ? AppConstants.accentColor : Colors.white.withValues(alpha: 0.8),
                                                   ),
-                                                  const SizedBox(width: 8),
-                                                  const Text(
+                                                  const SizedBox(width: 10),
+                                                  Text(
                                                     'AI SERVICES',
                                                     style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w600,
                                                       letterSpacing: 1.2,
+                                                      color: dashboardState.currentView == 'ai_overview'
+                                                          ? Colors.white
+                                                          : Colors.white.withValues(alpha: 0.9),
                                                     ),
                                                   ),
-                                                  const SizedBox(width: 4),
+                                                  const SizedBox(width: 6),
                                                   Text(
-                                                    '(${_aiServices.length})',
+                                                    '(${dashboardState.aiServices.length})',
                                                     style: TextStyle(
-                                                      fontSize: 11,
-                                                      color: _currentView == 'ai_overview' ? const Color(0xFF0f172a) : Colors.grey[600],
+                                                      fontSize: 12,
+                                                      color: dashboardState.currentView == 'ai_overview'
+                                                          ? Colors.white.withValues(alpha: 0.9)
+                                                          : Colors.white.withValues(alpha: 0.7),
                                                       fontWeight: FontWeight.w500,
                                                     ),
                                                   ),
                                                   const Spacer(),
                                                   Icon(
                                                     _expandedSection == 'ai' ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                                    size: 16,
-                                                    color: Colors.grey[600],
+                                                    size: 18,
+                                                    color: dashboardState.currentView == 'ai_overview'
+                                                        ? AppConstants.accentColor
+                                                        : Colors.white.withValues(alpha: 0.8),
                                                   ),
                                                 ],
                                               ),
@@ -385,29 +384,27 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                           ),
                                           const SizedBox(height: 8),
                                           if (_expandedSection == 'ai') ...[
-                                            ..._aiServices.values.map((service) {
-                                              final isSelected = _currentSelectedItem == service['id'];
+                                            ...dashboardState.aiServices.map((service) {
+                                              final isSelected = dashboardState.currentSelectedItem == service.id;
                                               return Container(
                                                 margin: const EdgeInsets.only(bottom: 4),
                                                 decoration: BoxDecoration(
-                                                  color: isSelected ? const Color(0xFF0f172a).withOpacity(0.1) : Colors.transparent,
+                                                  color: isSelected ? AppConstants.accentColor.withValues(alpha: 0.15) : AppConstants.primaryColor.withValues(alpha: 0.05),
                                                   borderRadius: BorderRadius.circular(8),
+                                                  border: isSelected ? Border.all(color: AppConstants.accentColor.withValues(alpha: 0.3), width: 1) : null,
                                                 ),
                                                 child: ListTile(
                                                   title: Text(
-                                                    service['name'],
+                                                    service.name,
                                                     style: TextStyle(
                                                       fontSize: 14,
                                                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                                      color: Colors.white,
                                                     ),
-                                                  ),
-                                                  subtitle: Text(
-                                                    '${service['keys'].length} API key${service['keys'].length == 1 ? '' : 's'}',
-                                                    style: const TextStyle(fontSize: 11, color: Colors.grey),
                                                   ),
                                                   leading: Icon(
                                                     Icons.auto_awesome,
-                                                    color: isSelected ? const Color(0xFF0f172a) : Colors.grey[700],
+                                                    color: isSelected ? AppConstants.accentColor : Colors.white.withValues(alpha: 0.8),
                                                     size: 18,
                                                   ),
                                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -416,11 +413,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                                     borderRadius: BorderRadius.circular(8),
                                                   ),
                                                   onTap: () {
-                                                    setState(() {
-                                                      _currentSelectedItem = service['id'];
-                                                      _currentSection = 'ai';
-                                                      _currentView = 'ai';
-                                                    });
+                                                    dashboardState.selectAiService(service.id);
                                                   },
                                                 ),
                                               );
@@ -428,15 +421,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                             const SizedBox(height: 8),
                                             Container(
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFF0f172a).withOpacity(0.1),
+                                                color: AppConstants.primaryColor.withValues(alpha: 0.15),
                                                 borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: AppConstants.accentColor.withValues(alpha: 0.3), width: 1),
                                               ),
                                               child: ListTile(
-                                                title: const Text(
+                                                title: Text(
                                                   'Add New AI Service',
-                                                  style: TextStyle(fontSize: 13, color: Color(0xFF0f172a), fontWeight: FontWeight.w500),
+                                                  style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
                                                 ),
-                                                leading: Icon(Icons.add, color: const Color(0xFF0f172a), size: 18),
+                                                leading: Icon(Icons.add, color: AppConstants.accentColor, size: 18),
                                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                                 dense: true,
                                                 shape: RoundedRectangleBorder(
@@ -455,18 +449,30 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                             ),
                             // Sticky bottom section
                             Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
+                              decoration: BoxDecoration(
+                                color: AppConstants.primaryColor.withValues(alpha: 0.03),
                                 border: Border(
-                                  top: BorderSide(color: Colors.grey, width: 0.5),
+                                  top: BorderSide(color: AppConstants.primaryColor.withValues(alpha: 0.1), width: 1),
                                 ),
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ListTile(
-                                    title: const Text('Support'),
-                                    leading: const Icon(Icons.help, color: Colors.blue),
+                                    title: Text(
+                                      'Support',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    leading: Icon(
+                                      Icons.help,
+                                      color: AppConstants.accentColor,
+                                      size: 20,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    dense: true,
                                     onTap: () {
                                       setState(() {
                                         _currentView = 'support';
@@ -475,8 +481,20 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                     },
                                   ),
                                   ListTile(
-                                    title: const Text('Settings'),
-                                    leading: const Icon(Icons.settings, color: Colors.grey),
+                                    title: Text(
+                                      'Settings',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    leading: Icon(
+                                      Icons.settings,
+                                      color: AppConstants.accentColor,
+                                      size: 20,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    dense: true,
                                     onTap: () {
                                       Navigator.push(
                                         context,
@@ -541,25 +559,33 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
         ],
       ),
+        );
+      },
     );
   }
 
   Widget _buildMainContent() {
-    if (_currentView == 'dashboard') {
+    final dashboardState = Provider.of<DashboardState>(context);
+
+    if (dashboardState.currentView == 'overview') {
       return _buildDashboardView();
-    } else if (_currentView == 'projects_overview') {
+    } else if (dashboardState.currentView == 'projects_overview') {
       return _buildProjectsOverview();
-    } else if (_currentView == 'ai_overview') {
+    } else if (dashboardState.currentView == 'ai_overview') {
       return _buildAiServicesOverview();
-    } else if (_currentView == 'support') {
+    } else if (dashboardState.currentView == 'support') {
       return const SupportScreen();
-    } else if (_currentSelectedItem != null) {
-      if (_currentSection == 'projects') {
-        final project = _projects[_currentSelectedItem]!;
-        return _buildProjectDetails(project);
+    } else if (dashboardState.currentSelectedItem != null) {
+      if (dashboardState.currentSection == 'projects') {
+        final project = dashboardState.getProject(dashboardState.currentSelectedItem!);
+        if (project != null) {
+          return _buildProjectDetails(project);
+        }
       } else {
-        final service = _aiServices[_currentSelectedItem]!;
-        return _buildAiServiceDetails(service);
+        final service = dashboardState.getAiService(dashboardState.currentSelectedItem!);
+        if (service != null) {
+          return _buildAiServiceDetails(service);
+        }
       }
     } else {
       return Container(
@@ -597,7 +623,17 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         ),
       );
     }
-  
+
+    // Fallback return
+    return Container(
+      color: Colors.grey[50],
+      child: const Center(
+        child: Text(
+          'No content to display',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
+    );
   }
 
   void _showLicenseDialog(BuildContext context) {
@@ -626,7 +662,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _buildProjectDetails(Map<String, dynamic> project) {
+  Widget _buildProjectDetails(Project project) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -634,10 +670,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.folder, size: 30, color: Colors.blue),
+              Icon(Icons.folder, size: 30, color: AppConstants.accentColor),
               const SizedBox(width: 10),
               Text(
-                project['name'],
+                project.name,
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
@@ -655,23 +691,23 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
-              itemCount: project['keys'].length,
+              itemCount: project.credentials.length,
               itemBuilder: (context, index) {
-                final key = project['keys'][index];
+                final credential = project.credentials[index];
                 return Card(
                   elevation: 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: ListTile(
-                    leading: _getIconForKeyType(key['type']),
-                    title: Text(key['name']),
+                    leading: _getIconForKeyType(credential.type.value),
+                    title: Text(credential.name),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildKeySubtitle(key),
+                        _buildCredentialSubtitle(credential),
                         Text(
-                          'Modified ${_formatLastModified(key['lastModified'])}',
+                          'Modified ${_formatLastModified(credential.updatedAt)}',
                           style: const TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                       ],
@@ -679,32 +715,38 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: Icon(Icons.copy, color: AppConstants.copyIconColor),
-                          onPressed: () => _copyToClipboard(key['value']),
+                        _buildActionButton(
+                          icon: Icons.copy,
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () => _copyToClipboard(credential.value),
                           tooltip: 'Copy to clipboard',
                         ),
-                        IconButton(
-                          icon: Icon(Icons.edit, color: AppConstants.editIconColor),
-                          onPressed: () => _startEditingKey(key),
+                        const SizedBox(width: 4),
+                        _buildActionButton(
+                          icon: Icons.edit,
+                          color: Theme.of(context).colorScheme.secondary,
+                          onPressed: () => _startEditingCredential(credential),
                           tooltip: 'Edit value',
                         ),
-                        if (key['type'] == 'password')
-                          IconButton(
-                            icon: Icon(
-                              _visiblePasswords[key['id']] ?? false
-                                ? Icons.visibility_off
-                                : Icons.visibility
-                            ),
-                            onPressed: () => _togglePasswordVisibility(key),
-                            tooltip: (_visiblePasswords[key['id']] ?? false)
+                        if (credential.type == CredentialType.password) ...[
+                          const SizedBox(width: 4),
+                          _buildActionButton(
+                            icon: _visiblePasswords[credential.id] ?? false
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                            color: Theme.of(context).colorScheme.outline,
+                            onPressed: () => _togglePasswordVisibility(credential),
+                            tooltip: (_visiblePasswords[credential.id] ?? false)
                               ? 'Hide password'
                               : 'Show password',
                           ),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: AppConstants.deleteIconColor),
-                          onPressed: () => _deleteKey(project['id'], key['id']),
-                          tooltip: 'Delete API key',
+                        ],
+                        const SizedBox(width: 4),
+                        _buildActionButton(
+                          icon: Icons.delete,
+                          color: Theme.of(context).colorScheme.error,
+                          onPressed: () => _deleteCredential(credential.id, project.id),
+                          tooltip: 'Delete credential',
                         ),
                       ],
                     ),
@@ -717,20 +759,28 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           Row(
             children: [
               ElevatedButton.icon(
-                onPressed: () => _showAddKeyDialog(project['id']),
+                onPressed: () => _showAddCredentialDialog(project.id),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.primaryColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 icon: const Icon(Icons.add),
                 label: const Text('Add New Key'),
               ),
               const SizedBox(width: 10),
               ElevatedButton.icon(
-                onPressed: () => _generatePassword(project['id']),
+                onPressed: () => _generatePassword(project.id),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.successColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 icon: const Icon(Icons.password),
                 label: const Text('Generate Password'),
@@ -742,7 +792,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _buildAiServiceDetails(Map<String, dynamic> service) {
+  Widget _buildAiServiceDetails(AiService service) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -750,10 +800,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, size: 30, color: Colors.purple),
+              Icon(Icons.auto_awesome, size: 30, color: AppConstants.accentColor),
               const SizedBox(width: 10),
               Text(
-                service['name'],
+                service.name,
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
@@ -771,56 +821,48 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
-              itemCount: service['keys'].length,
+              itemCount: service.keys.length,
               itemBuilder: (context, index) {
-                final key = service['keys'][index];
+                final key = service.keys[index];
                 return Card(
                   elevation: 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: ListTile(
-                    leading: const Icon(Icons.key, color: Colors.purple),
-                    title: Text(key['name']),
+                    leading: Icon(Icons.key, color: AppConstants.accentColor),
+                    title: Text(key.name),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildKeySubtitle(key),
-                        if (key['lastModified'] != null)
-                          Text(
-                            'Modified ${_formatLastModified(key['lastModified'])}',
-                            style: const TextStyle(fontSize: 10, color: Colors.grey),
-                          ),
+                        _buildAiServiceKeySubtitle(key),
+                        Text(
+                          'Modified ${_formatLastModified(key.updatedAt)}',
+                          style: const TextStyle(fontSize: 10, color: Colors.grey),
+                        ),
                       ],
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: Icon(Icons.copy, color: AppConstants.copyIconColor),
-                          onPressed: () => _copyToClipboard(key['value']),
+                        _buildActionButton(
+                          icon: Icons.copy,
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () => _copyToClipboard(key.value),
                           tooltip: 'Copy to clipboard',
                         ),
-                        IconButton(
-                          icon: Icon(Icons.edit, color: AppConstants.editIconColor),
-                          onPressed: () => _startEditingKey(key),
+                        const SizedBox(width: 4),
+                        _buildActionButton(
+                          icon: Icons.edit,
+                          color: Theme.of(context).colorScheme.secondary,
+                          onPressed: () => _startEditingAiServiceKey(key),
                           tooltip: 'Edit value',
                         ),
-                        if (key['type'] == 'password')
-                          IconButton(
-                            icon: Icon(
-                              _visiblePasswords[key['id']] ?? false
-                                ? Icons.visibility_off
-                                : Icons.visibility
-                            ),
-                            onPressed: () => _togglePasswordVisibility(key),
-                            tooltip: (_visiblePasswords[key['id']] ?? false)
-                              ? 'Hide password'
-                              : 'Show password',
-                          ),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: AppConstants.deleteIconColor),
-                          onPressed: () => _deleteKey(service['id'], key['id']),
+                        const SizedBox(width: 4),
+                        _buildActionButton(
+                          icon: Icons.delete,
+                          color: Theme.of(context).colorScheme.error,
+                          onPressed: () => _deleteAiServiceKey(key.id, service.id),
                           tooltip: 'Delete API key',
                         ),
                       ],
@@ -832,10 +874,14 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
           const SizedBox(height: 20),
           ElevatedButton.icon(
-            onPressed: () => _showAddKeyDialog(service['id']),
+            onPressed: () => _showAddAiServiceKeyDialog(service.id),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppConstants.secondaryColor,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             icon: const Icon(Icons.add),
             label: const Text('Add New Key'),
@@ -846,11 +892,13 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   Widget _buildDashboardView() {
+    final dashboardState = Provider.of<DashboardState>(context);
+
     // Calculate stats
-    final totalProjects = _projects.length;
-    final totalAiServices = _aiServices.length;
-    final totalKeys = _projects.values.fold(0, (sum, project) => sum + (project['keys'] as List).length) +
-                      _aiServices.values.fold(0, (sum, service) => sum + (service['keys'] as List).length);
+    final totalProjects = dashboardState.projects.length;
+    final totalAiServices = dashboardState.aiServices.length;
+    final totalKeys = dashboardState.projects.fold(0, (sum, project) => sum + project.credentials.length) +
+                      dashboardState.aiServices.fold(0, (sum, service) => sum + service.keys.length);
 
     return Container(
       color: Colors.grey[50],
@@ -880,7 +928,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
-                          Icon(Icons.folder, size: 40, color: AppConstants.projectIconColor),
+                          Icon(Icons.folder, size: 40, color: AppConstants.accentColor),
                           const SizedBox(height: 10),
                           Text(
                             '$totalProjects',
@@ -900,7 +948,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
-                          Icon(Icons.auto_awesome, size: 40, color: AppConstants.aiIconColor),
+                          Icon(Icons.auto_awesome, size: 40, color: AppConstants.accentColor),
                           const SizedBox(height: 10),
                           Text(
                             '$totalAiServices',
@@ -963,7 +1011,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     onPressed: _showAddAiServiceDialog,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(20),
-                      backgroundColor: AppConstants.secondaryColor,
+                      backgroundColor: AppConstants.accentColor,
                       foregroundColor: Colors.white,
                     ),
                     icon: const Icon(Icons.auto_awesome),
@@ -1018,7 +1066,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                                   Icon(
                                     item['type'] == 'project' ? Icons.folder : Icons.auto_awesome,
                                     size: 16,
-                                    color: item['type'] == 'project' ? Colors.blue : const Color(0xFF0f172a),
+                                    color: AppConstants.accentColor,
                                   ),
                                   const SizedBox(width: 6),
                                   Expanded(
@@ -1101,7 +1149,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         children: [
           CircleAvatar(
             radius: 12,
-            backgroundColor: Colors.blue,
+            backgroundColor: AppConstants.accentColor,
             child: Text(
               '$step',
               style: const TextStyle(color: Colors.white, fontSize: 12),
@@ -1150,6 +1198,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   Widget _buildProjectsOverview() {
+    final dashboardState = Provider.of<DashboardState>(context);
+
     return Container(
       color: Colors.grey[50],
       child: SingleChildScrollView(
@@ -1159,7 +1209,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.folder, size: 32, color: Colors.blue),
+                Icon(Icons.folder, size: 32, color: AppConstants.accentColor),
                 const SizedBox(width: 12),
                 const Text(
                   'Projects Overview',
@@ -1175,7 +1225,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             const SizedBox(height: 30),
 
             // Projects Grid/List
-            if (_projects.isEmpty)
+            if (dashboardState.projects.isEmpty)
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1197,7 +1247,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       onPressed: _showAddProjectDialog,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(16),
-                        backgroundColor: Colors.blue,
+                        backgroundColor: AppConstants.accentColor,
                         foregroundColor: Colors.white,
                       ),
                       icon: const Icon(Icons.add),
@@ -1216,19 +1266,15 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   mainAxisSpacing: 16,
                   childAspectRatio: 1.2,
                 ),
-                itemCount: _projects.length,
+                itemCount: dashboardState.projects.length,
                 itemBuilder: (context, index) {
-                  final project = _projects.values.elementAt(index);
+                  final project = dashboardState.projects[index];
                   return Card(
                     elevation: 4,
                     child: InkWell(
                       onTap: () {
-                        _trackRecentlyUsed('project', project['id'], project['name']);
-                        setState(() {
-                          _currentSelectedItem = project['id'];
-                          _currentSection = 'projects';
-                          _currentView = 'projects';
-                        });
+                        _trackRecentlyUsed('project', project.id, project.name);
+                        dashboardState.selectProject(project.id);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -1237,11 +1283,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.folder, color: Colors.blue[600], size: 24),
+                                Icon(Icons.folder, color: AppConstants.accentColor, size: 24),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    project['name'],
+                                    project.name,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -1252,13 +1298,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Text(
-                              '${project['keys'].length} API key${project['keys'].length == 1 ? '' : 's'}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
+
                             const Spacer(),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -1284,7 +1324,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 onPressed: _showAddProjectDialog,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
-                  backgroundColor: Colors.blue,
+                  backgroundColor: AppConstants.accentColor,
                   foregroundColor: Colors.white,
                 ),
                 icon: const Icon(Icons.add),
@@ -1298,6 +1338,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   Widget _buildAiServicesOverview() {
+    final dashboardState = Provider.of<DashboardState>(context);
+
     return Container(
       color: Colors.grey[50],
       child: SingleChildScrollView(
@@ -1307,7 +1349,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.auto_awesome, size: 32, color: const Color(0xFF0f172a)),
+                Icon(Icons.auto_awesome, size: 32, color: AppConstants.accentColor),
                 const SizedBox(width: 12),
                 const Text(
                   'AI Services Overview',
@@ -1323,7 +1365,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             const SizedBox(height: 30),
 
             // AI Services Grid/List
-            if (_aiServices.isEmpty)
+            if (dashboardState.aiServices.isEmpty)
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1345,7 +1387,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       onPressed: _showAddAiServiceDialog,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(16),
-                        backgroundColor: const Color(0xFF0f172a),
+                        backgroundColor: AppConstants.accentColor,
                         foregroundColor: Colors.white,
                       ),
                       icon: const Icon(Icons.add),
@@ -1364,19 +1406,15 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   mainAxisSpacing: 16,
                   childAspectRatio: 1.2,
                 ),
-                itemCount: _aiServices.length,
+                itemCount: dashboardState.aiServices.length,
                 itemBuilder: (context, index) {
-                  final service = _aiServices.values.elementAt(index);
+                  final service = dashboardState.aiServices[index];
                   return Card(
                     elevation: 4,
                     child: InkWell(
                       onTap: () {
-                        _trackRecentlyUsed('ai_service', service['id'], service['name']);
-                        setState(() {
-                          _currentSelectedItem = service['id'];
-                          _currentSection = 'ai';
-                          _currentView = 'ai';
-                        });
+                        _trackRecentlyUsed('ai_service', service.id, service.name);
+                        dashboardState.selectAiService(service.id);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -1385,11 +1423,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.auto_awesome, color: const Color(0xFF0f172a), size: 24),
+                                Icon(Icons.auto_awesome, color: AppConstants.accentColor, size: 24),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    service['name'],
+                                    service.name,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -1400,13 +1438,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Text(
-                              '${service['keys'].length} API key${service['keys'].length == 1 ? '' : 's'}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
+
                             const Spacer(),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -1432,7 +1464,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 onPressed: _showAddAiServiceDialog,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
-                  backgroundColor: const Color(0xFF0f172a),
+                  backgroundColor: AppConstants.accentColor,
                   foregroundColor: Colors.white,
                 ),
                 icon: const Icon(Icons.add),
@@ -1460,7 +1492,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           onTap: () => _startEditingKey(key),
           child: Text(
             key['value'],
-            style: const TextStyle(fontFamily: 'monospace', color: Colors.blue),
+            style: TextStyle(fontFamily: 'monospace', color: AppConstants.accentColor),
           ),
         );
       } else {
@@ -1476,10 +1508,66 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         onTap: () => _startEditingKey(key),
         child: Text(
           value,
-          style: const TextStyle(color: Colors.blue),
+          style: TextStyle(color: AppConstants.accentColor),
         ),
       );
     }
+  }
+
+  Widget _buildCredentialSubtitle(Credential credential) {
+    bool isEditing = _editingKeys[credential.id] ?? false;
+
+    if (isEditing) {
+      return _buildEditableCredentialValue(credential);
+    }
+
+    if (credential.type == CredentialType.password) {
+      // Check if password is set to visible
+      bool isVisible = _visiblePasswords[credential.id] ?? false;
+      if (isVisible) {
+        return GestureDetector(
+          onTap: () => _startEditingCredential(credential),
+          child: Text(
+            credential.value,
+            style: TextStyle(fontFamily: 'monospace', color: AppConstants.accentColor),
+          ),
+        );
+      } else {
+        return const Text('••••••••'); // Masked password
+      }
+    } else {
+      // Truncate long values
+      String value = credential.value.length > 30
+          ? '${credential.value.substring(0, 30)}...'
+          : credential.value;
+      return GestureDetector(
+        onTap: () => _startEditingCredential(credential),
+        child: Text(
+          value,
+          style: TextStyle(color: AppConstants.accentColor),
+        ),
+      );
+    }
+  }
+
+  Widget _buildAiServiceKeySubtitle(AiServiceKey key) {
+    bool isEditing = _editingKeys[key.id] ?? false;
+
+    if (isEditing) {
+      return _buildEditableAiServiceKeyValue(key);
+    }
+
+    // Truncate long values
+    String value = key.value.length > 30
+        ? '${key.value.substring(0, 30)}...'
+        : key.value;
+    return GestureDetector(
+      onTap: () => _startEditingAiServiceKey(key),
+      child: Text(
+        value,
+        style: TextStyle(color: AppConstants.accentColor),
+      ),
+    );
   }
 
   Widget _buildEditableKeyValue(Map<String, dynamic> key) {
@@ -1496,15 +1584,18 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     });
 
     return Container(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppConstants.primaryColor.withOpacity(0.3)),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -1512,42 +1603,59 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Editing: ${key['name']}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-              fontWeight: FontWeight.w500,
-            ),
+          Row(
+            children: [
+              Icon(
+                Icons.edit,
+                size: 16,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Editing: ${key['name']}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: controller,
                   focusNode: focusNode,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'monospace',
-                    fontSize: 16,
-                    color: Color(0xFF0f172a), // Navy dark blue
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey[50],
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6),
-                      borderSide: BorderSide(color: AppConstants.primaryColor.withOpacity(0.3)),
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6),
-                      borderSide: BorderSide(color: AppConstants.primaryColor.withOpacity(0.3)),
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6),
-                      borderSide: BorderSide(color: AppConstants.primaryColor, width: 2),
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
                     ),
                   ),
                   onSubmitted: (value) => _saveKeyValue(key, value),
@@ -1556,34 +1664,226 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
+              Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green, size: 24),
+                  _buildActionButton(
+                    icon: Icons.check,
+                    color: Colors.green,
                     onPressed: () => _saveKeyValue(key, controller.text),
                     tooltip: 'Save changes',
-                    padding: const EdgeInsets.all(8),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.green.withOpacity(0.1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
                   ),
-                  const SizedBox(height: 4),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red, size: 24),
+                  const SizedBox(width: 6),
+                  _buildActionButton(
+                    icon: Icons.close,
+                    color: Theme.of(context).colorScheme.error,
                     onPressed: () => _cancelEditingKey(key),
                     tooltip: 'Cancel editing',
-                    padding: const EdgeInsets.all(8),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.red.withOpacity(0.1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditableCredentialValue(Credential credential) {
+    final controller = TextEditingController(text: credential.value);
+    final focusNode = FocusNode();
+
+    // Auto-focus and select all text
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      focusNode.requestFocus();
+      controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: controller.text.length,
+      );
+    });
+
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Editing: ${credential.name}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
                       ),
                     ),
                   ),
-                ],
+                  maxLines: credential.type == CredentialType.connectionString ? 3 : 1,
+                  onSubmitted: (value) => _saveCredentialValue(credential, value),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => _cancelEditingCredential(credential),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.outline,
+                ),
+                child: const Text('Cancel'),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () => _saveCredentialValue(credential, controller.text),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('Save'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditableAiServiceKeyValue(AiServiceKey key) {
+    final controller = TextEditingController(text: key.value);
+    final focusNode = FocusNode();
+
+    // Auto-focus and select all text
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      focusNode.requestFocus();
+      controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: controller.text.length,
+      );
+    });
+
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Editing: ${key.name}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  maxLines: 1,
+                  onSubmitted: (value) => _saveAiServiceKeyValue(key, value),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => _cancelEditingAiServiceKey(key),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.outline,
+                ),
+                child: const Text('Cancel'),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () => _saveAiServiceKeyValue(key, controller.text),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('Save'),
               ),
             ],
           ),
@@ -1605,6 +1905,41 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       default:
         return const Icon(Icons.info);
     }
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+    required String tooltip,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: IconButton(
+        icon: Icon(icon, size: 18),
+        color: color,
+        onPressed: onPressed,
+        tooltip: tooltip,
+        padding: const EdgeInsets.all(8),
+        constraints: const BoxConstraints(
+          minWidth: 36,
+          minHeight: 36,
+        ),
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
   }
 
   void _copyToClipboard(String value) {
@@ -1631,24 +1966,6 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  void _togglePasswordVisibility(Map<String, dynamic> key) {
-    setState(() {
-      String keyId = key['id'];
-      // Toggle the visibility state for this specific password
-      _visiblePasswords[keyId] = !(_visiblePasswords[keyId] ?? false);
-    });
-
-    // Show feedback about the toggle
-    bool isNowVisible = _visiblePasswords[key['id']] ?? false;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isNowVisible ? 'Password revealed' : 'Password hidden'
-        ),
-        duration: const Duration(seconds: 1),
-      ),
-    );
-  }
 
   void _startEditingKey(Map<String, dynamic> key) {
     setState(() {
@@ -1681,47 +1998,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     });
   }
 
-  void _deleteKey(String parentId, String keyId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete API Key'),
-          content: const Text(
-            'Are you sure you want to delete this API key? This action cannot be undone.'
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  if (_currentSection == 'projects') {
-                    final project = _projects[parentId]!;
-                    project['keys'].removeWhere((key) => key['id'] == keyId);
-                  } else {
-                    final service = _aiServices[parentId]!;
-                    service['keys'].removeWhere((key) => key['id'] == keyId);
-                  }
-                });
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('API key deleted successfully'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   void _showAddProjectDialog() {
     final nameController = TextEditingController();
@@ -1744,17 +2021,41 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (nameController.text.isNotEmpty) {
-                  final newId = (DateTime.now().millisecondsSinceEpoch).toString();
-                  setState(() {
-                    _projects[newId] = {
-                      'id': newId,
-                      'name': nameController.text,
-                      'keys': [],
-                    };
-                  });
-                  Navigator.of(context).pop();
+                  final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+                  try {
+                    final project = await dashboardState.createProject(
+                      nameController.text,
+                      description: '',
+                    );
+
+                    if (project != null) {
+                      Navigator.of(context).pop();
+
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(Icons.check_circle, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text('Project "${nameController.text}" created successfully!'),
+                            ],
+                          ),
+                          backgroundColor: Theme.of(context).colorScheme.secondary,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to create project: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               },
               child: const Text('Add'),
@@ -1786,114 +2087,41 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (nameController.text.isNotEmpty) {
-                  final newId = (DateTime.now().millisecondsSinceEpoch).toString();
-                  setState(() {
-                    _aiServices[newId] = {
-                      'id': newId,
-                      'name': nameController.text,
-                      'keys': [],
-                    };
-                  });
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+                  final dashboardState = Provider.of<DashboardState>(context, listen: false);
 
-  void _showAddKeyDialog(String parentId) {
-    final nameController = TextEditingController();
-    final valueController = TextEditingController();
-    String keyType = 'api_key';
+                  try {
+                    final service = await dashboardState.createAiService(
+                      nameController.text,
+                      description: '',
+                    );
 
-    // Check if we're in a specific project/service view (not dashboard)
-    final isInSpecificView = _currentSelectedItem != null && _currentView != 'dashboard';
+                    if (service != null) {
+                      Navigator.of(context).pop();
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(isInSpecificView ? 'Add New API Key' : (_currentSection == 'projects' ? 'Add New Key' : 'Add New API Key')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Only show name field if we're NOT in a specific project/service view
-              if (!isInSpecificView) ...[
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Key Name',
-                    hintText: 'Enter key name',
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-              TextField(
-                controller: valueController,
-                decoration: InputDecoration(
-                  labelText: isInSpecificView ? 'API Key Value' : (_currentSection == 'projects' ? 'Key Value' : 'API Key'),
-                  hintText: isInSpecificView ? 'Enter API key value' : (_currentSection == 'projects' ? 'Enter key value' : 'Enter API key'),
-                ),
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value: keyType,
-                decoration: const InputDecoration(labelText: 'Key Type'),
-                items: const [
-                  DropdownMenuItem(value: 'api_key', child: Text('API Key')),
-                  DropdownMenuItem(value: 'password', child: Text('Password')),
-                  DropdownMenuItem(value: 'url', child: Text('URL')),
-                  DropdownMenuItem(value: 'connection_string', child: Text('Connection String')),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    keyType = value;
-                  }
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Validation depends on context
-                final hasName = isInSpecificView || nameController.text.isNotEmpty;
-                final hasValue = valueController.text.isNotEmpty;
-
-                if (hasName && hasValue) {
-                  final newKeyId = '${parentId}-${DateTime.now().millisecondsSinceEpoch}';
-
-                  // Auto-generate name if we're in specific view
-                  final keyName = isInSpecificView
-                    ? '${keyType.replaceAll('_', ' ').toUpperCase()} ${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}'
-                    : nameController.text;
-
-                  final newKey = {
-                    'id': newKeyId,
-                    'name': keyName,
-                    'value': valueController.text,
-                    'type': keyType,
-                    'lastModified': DateTime.now(),
-                  };
-
-                  setState(() {
-                    if (_currentSection == 'projects') {
-                      _projects[parentId]!['keys'].add(newKey);
-                    } else {
-                      _aiServices[parentId]!['keys'].add(newKey);
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(Icons.check_circle, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text('AI Service "${nameController.text}" created successfully!'),
+                            ],
+                          ),
+                          backgroundColor: Theme.of(context).colorScheme.secondary,
+                        ),
+                      );
                     }
-                  });
-                  Navigator.of(context).pop();
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to create AI service: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               },
               child: const Text('Add'),
@@ -1904,32 +2132,52 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  void _generatePassword(String projectId) {
+
+
+  void _generatePassword(String projectId) async {
+    final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
     // Generate a random password
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*';
     final random = Random.secure();
     final password = List.generate(16, (index) => chars[random.nextInt(chars.length)]).join();
-    
-    final newKeyId = '${projectId}-${DateTime.now().millisecondsSinceEpoch}';
-    final newPassword = {
-      'id': newKeyId,
-      'name': 'Generated Password ${DateTime.now().second}',
-      'value': password,
-      'type': 'password',
-      'lastModified': DateTime.now(),
-    };
-    
-    setState(() {
-      _projects[projectId]!['keys'].add(newPassword);
-    });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Password generated and added')),
-    );
+
+    final passwordName = 'Generated Password ${DateTime.now().second}';
+
+    try {
+      final success = await dashboardState.createCredential(
+        projectId: projectId,
+        name: passwordName,
+        value: password,
+        type: CredentialType.password,
+      );
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
+                Text('Password "$passwordName" generated and added!'),
+              ],
+            ),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to generate password: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  void _showEditProjectDialog(Map<String, dynamic> project) {
-    final nameController = TextEditingController(text: project['name']);
+  void _showEditProjectDialog(Project project) {
+    final nameController = TextEditingController(text: project.name);
     
     showDialog(
       context: context,
@@ -1948,12 +2196,32 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (nameController.text.isNotEmpty) {
-                  setState(() {
-                    project['name'] = nameController.text;
-                  });
-                  Navigator.of(context).pop();
+                  final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+                  try {
+                    final success = await dashboardState.updateProject(
+                      project.copyWith(name: nameController.text),
+                    );
+
+                    if (success) {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Project updated successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to update project: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               },
               child: const Text('Save'),
@@ -1964,8 +2232,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  void _showEditAiServiceDialog(Map<String, dynamic> service) {
-    final nameController = TextEditingController(text: service['name']);
+  void _showEditAiServiceDialog(AiService service) {
+    final nameController = TextEditingController(text: service.name);
     
     showDialog(
       context: context,
@@ -1984,12 +2252,32 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (nameController.text.isNotEmpty) {
-                  setState(() {
-                    service['name'] = nameController.text;
-                  });
-                  Navigator.of(context).pop();
+                  final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+                  try {
+                    final success = await dashboardState.updateAiService(
+                      service.copyWith(name: nameController.text),
+                    );
+
+                    if (success) {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('AI Service updated successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to update AI service: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               },
               child: const Text('Save'),
@@ -1997,6 +2285,399 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ],
         );
       },
+    );
+  }
+
+  // New methods for credential management
+  void _startEditingCredential(Credential credential) {
+    setState(() {
+      _editingKeys[credential.id] = true;
+    });
+  }
+
+  void _saveCredentialValue(Credential credential, String newValue) async {
+    final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+    try {
+      await dashboardState.updateCredential(
+        credential.copyWith(value: newValue),
+      );
+
+      setState(() {
+        _editingKeys[credential.id] = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Credential updated successfully'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update credential: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  void _cancelEditingCredential(Credential credential) {
+    setState(() {
+      _editingKeys[credential.id] = false;
+    });
+  }
+
+  void _deleteCredential(String credentialId, String projectId) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Credential'),
+        content: const Text('Are you sure you want to delete this credential? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+      try {
+        await dashboardState.deleteCredential(credentialId, projectId);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Credential deleted successfully'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete credential: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  void _togglePasswordVisibility(Credential credential) {
+    setState(() {
+      String credentialId = credential.id;
+      _visiblePasswords[credentialId] = !(_visiblePasswords[credentialId] ?? false);
+    });
+
+    bool isNowVisible = _visiblePasswords[credential.id] ?? false;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isNowVisible ? 'Password revealed' : 'Password hidden'
+        ),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  void _showAddCredentialDialog(String projectId) {
+    final nameController = TextEditingController();
+    final valueController = TextEditingController();
+    CredentialType credentialType = CredentialType.apiKey;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Add New Credential'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Credential Name',
+                  hintText: 'e.g., Database Password',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: valueController,
+                decoration: const InputDecoration(
+                  labelText: 'Credential Value',
+                  hintText: 'Enter the credential value',
+                ),
+                obscureText: credentialType == CredentialType.password,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<CredentialType>(
+                value: credentialType,
+                decoration: const InputDecoration(
+                  labelText: 'Credential Type',
+                ),
+                items: CredentialType.values.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(type.displayName),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setDialogState(() {
+                      credentialType = value;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (nameController.text.isNotEmpty && valueController.text.isNotEmpty) {
+                  final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+                  try {
+                    await dashboardState.createCredential(
+                      projectId: projectId,
+                      name: nameController.text,
+                      value: valueController.text,
+                      type: credentialType,
+                    );
+
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text('Credential "${nameController.text}" added successfully!'),
+                          ],
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to add credential: $e'),
+                        backgroundColor: Colors.red,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // AI Service Key methods
+  void _startEditingAiServiceKey(AiServiceKey key) {
+    setState(() {
+      _editingKeys[key.id] = true;
+    });
+  }
+
+  void _saveAiServiceKeyValue(AiServiceKey key, String newValue) async {
+    final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+    try {
+      await dashboardState.updateAiServiceKey(
+        key.copyWith(value: newValue),
+      );
+
+      setState(() {
+        _editingKeys[key.id] = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('AI service key updated successfully'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update AI service key: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  void _cancelEditingAiServiceKey(AiServiceKey key) {
+    setState(() {
+      _editingKeys[key.id] = false;
+    });
+  }
+
+  void _deleteAiServiceKey(String keyId, String serviceId) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete AI Service Key'),
+        content: const Text('Are you sure you want to delete this API key? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+      try {
+        await dashboardState.deleteAiServiceKey(keyId, serviceId);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('AI service key deleted successfully'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete AI service key: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  void _showAddAiServiceKeyDialog(String serviceId) {
+    final nameController = TextEditingController();
+    final valueController = TextEditingController();
+    AiKeyType keyType = AiKeyType.apiKey;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Add New AI Service Key'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Key Name',
+                  hintText: 'e.g., API Key',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: valueController,
+                decoration: const InputDecoration(
+                  labelText: 'Key Value',
+                  hintText: 'Enter the API key value',
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<AiKeyType>(
+                value: keyType,
+                decoration: const InputDecoration(
+                  labelText: 'Key Type',
+                ),
+                items: AiKeyType.values.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(type.displayName),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setDialogState(() {
+                      keyType = value;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (nameController.text.isNotEmpty && valueController.text.isNotEmpty) {
+                  final dashboardState = Provider.of<DashboardState>(context, listen: false);
+
+                  try {
+                    await dashboardState.createAiServiceKey(
+                      serviceId: serviceId,
+                      name: nameController.text,
+                      value: valueController.text,
+                      type: keyType,
+                    );
+
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text('AI service key "${nameController.text}" added successfully!'),
+                          ],
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to add AI service key: $e'),
+                        backgroundColor: Colors.red,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

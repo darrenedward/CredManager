@@ -1,4 +1,4 @@
-name: api_key_manager
+name: cred_manager
 description: Flutter frontend for API Key Manager authentication system.
 publish_to: 'none'
 
@@ -19,6 +19,12 @@ dependencies:
   crypto: ^3.0.3
   cryptography: ^2.7.0
   jwt_decode: ^0.3.1
+  sqflite: ^2.3.0
+  sqflite_common_ffi: ^2.3.0
+  sqlite3_flutter_libs: ^0.5.0
+  path: ^1.8.3
+  convert: ^3.1.1
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:
