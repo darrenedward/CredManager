@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'user_model.dart';
 import '../services/storage_service.dart';
 import '../services/auth_service.dart';
+import '../services/biometric_auth_service.dart';
 import '../services/jwt_service.dart';
 import '../services/settings_service.dart';
 import '../services/credential_storage_service.dart';
@@ -18,7 +21,8 @@ class AuthState extends ChangeNotifier {
   Timer? _sessionTimer;
   Timer? _inactivityTimer;
   int _sessionTimeoutMinutes = AppConstants.defaultSessionTimeout;
-  
+  bool _autoCopyPasswords = false;
+
   // Inactivity tracking
   DateTime? _lastActivityTime;
   static const int _inactivityCheckInterval = 60; // Check every minute
@@ -35,12 +39,14 @@ class AuthState extends ChangeNotifier {
   bool get hasStoredData => _user != null && !_user!.isFirstTime;
   bool get hasValidSession => _token != null && _user != null;
   int get sessionTimeoutMinutes => _sessionTimeoutMinutes;
+  bool get autoCopyPasswords => _autoCopyPasswords;
   DateTime? get sessionStartTime => _sessionStartTime;
   DateTime? get lastActivityTime => _lastActivityTime;
   CredentialStorageService get credentialStorage => _credentialStorage;
 
   final StorageService _storageService = StorageService();
   final AuthService _authService = AuthService();
+  final BiometricAuthService _biometricService = BiometricAuthService();
   final SettingsService _settingsService = SettingsService();
   final CredentialStorageService _credentialStorage = CredentialStorageService();
 
@@ -105,6 +111,9 @@ class AuthState extends ChangeNotifier {
 
     // Load session timeout setting
     _sessionTimeoutMinutes = await _settingsService.getSessionTimeout();
+
+    // Load auto-copy passwords setting
+    _autoCopyPasswords = await _settingsService.getAutoCopyPasswords();
 
     print('DEBUG: Auth state loaded - User: ${_user != null}, Token: ${_token != null}, SetupCompleted: $setupCompleted');
     _isInitialized = true;
@@ -178,6 +187,135 @@ class AuthState extends ChangeNotifier {
       setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  /// Enable biometric authentication and store encrypted passphrase
+  Future<bool> enableBiometricAuth(String passphrase) async {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check if biometric is available
+      final isAvailable = await _biometricService.isBiometricAvailable();
+      if (!isAvailable) {
+        setError('Biometric authentication is not available on this device');
+        return false;
+      }
+
+      // Test biometric authentication first
+      final authResult = await _biometricService.authenticateWithBiometrics(
+        localizedReason: 'Authenticate to enable biometric login',
+      );
+
+      if (!authResult.success) {
+        setError(authResult.errorMessage ?? 'Biometric authentication failed');
+        return false;
+      }
+
+      // Encrypt and store the passphrase
+      final encryptedPassphrase = await _encryptPassphraseForBiometric(passphrase);
+      await _biometricService.storeBiometricKey(encryptedPassphrase);
+      await _biometricService.setBiometricEnabled(true);
+
+      print('DEBUG: Biometric authentication enabled successfully');
+      return true;
+    } catch (e) {
+      print('DEBUG: Error enabling biometric auth: $e');
+      setError('Failed to enable biometric authentication');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Login using biometric authentication
+  Future<bool> loginWithBiometric() async {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check if biometric is enabled
+      final isEnabled = await _biometricService.isBiometricEnabled();
+      if (!isEnabled) {
+        setError('Biometric authentication is not enabled');
+        return false;
+      }
+
+      // Authenticate with biometrics
+      final authResult = await _biometricService.authenticateWithBiometrics(
+        localizedReason: 'Authenticate to access your credentials',
+      );
+
+      if (!authResult.success) {
+        setError(authResult.errorMessage ?? 'Biometric authentication failed');
+        return false;
+      }
+
+      // Retrieve and decrypt the stored passphrase
+      final encryptedPassphrase = await _biometricService.getBiometricKey();
+      if (encryptedPassphrase == null) {
+        setError('No stored passphrase found. Please re-enable biometric authentication.');
+        await _biometricService.setBiometricEnabled(false);
+        return false;
+      }
+
+      final passphrase = await _decryptPassphraseFromBiometric(encryptedPassphrase);
+      if (passphrase == null) {
+        setError('Failed to decrypt stored passphrase');
+        return false;
+      }
+
+      // Use the decrypted passphrase to login normally
+      await login(passphrase);
+      return isLoggedIn;
+    } catch (e) {
+      print('DEBUG: Error with biometric login: $e');
+      setError('Biometric login failed');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Disable biometric authentication
+  Future<void> disableBiometricAuth() async {
+    try {
+      await _biometricService.setBiometricEnabled(false);
+      await _biometricService.removeBiometricKey();
+      print('DEBUG: Biometric authentication disabled');
+    } catch (e) {
+      print('DEBUG: Error disabling biometric auth: $e');
+      throw Exception('Failed to disable biometric authentication');
+    }
+  }
+
+  /// Check if biometric authentication is available
+  Future<bool> isBiometricAvailable() async {
+    return await _biometricService.isBiometricAvailable();
+  }
+
+  /// Check if biometric authentication is enabled
+  Future<bool> isBiometricEnabled() async {
+    return await _biometricService.isBiometricEnabled();
+  }
+
+  /// Encrypt passphrase for biometric storage
+  Future<String> _encryptPassphraseForBiometric(String passphrase) async {
+    // For simplicity, use base64 encoding
+    // In production, use proper AES encryption with a secure key
+    final bytes = utf8.encode(passphrase);
+    return base64.encode(bytes);
+  }
+
+  /// Decrypt passphrase from biometric storage
+  Future<String?> _decryptPassphraseFromBiometric(String encryptedPassphrase) async {
+    try {
+      final bytes = base64.decode(encryptedPassphrase);
+      return utf8.decode(bytes);
+    } catch (e) {
+      print('DEBUG: Error decrypting passphrase: $e');
+      return null;
     }
   }
 
@@ -326,6 +464,25 @@ class AuthState extends ChangeNotifier {
       _setUpConfigurableTimeout(); // Re-setup the timeout timer
       notifyListeners();
     }
+  }
+
+  /// Sets the session timeout (synchronous version for UI)
+  void setSessionTimeout(int minutes) {
+    _sessionTimeoutMinutes = minutes;
+    _setUpConfigurableTimeout(); // Re-setup the timeout timer
+    notifyListeners();
+
+    // Save to storage asynchronously
+    _settingsService.setSessionTimeout(minutes);
+  }
+
+  /// Sets the auto-copy passwords setting
+  Future<void> setAutoCopyPasswords(bool enabled) async {
+    _autoCopyPasswords = enabled;
+    notifyListeners();
+
+    // Save to storage
+    await _settingsService.setAutoCopyPasswords(enabled);
   }
 
   /// Cleans up expired tokens

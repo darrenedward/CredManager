@@ -104,46 +104,47 @@ class Argon2Service {
       return _constantTimeEquals(storedHash, computed);
     } catch (e) {
       return false;
-      /// Derives a key from passphrase and salt using Argon2id (default project parameters)
-      Future<Uint8List> deriveKey(String passphrase, Uint8List salt, int keyLength) async {
-        if (passphrase.trim().isEmpty) throw ArgumentError('Passphrase required');
-        if (salt.isEmpty) throw ArgumentError('Salt required');
-        if (keyLength <= 0) throw ArgumentError('Key length must be positive');
-        final argon2 = Argon2id(
-          memory: _memoryCost,
-          parallelism: _parallelism,
-          iterations: _timeCost,
-          hashLength: keyLength,
-        );
-        final secretKey = SecretKey(utf8.encode(passphrase.trim()));
-        final derived = await argon2.deriveKey(secretKey: secretKey, nonce: salt);
-        return Uint8List.fromList(await derived.extractBytes());
-      }
-    
-      /// Derives a key with custom Argon2 parameters (for tests)
-      Future<Uint8List> deriveKeyWithParams(
-        String passphrase,
-        Uint8List salt,
-        int keyLength, {
-        required int memoryCost,
-        required int timeCost,
-        required int parallelism,
-      }) async {
-        if (passphrase.trim().isEmpty) throw ArgumentError('Passphrase required');
-        if (salt.isEmpty) throw ArgumentError('Salt required');
-        if (keyLength <= 0) throw ArgumentError('Key length must be positive');
-        if (memoryCost < 1024 || timeCost < 1) throw ArgumentError('Weak Argon2 parameters');
-        final argon2 = Argon2id(
-          memory: memoryCost,
-          parallelism: parallelism,
-          iterations: timeCost,
-          hashLength: keyLength,
-        );
-        final secretKey = SecretKey(utf8.encode(passphrase.trim()));
-        final derived = await argon2.deriveKey(secretKey: secretKey, nonce: salt);
-        return Uint8List.fromList(await derived.extractBytes());
-      }
     }
+  }
+
+  /// Derives a key from passphrase and salt using Argon2id (default project parameters)
+  Future<Uint8List> deriveKey(String passphrase, Uint8List salt, int keyLength) async {
+    if (passphrase.trim().isEmpty) throw ArgumentError('Passphrase required');
+    if (salt.isEmpty) throw ArgumentError('Salt required');
+    if (keyLength <= 0) throw ArgumentError('Key length must be positive');
+    final argon2 = Argon2id(
+      memory: _memoryCost,
+      parallelism: _parallelism,
+      iterations: _timeCost,
+      hashLength: keyLength,
+    );
+    final secretKey = SecretKey(utf8.encode(passphrase.trim()));
+    final derived = await argon2.deriveKey(secretKey: secretKey, nonce: salt);
+    return Uint8List.fromList(await derived.extractBytes());
+  }
+
+  /// Derives a key with custom Argon2 parameters (for tests)
+  Future<Uint8List> deriveKeyWithParams(
+    String passphrase,
+    Uint8List salt,
+    int keyLength, {
+    required int memoryCost,
+    required int timeCost,
+    required int parallelism,
+  }) async {
+    if (passphrase.trim().isEmpty) throw ArgumentError('Passphrase required');
+    if (salt.isEmpty) throw ArgumentError('Salt required');
+    if (keyLength <= 0) throw ArgumentError('Key length must be positive');
+    if (memoryCost < 1024 || timeCost < 1) throw ArgumentError('Weak Argon2 parameters');
+    final argon2 = Argon2id(
+      memory: memoryCost,
+      parallelism: parallelism,
+      iterations: timeCost,
+      hashLength: keyLength,
+    );
+    final secretKey = SecretKey(utf8.encode(passphrase.trim()));
+    final derived = await argon2.deriveKey(secretKey: secretKey, nonce: salt);
+    return Uint8List.fromList(await derived.extractBytes());
   }
 
   /// Constant-time comparison to prevent timing attacks

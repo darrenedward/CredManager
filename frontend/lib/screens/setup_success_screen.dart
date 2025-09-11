@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/auth_state.dart';
-import '../screens/main_dashboard_screen.dart';
+import '../screens/main_dashboard_screen_responsive.dart';
 import '../utils/constants.dart';
 
 class SetupSuccessScreen extends StatelessWidget {
@@ -52,7 +52,7 @@ class SetupSuccessScreen extends StatelessWidget {
                 // Navigate to the main dashboard
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => const MainDashboardScreen(),
+                    builder: (context) => const MainDashboardScreenResponsive(),
                   ),
                 );
               },

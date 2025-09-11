@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import '../models/auth_state.dart';
 import '../models/dashboard_state.dart';
+import '../services/theme_service.dart';
 import '../utils/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -501,11 +502,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Icons.palette,
               AppConstants.supportIconColor4,
               [
-                _buildSwitchSetting(
-                  'Dark Mode',
-                  'Use dark theme for the interface',
-                  _darkMode,
-                  (value) => setState(() => _darkMode = value),
+                Consumer<ThemeService>(
+                  builder: (context, themeService, child) => _buildSwitchSetting(
+                    'Dark Mode',
+                    'Use dark theme for the interface',
+                    themeService.isDarkMode,
+                    (value) async {
+                      await themeService.setDarkMode(value);
+                      setState(() => _darkMode = value);
+                    },
+                  ),
                 ),
                 const Divider(),
                 _buildSwitchSetting(

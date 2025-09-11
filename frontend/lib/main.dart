@@ -5,16 +5,18 @@ import 'screens/login_screen.dart';
 import 'screens/recovery_screen.dart';
 import 'screens/reset_passphrase_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/main_dashboard_screen.dart';
+import 'screens/main_dashboard_screen_responsive.dart';
 import 'screens/theme_test_screen.dart';
 import 'models/auth_state.dart';
 import 'models/dashboard_state.dart';
+import 'services/theme_service.dart';
 import 'utils/constants.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => ThemeService()),
         ChangeNotifierProvider(create: (context) => AuthState()),
         ChangeNotifierProxyProvider<AuthState, DashboardState>(
           create: (context) => DashboardState(
@@ -42,46 +44,24 @@ class ApiKeyManagerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppConstants.appName,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppConstants.primarySeed,
-          secondary: AppConstants.secondarySeed,
-          brightness: Brightness.light,
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppConstants.surfaceColor,
-          foregroundColor: AppConstants.primaryColor,
-          elevation: 0,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppConstants.primaryColor,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        cardTheme: CardThemeData(
-          color: AppConstants.surfaceColor,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      home: const AuthWrapper(),
-      routes: {
-        '/setup': (context) => const SetupScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/recovery': (context) => const RecoveryScreen(),
-        '/reset-passphrase': (context) => const ResetPassphraseScreen(recoveryToken: ''),
-        '/settings': (context) => const SettingsScreen(),
-        '/dashboard': (context) => const MainDashboardScreen(),
-        '/theme-test': (context) => const ThemeTestScreen(),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return MaterialApp(
+          title: AppConstants.appName,
+          theme: themeService.lightTheme,
+          darkTheme: themeService.darkTheme,
+          themeMode: themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          home: const AuthWrapper(),
+          routes: {
+            '/setup': (context) => const SetupScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/recovery': (context) => const RecoveryScreen(),
+            '/reset-passphrase': (context) => const ResetPassphraseScreen(recoveryToken: ''),
+            '/settings': (context) => const SettingsScreen(),
+            '/dashboard': (context) => const MainDashboardScreenResponsive(),
+            '/theme-test': (context) => const ThemeTestScreen(),
+          },
+        );
       },
     );
   }
@@ -158,7 +138,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     } else if (authState.hasValidSession) {
       // Setup completed and has valid active session
       print('DEBUG: AuthWrapper - Setup completed with valid session, showing MainDashboardScreen');
-      return const MainDashboardScreen();
+      return const MainDashboardScreenResponsive();
     } else {
       // Setup completed but no valid session - needs to login
       print('DEBUG: AuthWrapper - Setup completed but no valid session, showing LoginScreen');

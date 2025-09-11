@@ -65,6 +65,30 @@ class DashboardState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void showSettings() {
+    _currentView = 'settings';
+    _currentSelectedItem = null;
+    notifyListeners();
+  }
+
+  void showSupport() {
+    _currentView = 'support';
+    _currentSelectedItem = null;
+    notifyListeners();
+  }
+
+  void showProjectManagement() {
+    _currentView = 'project_management';
+    _currentSelectedItem = null;
+    notifyListeners();
+  }
+
+  void showAiServiceManagement() {
+    _currentView = 'ai_service_management';
+    _currentSelectedItem = null;
+    notifyListeners();
+  }
+
   void selectProject(String projectId) {
     _currentView = 'project_detail';
     _currentSection = 'projects';
@@ -232,7 +256,7 @@ class DashboardState extends ChangeNotifier {
     }
   }
   
-  /// Adds a credential to a project
+  /// Adds a credential to a project (legacy method)
   Future<bool> addCredentialToProject({
     required String projectId,
     required String name,
@@ -242,27 +266,27 @@ class DashboardState extends ChangeNotifier {
     try {
       setLoading(true);
       clearError();
-      
+
       final credential = await _credentialStorage.createCredential(
         projectId: projectId,
         name: name,
         value: value,
         type: type,
       );
-      
+
       // Update the project in local list
       final projectIndex = _projects.indexWhere((p) => p.id == projectId);
       if (projectIndex != -1) {
         final project = _projects[projectIndex];
         final updatedCredentials = List<Credential>.from(project.credentials);
         updatedCredentials.insert(0, credential);
-        
+
         _projects[projectIndex] = project.copyWith(
           credentials: updatedCredentials,
           updatedAt: DateTime.now(),
         );
       }
-      
+
       return true;
     } catch (e) {
       setError('Failed to add credential: $e');
@@ -272,7 +296,63 @@ class DashboardState extends ChangeNotifier {
       setLoading(false);
     }
   }
-  
+
+  /// Adds a credential to a project with detailed parameters
+  Future<void> addDetailedCredentialToProject(
+    String projectId,
+    String name,
+    String username,
+    String password, {
+    String? url,
+    String? notes,
+  }) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      // Create a structured value that includes all the information
+      final structuredValue = {
+        'password': password,
+        'username': username,
+        if (url != null && url.isNotEmpty) 'url': url,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+      };
+
+      // Convert to JSON string for storage
+      final valueToStore = structuredValue.length == 1
+        ? password // If only password, store it directly
+        : '${structuredValue['password']}|||${structuredValue['username']}|||${url ?? ''}|||${notes ?? ''}';
+
+      final credential = await _credentialStorage.createCredential(
+        projectId: projectId,
+        name: name,
+        value: valueToStore,
+        type: CredentialType.password,
+      );
+
+      // Update the project in local list
+      final projectIndex = _projects.indexWhere((p) => p.id == projectId);
+      if (projectIndex != -1) {
+        final project = _projects[projectIndex];
+        final updatedCredentials = List<Credential>.from(project.credentials);
+        updatedCredentials.insert(0, credential);
+
+        _projects[projectIndex] = project.copyWith(
+          credentials: updatedCredentials,
+          updatedAt: DateTime.now(),
+        );
+      }
+
+      notifyListeners();
+    } catch (e) {
+      setError('Failed to add credential: $e');
+      print('Error adding credential: $e');
+      rethrow;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   /// Updates a credential
   Future<bool> updateCredential(Credential credential) async {
     try {
@@ -584,6 +664,37 @@ class DashboardState extends ChangeNotifier {
       setError('Failed to add AI service key: $e');
       print('Error adding AI service key: $e');
       return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Clears all data from storage and resets the state
+  Future<void> clearAllData() async {
+    try {
+      setLoading(true);
+      clearError();
+
+      // Clear all projects and their credentials from storage
+      for (final project in _projects) {
+        await _credentialStorage.deleteProject(project.id);
+      }
+
+      // Clear all AI services from storage
+      for (final service in _aiServices) {
+        await _credentialStorage.deleteAiService(service.id);
+      }
+
+      // Clear local state
+      _projects.clear();
+      _aiServices.clear();
+      _currentView = 'overview';
+
+      notifyListeners();
+    } catch (e) {
+      setError('Failed to clear all data: $e');
+      print('Error clearing all data: $e');
+      rethrow;
     } finally {
       setLoading(false);
     }

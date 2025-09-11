@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:path/path.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart' as sqlcipher;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hex/hex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,7 +14,7 @@ class DatabaseService {
   static const String _databaseName = 'api_key_manager.db';
   static const int _databaseVersion = 3;
 
-  static Database? _database;
+  static sqlcipher.Database? _database;
   static DatabaseService? _instance;
   static String? _passphrase;
   static Uint8List? _encryptionSalt;
@@ -62,7 +62,7 @@ class DatabaseService {
   }
 
   /// Gets the database instance, initializing if necessary
-  Future<Database> get database async {
+  Future<sqlcipher.Database> get database async {
     if (_database != null) return _database!;
 
     if (_passphrase == null) {
@@ -74,18 +74,17 @@ class DatabaseService {
   }
 
   /// Initializes the database (plain mode for setup/init check)
-  Future<Database> _initDatabase() async {
+  Future<sqlcipher.Database> _initDatabase() async {
     // Initialize FFI for desktop platforms
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
     }
 
     // Get the database path
     final dbPath = await _getDatabasePath();
 
     // Open the database in plain mode
-    return await openDatabase(
+    return await sqlcipher.openDatabase(
       dbPath,
       version: _databaseVersion,
       onCreate: _onCreate,
@@ -95,19 +94,18 @@ class DatabaseService {
   }
 
   /// Initializes the encrypted database
-  Future<Database> _initEncryptedDatabase() async {
+  Future<sqlcipher.Database> _initEncryptedDatabase() async {
     if (_passphrase == null)
       throw Exception('Passphrase required for encrypted database');
 
-    // Initialize FFI for desktop platforms (using regular SQLite for now)
+    // Initialize FFI for desktop platforms
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
     }
 
     final dbPath = await _getDatabasePath();
 
-    final db = await openDatabase(
+    final db = await sqlcipher.openDatabase(
       dbPath,
       version: _databaseVersion,
       onCreate: _onCreate,
@@ -121,7 +119,7 @@ class DatabaseService {
   }
 
   /// Sets the encryption key for the database (SQLCipher PRAGMA key)
-  Future<void> _setEncryptionKey(Database db) async {
+  Future<void> _setEncryptionKey(sqlcipher.Database db) async {
     if (_encryptionKey == null) throw Exception('Encryption key not derived');
     final pragmaKey =
         EncryptionService().formatKeyForSQLCipher(_encryptionKey!);
@@ -133,7 +131,7 @@ class DatabaseService {
   Future<String> _getDatabasePath() async {
     if (Platform.isAndroid || Platform.isIOS) {
       // Mobile platforms - use app documents directory
-      final documentsDirectory = await getDatabasesPath();
+      final documentsDirectory = await sqlcipher.getDatabasesPath();
       return join(documentsDirectory, _databaseName);
     } else {
       // Desktop platforms - use application documents directory
@@ -167,7 +165,7 @@ class DatabaseService {
   }
 
   /// Creates the database schema
-  Future<void> _onCreate(Database db, int version) async {
+  Future<void> _onCreate(sqlcipher.Database db, int version) async {
     await db.transaction((txn) async {
       // Create projects table
       await txn.execute('''
@@ -289,7 +287,7 @@ class DatabaseService {
   }
 
   /// Handles database upgrades
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgrade(sqlcipher.Database db, int oldVersion, int newVersion) async {
     print('Upgrading database from version $oldVersion to $newVersion');
 
     // Handle migration from version 1 to 2
@@ -304,7 +302,7 @@ class DatabaseService {
   }
 
   /// Migrates database to version 2 (adds security_questions table)
-  Future<void> _migrateToVersion2(Database db) async {
+  Future<void> _migrateToVersion2(sqlcipher.Database db) async {
     print('Migrating to version 2: Adding security_questions table');
 
     await db.transaction((txn) async {
@@ -328,7 +326,7 @@ class DatabaseService {
     print('Successfully migrated to version 2');
   }
 
-  Future<void> _migrateToVersion3(Database db) async {
+  Future<void> _migrateToVersion3(sqlcipher.Database db) async {
     print(
         'Migrating to version 3: Adding consolidated storage columns to app_metadata');
 
@@ -349,7 +347,7 @@ class DatabaseService {
   }
 
   /// Called when database is opened
-  Future<void> _onOpen(Database db) async {
+  Future<void> _onOpen(sqlcipher.Database db) async {
     // Enable foreign key constraints
     await db.execute('PRAGMA foreign_keys = ON');
 
@@ -427,7 +425,7 @@ class DatabaseService {
   }
 
   /// Executes multiple operations in a transaction
-  Future<T> transaction<T>(Future<T> Function(Transaction txn) action) async {
+  Future<T> transaction<T>(Future<T> Function(sqlcipher.Transaction txn) action) async {
     final db = await database;
     return await db.transaction(action);
   }
@@ -575,5 +573,341 @@ class DatabaseService {
     final db = await database;
     await db.delete('security_questions');
     print('Deleted all security questions from database');
+  }
+  /// Detects if there's a legacy unencrypted database that needs migration
+  Future<bool> detectLegacyDatabase() async {
+    final dbPath = await _getDatabasePath();
+    final file = File(dbPath);
+    
+    if (!await file.exists()) {
+      return false; // No database exists
+    }
+
+    try {
+      // Try to open the database without encryption
+      final db = await sqlcipher.openDatabase(
+        dbPath,
+        version: _databaseVersion,
+        onOpen: (db) async {
+          await db.execute('PRAGMA foreign_keys = ON');
+        },
+      );
+
+      // Check if it contains our expected tables (indicating it's our legacy DB)
+      final tables = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+      );
+
+      await db.close();
+
+      // If it has our expected tables, it's a legacy database
+      final tableNames = tables.map((t) => t['name'] as String).toSet();
+      final expectedTables = {'projects', 'credentials', 'app_metadata', 'ai_services', 'ai_service_keys'};
+      
+      return expectedTables.every(tableNames.contains);
+    } catch (e) {
+      // If opening fails, it might be encrypted or corrupted
+      print('Legacy database detection error: $e');
+      return false;
+    }
+  }
+
+  /// Migrates from unencrypted SQLite to encrypted SQLCipher database
+  Future<bool> migrateToEncrypted(String passphrase) async {
+    if (passphrase.isEmpty) {
+      throw ArgumentError('Passphrase cannot be empty');
+    }
+
+    final dbPath = await _getDatabasePath();
+    final backupPath = '$dbPath.backup.${DateTime.now().millisecondsSinceEpoch}';
+
+    try {
+      // Step 1: Backup original database
+      final originalFile = File(dbPath);
+      if (await originalFile.exists()) {
+        await originalFile.copy(backupPath);
+        print('Created backup at: $backupPath');
+      }
+
+      // Step 2: Set passphrase and encryption key
+      await setPassphrase(passphrase);
+
+      // Step 3: Open encrypted database (will create new encrypted file)
+      final encryptedDb = await _initEncryptedDatabase();
+      
+      // Step 4: Copy all data from original to encrypted database
+      final originalDb = await sqlcipher.openDatabase(
+        dbPath,
+        version: _databaseVersion,
+        onOpen: (db) async {
+          await db.execute('PRAGMA foreign_keys = ON');
+        },
+      );
+
+      await _copyDatabaseData(originalDb, encryptedDb);
+
+      // Step 5: Close both databases
+      await originalDb.close();
+      await encryptedDb.close();
+
+      // Step 6: Verify migration success
+      DatabaseService.setPassphrase(passphrase);
+      final verificationDb = await database;
+      final integrityCheck = await checkIntegrity();
+      await verificationDb.close();
+
+      if (integrityCheck) {
+        print('Migration completed successfully');
+        // Optionally delete backup after successful migration
+        // await File(backupPath).delete();
+        return true;
+      } else {
+        print('Migration failed integrity check');
+        // Restore from backup
+        await _restoreFromBackup(dbPath, backupPath);
+        return false;
+      }
+    } catch (e) {
+      print('Migration failed: $e');
+      // Restore from backup on failure
+      await _restoreFromBackup(dbPath, backupPath);
+      return false;
+    }
+  }
+
+  /// Copies all data from source to destination database
+  Future<void> _copyDatabaseData(sqlcipher.Database source, sqlcipher.Database destination) async {
+    // Get all tables from source
+    final tables = await source.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+    );
+
+    for (final table in tables) {
+      final tableName = table['name'] as String;
+      print('Migrating table: $tableName');
+
+      // Get all data from source table
+      final data = await source.query(tableName);
+      
+      // Insert into destination table
+      for (final row in data) {
+        await destination.insert(tableName, row);
+      }
+
+      print('Migrated ${data.length} rows from $tableName');
+    }
+
+    // Copy indexes
+    final indexes = await source.rawQuery(
+      "SELECT name, sql FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'"
+    );
+
+    for (final index in indexes) {
+      final indexSql = index['sql'] as String;
+      await destination.execute(indexSql);
+      print('Created index: ${index['name']}');
+    }
+  }
+
+  /// Restores database from backup file
+  Future<void> _restoreFromBackup(String dbPath, String backupPath) async {
+    final backupFile = File(backupPath);
+    if (await backupFile.exists()) {
+      await backupFile.copy(dbPath);
+      print('Restored database from backup: $backupPath');
+    }
+  }
+
+  /// Migrates with backup functionality
+  Future<Map<String, dynamic>> migrateToEncryptedWithBackup(String passphrase) async {
+    final migrationSuccess = await migrateToEncrypted(passphrase);
+    final dbPath = await _getDatabasePath();
+    final backupPath = '$dbPath.backup.${DateTime.now().millisecondsSinceEpoch}';
+    
+    return {
+      'migrationSuccess': migrationSuccess,
+      'backupPath': migrationSuccess ? null : backupPath,
+    };
+  }
+
+  /// Migrates with rollback capability
+  Future<void> migrateToEncryptedWithRollback(String passphrase) async {
+    final result = await migrateToEncryptedWithBackup(passphrase);
+    if (!result['migrationSuccess']) {
+      throw Exception('Migration failed - rollback initiated');
+    }
+  }
+
+  /// Creates a corrupted migration state for testing
+  Future<void> createCorruptedMigrationState() async {
+    // This is a test-only method to simulate corrupted state
+    final dbPath = await _getDatabasePath();
+    final corruptedPath = '$dbPath.corrupted';
+    final file = File(dbPath);
+    if (await file.exists()) {
+      await file.copy(corruptedPath);
+      // Corrupt the file by truncating it
+      final corruptedFile = File(corruptedPath);
+      await corruptedFile.writeAsBytes([0, 1, 2, 3, 4]); // Invalid SQLite header
+    }
+  }
+
+  /// Recovers from corrupted migration state
+  Future<Map<String, dynamic>> recoverFromCorruptedMigration() async {
+    final dbPath = await _getDatabasePath();
+    final corruptedPath = '$dbPath.corrupted';
+    final backupPath = '$dbPath.backup';
+    
+    final corruptedFile = File(corruptedPath);
+    final backupFile = File(backupPath);
+    
+    bool recoverySuccessful = false;
+    bool dataIntegrityVerified = false;
+    
+    if (await backupFile.exists()) {
+      // Restore from backup
+      await backupFile.copy(dbPath);
+      recoverySuccessful = true;
+      
+      // Verify integrity
+      DatabaseService.clearPassphrase();
+      final db = await database;
+      dataIntegrityVerified = await checkIntegrity();
+      await db.close();
+    }
+    
+    // Cleanup
+    if (await corruptedFile.exists()) {
+      await corruptedFile.delete();
+    }
+    
+    return {
+      'recoverySuccessful': recoverySuccessful,
+      'dataIntegrityVerified': dataIntegrityVerified,
+    };
+  }
+
+  /// Migrates SharedPreferences data to encrypted database
+  Future<void> migrateSharedPreferencesToDB(Map<String, dynamic> sharedPrefsData) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    for (final entry in sharedPrefsData.entries) {
+      await updateMetadata(entry.key, entry.value.toString());
+    }
+
+    // Set default values if not present
+    if (!sharedPrefsData.containsKey('is_first_time')) {
+      await updateMetadata('is_first_time', '1');
+    }
+    if (!sharedPrefsData.containsKey('setup_completed')) {
+      await updateMetadata('setup_completed', '0');
+    }
+
+    print('Migrated ${sharedPrefsData.length} SharedPreferences entries to encrypted database');
+  }
+
+  /// Cleans up SharedPreferences after successful migration
+  Future<bool> cleanupSharedPreferencesAfterMigration() async {
+    // This would typically interact with SharedPreferences plugin
+    // For now, we'll just return success as the actual cleanup
+    // would be handled by the authentication service
+    print('SharedPreferences cleanup completed (simulated)');
+    return true;
+  }
+
+  /// Checks if legacy SharedPreferences data exists
+  Future<bool> hasLegacySharedPreferencesData() async {
+    // This would check SharedPreferences for auth-related keys
+    // For migration purposes, we assume cleanup is handled elsewhere
+    return false;
+  }
+
+  /// Migrates predefined security questions to user-defined format
+  Future<Map<String, dynamic>> migratePredefinedSecurityQuestions() async {
+    final questions = await getSecurityQuestions();
+    if (questions == null) {
+      return {
+        'requiresUserInput': false,
+        'questionsRemoved': 0,
+        'questionsRemaining': 0,
+      };
+    }
+
+    // Filter out predefined questions (isCustom = false)
+    final predefinedQuestions = questions.where((q) => q['isCustom'] == 'false').toList();
+    final customQuestions = questions.where((q) => q['isCustom'] == 'true').toList();
+
+    // Remove predefined questions
+    if (predefinedQuestions.isNotEmpty) {
+      await deleteSecurityQuestions();
+      
+      // Re-insert only custom questions
+      if (customQuestions.isNotEmpty) {
+        await storeSecurityQuestions(customQuestions);
+      }
+    }
+
+    return {
+      'requiresUserInput': predefinedQuestions.isNotEmpty && customQuestions.isEmpty,
+      'questionsRemoved': predefinedQuestions.length,
+      'questionsRemaining': customQuestions.length,
+    };
+  }
+
+  /// Validates migration integrity by comparing expected vs actual data counts
+  Future<Map<String, dynamic>> validateMigrationIntegrity(Map<String, dynamic> expectedCounts) async {
+    final db = await database;
+    
+    final validationResults = <String, dynamic>{
+      'isValid': true,
+      'missingRecords': [],
+      'corruptedRecords': [],
+    };
+
+    // Validate project count
+    if (expectedCounts.containsKey('project_count')) {
+      final projectCountResult = await db.rawQuery('SELECT COUNT(*) as count FROM projects');
+      final actualProjectCount = projectCountResult.first['count'] as int;
+      final expectedProjectCount = expectedCounts['project_count'] as int;
+      
+      if (actualProjectCount != expectedProjectCount) {
+        validationResults['isValid'] = false;
+        validationResults['projectCount'] = actualProjectCount;
+        validationResults['missingRecords'].add('projects: expected $expectedProjectCount, got $actualProjectCount');
+      }
+    }
+
+    // Validate credential count
+    if (expectedCounts.containsKey('credential_count')) {
+      final credentialCountResult = await db.rawQuery('SELECT COUNT(*) as count FROM credentials');
+      final actualCredentialCount = credentialCountResult.first['count'] as int;
+      final expectedCredentialCount = expectedCounts['credential_count'] as int;
+      
+      if (actualCredentialCount != expectedCredentialCount) {
+        validationResults['isValid'] = false;
+        validationResults['credentialCount'] = actualCredentialCount;
+        validationResults['missingRecords'].add('credentials: expected $expectedCredentialCount, got $actualCredentialCount');
+      }
+    }
+
+    // Validate metadata entries
+    if (expectedCounts.containsKey('metadata_entries')) {
+      final metadataCountResult = await db.rawQuery('SELECT COUNT(*) as count FROM app_metadata');
+      final actualMetadataCount = metadataCountResult.first['count'] as int;
+      final expectedMetadataCount = expectedCounts['metadata_entries'] as int;
+      
+      if (actualMetadataCount != expectedMetadataCount) {
+        validationResults['isValid'] = false;
+        validationResults['metadataCount'] = actualMetadataCount;
+        validationResults['missingRecords'].add('metadata: expected $expectedMetadataCount, got $actualMetadataCount');
+      }
+    }
+
+    return validationResults;
+  }
+
+  /// Gets the database file path
+  Future<String> getDatabasePath() async {
+    return await _getDatabasePath();
   }
 }

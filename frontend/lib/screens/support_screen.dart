@@ -325,6 +325,452 @@ class SupportScreen extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 30),
+
+              // Getting Started Guide
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.play_circle_outline,
+                              color: AppConstants.accentColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Getting Started Guide',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildGettingStartedStep(
+                          '1. Create Your First Project',
+                          'Navigate to the Projects tab and click "New Project". Give it a name and description to organize your credentials by purpose or environment.',
+                          Icons.folder_outlined,
+                        ),
+                        _buildGettingStartedStep(
+                          '2. Add Credentials',
+                          'Click "Add Credential" in your project. Enter the service name, credential type (API Key, Password, etc.), and the actual credential value.',
+                          Icons.add_circle_outline,
+                        ),
+                        _buildGettingStartedStep(
+                          '3. Setup AI Services',
+                          'Use the AI Services tab to manage API keys for OpenAI, Anthropic, and other AI platforms with pre-configured templates.',
+                          Icons.auto_awesome_outlined,
+                        ),
+                        _buildGettingStartedStep(
+                          '4. Configure Security',
+                          'Go to Settings to adjust auto-lock timeout, enable biometric authentication, and configure backup preferences.',
+                          Icons.security_outlined,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Data Management
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.storage,
+                              color: AppConstants.secondaryColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Data Management',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildDataManagementItem(
+                          'Backup Your Data',
+                          'Click the "Backup Data" button in the dashboard quick actions. Choose a secure location to save your encrypted backup file. This creates a complete backup of all your projects and credentials.',
+                          Icons.backup,
+                        ),
+                        _buildDataManagementItem(
+                          'Import Data',
+                          'Use "Import Data" from the dashboard to restore from a backup file. You can also import from other password managers by converting to the supported JSON format.',
+                          Icons.upload,
+                        ),
+                        _buildDataManagementItem(
+                          'Export Individual Projects',
+                          'Right-click any project to export just that project\'s credentials. Useful for sharing specific credentials with team members.',
+                          Icons.download,
+                        ),
+                        _buildDataManagementItem(
+                          'Sync Across Devices',
+                          'While the app is offline-first, you can manually sync by backing up on one device and importing on another. Cloud sync is planned for future releases.',
+                          Icons.sync,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Project Management Guide
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.folder_open,
+                              color: AppConstants.accentColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Project Management',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildProjectManagementItem(
+                          'Creating Projects',
+                          'Go to Projects tab → Click "New Project" → Enter name and description → Save. Projects help organize credentials by purpose (e.g., "Production APIs", "Development Keys").',
+                          Icons.create_new_folder,
+                        ),
+                        _buildProjectManagementItem(
+                          'Adding Credentials to Projects',
+                          'Open a project → Click "Add Credential" → Choose type (API Key, Password, Token, etc.) → Enter service name and credential value → Save securely.',
+                          Icons.add_circle,
+                        ),
+                        _buildProjectManagementItem(
+                          'Project Export',
+                          'Right-click any project → Select "Export Project" → Choose location → Save encrypted file. Perfect for sharing project credentials with team members.',
+                          Icons.file_download,
+                        ),
+                        _buildProjectManagementItem(
+                          'Project Import',
+                          'Projects tab → Click "Import Project" → Select exported project file → Enter passphrase → All credentials will be imported into a new project.',
+                          Icons.file_upload,
+                        ),
+                        _buildProjectManagementItem(
+                          'Deleting Projects',
+                          'Right-click project → Select "Delete Project" → Confirm deletion. Warning: This permanently removes all credentials in the project.',
+                          Icons.delete_forever,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Credential Management
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.key,
+                              color: AppConstants.successColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Credential Management',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildCredentialManagementItem(
+                          'Supported Credential Types',
+                          'API Keys, Passwords, Database Connection Strings, SSH Keys, Tokens, Certificates, and Custom credential types. Each type has optimized input fields.',
+                          Icons.category,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Quick Copy Feature',
+                          'Click the copy icon next to any credential to instantly copy it to clipboard. The app will show a confirmation and auto-clear clipboard after 30 seconds for security.',
+                          Icons.content_copy,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Editing Credentials',
+                          'Click on any credential → Edit button → Update values → Save. You can change the service name, credential type, or the actual credential value.',
+                          Icons.edit,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Credential Search',
+                          'Use the search bar at the top to quickly find credentials by service name, project, or credential type. Search works across all projects.',
+                          Icons.search,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Password Generator',
+                          'When adding passwords, click the generate button to create strong passwords with customizable length, symbols, and character sets.',
+                          Icons.auto_fix_high,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Security & Privacy
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.security,
+                              color: AppConstants.errorColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Security & Privacy',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildSecurityItem(
+                          'Auto-Lock Settings',
+                          'Go to Settings → Security → Set auto-lock timeout (5-60 minutes). App automatically locks when inactive to protect your credentials.',
+                          Icons.lock_clock,
+                        ),
+                        _buildSecurityItem(
+                          'Changing Master Passphrase',
+                          'Settings → Security → "Change Passphrase" → Enter current passphrase → Enter new passphrase → Confirm. All data is re-encrypted with the new passphrase.',
+                          Icons.password,
+                        ),
+                        _buildSecurityItem(
+                          'Clear All Data',
+                          'Settings → Security → "Clear All Data" → Type "DELETE" to confirm. This permanently removes all projects, credentials, and settings. Cannot be undone.',
+                          Icons.delete_sweep,
+                        ),
+                        _buildSecurityItem(
+                          'Biometric Authentication',
+                          'Settings → Security → Enable "Biometric Login" (if supported). Use fingerprint or face recognition to unlock the app instead of typing passphrase.',
+                          Icons.fingerprint,
+                        ),
+                        _buildSecurityItem(
+                          'Offline Security',
+                          'All data is stored locally and encrypted. No data is sent to external servers. Your credentials never leave your device unless you explicitly export them.',
+                          Icons.cloud_off,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Troubleshooting
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.help_outline,
+                              color: AppConstants.warningColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Troubleshooting',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildTroubleshootingItem(
+                          'Forgot Master Passphrase',
+                          'Unfortunately, if you forget your master passphrase, your data cannot be recovered. This is by design for security. You\'ll need to clear all data and start fresh.',
+                          Icons.lock_reset,
+                        ),
+                        _buildTroubleshootingItem(
+                          'Import/Export Not Working',
+                          'Ensure the file is not corrupted and you have the correct passphrase. Check file permissions and try saving/loading from a different location.',
+                          Icons.error_outline,
+                        ),
+                        _buildTroubleshootingItem(
+                          'App Won\'t Start',
+                          'Try restarting the app. If the issue persists, check if your system meets the minimum requirements. Consider clearing app data as a last resort.',
+                          Icons.refresh,
+                        ),
+                        _buildTroubleshootingItem(
+                          'Performance Issues',
+                          'Large numbers of credentials (1000+) may slow the app. Consider organizing into more projects or archiving old credentials by exporting and removing them.',
+                          Icons.speed,
+                        ),
+                        _buildTroubleshootingItem(
+                          'Backup File Corrupted',
+                          'Always keep multiple backup copies in different locations. Test backup files periodically by importing them into a test environment.',
+                          Icons.backup,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 40),
             ],
           ),
@@ -527,6 +973,294 @@ class SupportScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildGettingStartedStep(String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: AppConstants.accentColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(
+              icon,
+              color: AppConstants.accentColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataManagementItem(String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: AppConstants.secondaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(
+              icon,
+              color: AppConstants.secondaryColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProjectManagementItem(String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: AppConstants.accentColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(
+              icon,
+              color: AppConstants.accentColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCredentialManagementItem(String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: AppConstants.successColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(
+              icon,
+              color: AppConstants.successColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSecurityItem(String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: AppConstants.errorColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(
+              icon,
+              color: AppConstants.errorColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTroubleshootingItem(String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: AppConstants.warningColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(
+              icon,
+              color: AppConstants.warningColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

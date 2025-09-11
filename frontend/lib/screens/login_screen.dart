@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:local_auth/local_auth.dart';
 import '../widgets/auth_form.dart';
 import '../services/auth_service.dart';
+import '../services/biometric_auth_service.dart';
 import '../models/auth_state.dart';
 import '../models/user_model.dart';
 import '../utils/constants.dart';
@@ -19,6 +21,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _passphraseController = TextEditingController();
   final AuthService _authService = AuthService();
+  final BiometricAuthService _biometricService = BiometricAuthService();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -30,6 +33,29 @@ class _LoginScreenState extends State<LoginScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _autoLogin(widget.autoLoginToken!);
       });
+    } else {
+      // Check if biometric login is available and enabled
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkBiometricAutoLogin();
+      });
+    }
+  }
+
+  Future<void> _checkBiometricAutoLogin() async {
+    try {
+      final isAvailable = await _biometricService.isBiometricAvailable();
+      final isEnabled = await _biometricService.isBiometricEnabled();
+      
+      if (isAvailable && isEnabled) {
+        // Don't auto-trigger, just make the option available
+        // User can tap the biometric button if they want to use it
+        setState(() {
+          // This will trigger a rebuild to show the biometric button
+        });
+      }
+    } catch (e) {
+      // Silently fail, user can still use regular login
+      print('DEBUG: Error checking biometric availability: $e');
     }
   }
 
@@ -68,6 +94,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _biometricLogin() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      print('DEBUG: Starting biometric login');
+      final authState = Provider.of<AuthState>(context, listen: false);
+      
+      final success = await authState.loginWithBiometric();
+      
+      if (success) {
+        print('DEBUG: Biometric login successful');
+        _showSuccess('Biometric login successful!');
+        // AuthWrapper will automatically navigate to dashboard due to state change
+      } else {
+        print('DEBUG: Biometric login failed');
+        // Error message is already set in AuthState
+      }
+    } catch (e) {
+      print('DEBUG: Biometric login error: $e');
+      _showError('Biometric authentication failed. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   Future<void> _login() async {
     // Validate passphrase using validation utility
     final validationError = validatePassphraseError(_passphraseController.text);
@@ -87,13 +145,19 @@ class _LoginScreenState extends State<LoginScreen> {
       await authState.login(_passphraseController.text);
 
       if (mounted) {
-        print('DEBUG: AuthState login completed successfully');
-        _showSuccess('Login successful!');
-        // AuthWrapper will automatically navigate to dashboard due to state change
+        // Check if login was actually successful by verifying auth state
+        if (authState.hasValidSession) {
+          print('DEBUG: Login successful - hasValidSession: true');
+          _showSuccess('Welcome back!');
+          // AuthWrapper will automatically navigate to dashboard due to state change
+        } else {
+          print('DEBUG: Login failed - hasValidSession: false, error: ${authState.error}');
+          _showError(authState.error ?? 'Login failed. Please try again.');
+        }
       }
     } catch (e) {
       // Secure error handling - generic messages
-      print('DEBUG: Login failed with error: $e');
+      print('DEBUG: Login failed with exception: $e');
       if (mounted) {
         _showError('Login failed. Please try again.');
       }
@@ -180,6 +244,68 @@ class _LoginScreenState extends State<LoginScreen> {
               errorMessage: _errorMessage,
             ),
             const SizedBox(height: 20),
+            
+            // Biometric authentication button
+            FutureBuilder<bool>(
+              future: _biometricService.isBiometricAvailable(),
+              builder: (context, availableSnapshot) {
+                final isAvailable = availableSnapshot.data ?? false;
+                
+                if (!isAvailable) {
+                  return const SizedBox.shrink();
+                }
+                
+                return FutureBuilder<bool>(
+                  future: _biometricService.isBiometricEnabled(),
+                  builder: (context, enabledSnapshot) {
+                    final isEnabled = enabledSnapshot.data ?? false;
+                    
+                    if (!isEnabled) {
+                      return const SizedBox.shrink();
+                    }
+                    
+                    return Column(
+                      children: [
+                        FutureBuilder<String>(
+                          future: _biometricService.getPrimaryBiometricType(),
+                          builder: (context, typeSnapshot) {
+                            final biometricType = typeSnapshot.data ?? 'Biometric';
+                            
+                            return ElevatedButton.icon(
+                              onPressed: _isLoading ? null : _biometricLogin,
+                              icon: Icon(
+                                biometricType.toLowerCase().contains('face') 
+                                  ? Icons.face 
+                                  : Icons.fingerprint,
+                              ),
+                              label: Text('Use $biometricType'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppConstants.accentColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, 
+                                  vertical: 12
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'OR',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+            
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/recovery');

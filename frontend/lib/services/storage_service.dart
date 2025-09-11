@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
+import 'database_service.dart';
 
 class StorageService {
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
@@ -26,24 +27,29 @@ class StorageService {
   }
 
   Future<void> storeSecurityQuestions(List<Map<String, String>> questions) async {
-    print('Storing security questions: $questions');
-    final prefs = await SharedPreferences.getInstance();
-    final jsonQuestions = questions.map((q) => {
-      'question': q['question'] as String,
-      'answerHash': q['answerHash'] as String,
-      'isCustom': q['isCustom'] as String,
-    }).toList();
-    print('JSON questions to store: $jsonQuestions');
-    await prefs.setString(_securityQuestionsKey, jsonEncode(jsonQuestions));
+    print('Storing security questions in encrypted database: $questions');
+    // Use encrypted database instead of SharedPreferences for security
+    await DatabaseService.instance.storeSecurityQuestions(questions);
+
+    // Also migrate any existing questions from SharedPreferences to database
+    await _migrateSecurityQuestionsFromPrefs();
   }
 
   Future<List<Map<String, String>>?> getSecurityQuestions() async {
+    // First try to get from encrypted database
+    final dbQuestions = await DatabaseService.instance.getSecurityQuestions();
+    if (dbQuestions != null && dbQuestions.isNotEmpty) {
+      print('Retrieved ${dbQuestions.length} security questions from encrypted database');
+      return dbQuestions;
+    }
+
+    // Fallback: check SharedPreferences for migration
     final prefs = await SharedPreferences.getInstance();
     final questionsJson = prefs.getString(_securityQuestionsKey);
     if (questionsJson != null) {
-      print('Retrieved security questions JSON: $questionsJson');
+      print('Found security questions in SharedPreferences, migrating to database');
       final List<dynamic> decoded = jsonDecode(questionsJson) as List<dynamic>;
-      return decoded.map<Map<String, String>>((dynamic q) {
+      final questions = decoded.map<Map<String, String>>((dynamic q) {
         final Map<String, dynamic> questionMap = q as Map<String, dynamic>;
         return {
           'question': questionMap['question'] as String,
@@ -51,7 +57,15 @@ class StorageService {
           'isCustom': questionMap['isCustom'] as String? ?? 'false',
         };
       }).toList();
+
+      // Migrate to database and remove from SharedPreferences
+      await DatabaseService.instance.storeSecurityQuestions(questions);
+      await prefs.remove(_securityQuestionsKey);
+      print('Successfully migrated security questions to encrypted database');
+
+      return questions;
     }
+
     return null;
   }
 
@@ -143,6 +157,35 @@ class StorageService {
       await deleteToken();
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_isLoggedInKey, false);
+    }
+  }
+
+  /// Migrates security questions from SharedPreferences to encrypted database
+  Future<void> _migrateSecurityQuestionsFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final questionsJson = prefs.getString(_securityQuestionsKey);
+
+      if (questionsJson != null) {
+        print('Migrating existing security questions from SharedPreferences to database');
+        final List<dynamic> decoded = jsonDecode(questionsJson) as List<dynamic>;
+        final questions = decoded.map<Map<String, String>>((dynamic q) {
+          final Map<String, dynamic> questionMap = q as Map<String, dynamic>;
+          return {
+            'question': questionMap['question'] as String,
+            'answerHash': questionMap['answerHash'] as String,
+            'isCustom': questionMap['isCustom'] as String? ?? 'false',
+          };
+        }).toList();
+
+        // Store in database and remove from SharedPreferences
+        await DatabaseService.instance.storeSecurityQuestions(questions);
+        await prefs.remove(_securityQuestionsKey);
+        print('Successfully migrated ${questions.length} security questions to encrypted database');
+      }
+    } catch (e) {
+      print('Error during security questions migration: $e');
+      // Don't throw - migration failure shouldn't break the app
     }
   }
 }
