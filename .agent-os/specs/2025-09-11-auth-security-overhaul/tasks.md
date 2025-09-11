@@ -3,18 +3,18 @@
 ## Tasks
 
 ### PT001: Argon2 Authentication Fix and Enhancement
-**Status:** [ ] TODO
+**Status:** [x] COMPLETE
 **Effort:** M (3-4 days)
 **Description:** Fix passphrase parsing bugs, enforce Argon2-only hashing, remove SHA fallback, and implement proper input normalization
 
 **Subtasks:**
 - [x] ST001: Write comprehensive tests for Argon2 password verification with edge cases
 - [x] ST002: Fix passphrase parsing bug to handle whitespace and normalization
-- [ ] ST003: Remove SHA-256 fallback implementation entirely
-- [ ] ST004: Implement proper Argon2id parameter configuration for security
-- [ ] ST005: Add input validation and sanitization for passphrases
-- [ ] ST006: Update all authentication tests to use Argon2-only paths
-- [ ] ST007: Verify all authentication tests pass with new implementation
+- [x] ST003: Remove SHA-256 fallback implementation entirely
+- [x] ST004: Implement proper Argon2id parameter configuration for security
+- [x] ST005: Add input validation and sanitization for passphrases
+- [x] ST006: Update all authentication tests to use Argon2-only paths
+- [x] ST007: Verify all authentication tests pass with new implementation
 
 ### PT002: Encrypted Database Integration
 **Status:** [ ] TODO
