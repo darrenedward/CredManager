@@ -23,7 +23,7 @@
 
 **Subtasks:**
 - [x] ST008: Write tests for SQLCipher integration and data encryption
-- [ ] ST009: Replace sqflite dependency with SQLCipher package
+- [x] ST009: Replace sqflite dependency with SQLCipher package
 - [ ] ST010: Implement passphrase-derived database encryption key
 - [ ] ST011: Migrate all authentication data to encrypted database
 - [ ] ST012: Remove SharedPreferences and SecureStorage usage for auth data
