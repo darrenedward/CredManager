@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:crypto/crypto.dart';
 import '../utils/constants.dart';
 import 'storage_service.dart';
 import 'jwt_service.dart';
@@ -17,48 +16,23 @@ class AuthService {
   int _recoveryAttempts = 0;
   DateTime? _lastRecoveryAttempt;
 
-  /// Generates a salt for hashing (legacy method for migration)
-  String _generateSalt([int length = 32]) {
-    final random = Random.secure();
-    final values = List<int>.generate(length, (i) => random.nextInt(256));
-    return base64Url.encode(values);
-  }
-
-  /// Hashes a passphrase with a salt using SHA-256 (legacy method for migration)
-  String _hashPassphraseLegacy(String passphrase, String salt) {
-    final bytes = utf8.encode(passphrase + salt);
-    final digest = sha256.convert(bytes);
-    return '${digest.toString()}\$salt:$salt';
-  }
-
   /// Hashes a passphrase using Argon2 (military-grade security)
   Future<String> _hashPassphrase(String passphrase) async {
     return await _argon2Service.hashPassword(passphrase);
   }
 
-  /// Verifies a passphrase against a stored hash (supports both Argon2 and legacy SHA-256)
+  /// Verifies a passphrase against a stored hash (Argon2 only)
   Future<bool> _verifyPassphrase(String passphrase, String storedHash) async {
-    // Check if it's an Argon2 hash
-    if (storedHash.startsWith('\$argon2id\$')) {
-      return await _argon2Service.verifyPassword(passphrase, storedHash);
+    if (!storedHash.startsWith(r'$argon2id$')) {
+      return false;
     }
-
-    // Legacy SHA-256 hash format
-    if (!storedHash.contains('\$salt:')) return false;
-
-    final parts = storedHash.split('\$salt:');
-    final salt = parts[1];
-
-    // Hash the input passphrase with the extracted salt (legacy method)
-    final hashedInput = _hashPassphraseLegacy(passphrase, salt);
-
-    // Compare the hashes
-    return hashedInput == storedHash;
+    return await _argon2Service.verifyPassword(passphrase, storedHash);
   }
 
   /// Creates a new passphrase and security questions (offline mode)
   Future<String?> createPassphrase(String passphrase, List<Map<String, String>> securityQuestions) async {
     try {
+      passphrase = passphrase.trim();
       print('Starting createPassphrase with ${securityQuestions.length} questions');
       
       // Validate inputs
@@ -123,6 +97,7 @@ class AuthService {
   /// Logs in with a passphrase (offline mode)
   Future<String?> login(String passphrase) async {
     try {
+      passphrase = passphrase.trim();
       // Validate inputs
       if (passphrase.isEmpty) {
         throw Exception('Passphrase is required');
@@ -130,6 +105,7 @@ class AuthService {
       
       // Get stored passphrase hash
       final storedHash = await _storageService.getPassphraseHash();
+      print('DEBUG: Retrieved stored hash: ${storedHash != null ? 'YES (${storedHash.substring(0, 20)}...)' : 'NULL'}');
       if (storedHash == null) {
         throw Exception('No account found. Please set up your account first.');
       }
@@ -185,6 +161,8 @@ class AuthService {
 
   /// Verifies security question answers (offline mode)
   Future<bool> verifyRecoveryAnswers(List<Map<String, String>> answers) async {
+    print('DEBUG: Starting verifyRecoveryAnswers with ${answers.length} answers');
+    
     // Check rate limiting
     if (_isRecoveryLockedOut()) {
       throw Exception('Too many recovery attempts. Please try again later.');
@@ -197,14 +175,23 @@ class AuthService {
       
       final storedQuestions = await _storageService.getSecurityQuestions();
       if (storedQuestions == null || storedQuestions.isEmpty) {
+        print('DEBUG: No stored questions found');
         return false;
+      }
+      
+      print('DEBUG: Found ${storedQuestions.length} stored questions');
+      for (int i = 0; i < storedQuestions.length; i++) {
+        print('DEBUG: Stored Q${i+1}: ${storedQuestions[i]['question']}');
       }
       
       // Match answers to stored questions (case-insensitive)
       int correctAnswers = 0;
-      for (var answer in answers) {
+      for (int i = 0; i < answers.length; i++) {
+        final answer = answers[i];
         final question = answer['question'];
         final answerText = answer['answer'];
+        
+        print('DEBUG: Processing answer ${i+1}: Q="${question}", A="${answerText}"');
         
         if (question != null && answerText != null) {
           // Find matching question in stored questions
@@ -214,47 +201,49 @@ class AuthService {
           );
           
           if (matchingQuestion['question'] != '') {
+            print('DEBUG: Found matching stored question');
+            print('DEBUG: Stored hash: ${matchingQuestion['answerHash']}');
+            
             // Verify answer against stored hash (case-insensitive)
-            if (await _verifyAnswerCaseInsensitive(answerText, matchingQuestion['answerHash']!)) {
+            final isCorrect = await _verifyAnswerCaseInsensitive(answerText, matchingQuestion['answerHash']!);
+            print('DEBUG: Answer verification result: $isCorrect');
+            
+            if (isCorrect) {
               correctAnswers++;
+              print('DEBUG: Correct answer count now: $correctAnswers');
             }
+          } else {
+            print('DEBUG: No matching stored question found');
           }
         }
       }
       
       // All answers must be correct
       final isValid = correctAnswers == answers.length && answers.length == storedQuestions.length;
+      print('DEBUG: Final verification - Correct: $correctAnswers, Required: ${answers.length}, Stored: ${storedQuestions.length}');
+      print('DEBUG: Overall result: $isValid');
       
       if (isValid) {
         // Reset attempts on successful verification
         _recoveryAttempts = 0;
         _lastRecoveryAttempt = null;
+        print('DEBUG: Recovery successful - resetting attempt counter');
       }
       
       return isValid;
     } catch (e) {
+      print('DEBUG: Error in verifyRecoveryAnswers: $e');
       return false;
     }
   }
 
   /// Verifies an answer against a stored hash (case-insensitive)
   Future<bool> _verifyAnswerCaseInsensitive(String answer, String storedHash) async {
-    // Check if it's an Argon2 hash
-    if (storedHash.startsWith('\$argon2id\$')) {
-      return await _argon2Service.verifyPassword(answer.toLowerCase().trim(), storedHash);
+    if (!storedHash.startsWith(r'$argon2id$')) {
+      return false;
     }
-
-    // Legacy SHA-256 hash format
-    if (!storedHash.contains('\$salt:')) return false;
-
-    final parts = storedHash.split('\$salt:');
-    final salt = parts[1];
-
-    // Hash the input answer with the extracted salt (legacy method, lowercase for case-insensitive comparison)
-    final hashedInput = _hashPassphraseLegacy(answer.toLowerCase().trim(), salt);
-
-    // Compare the hashes
-    return hashedInput == storedHash;
+    final normalized = answer.toLowerCase().trim();
+    return await _argon2Service.verifyPassword(normalized, storedHash);
   }
 
   /// Requests a temporary recovery token (offline mode)
@@ -277,6 +266,7 @@ class AuthService {
   /// Resets the passphrase using a recovery token (offline mode)
   Future<String?> resetPassphrase(String token, String newPassphrase) async {
     try {
+      newPassphrase = newPassphrase.trim();
       // In a real implementation, we would verify the token first
       // For now, we'll just update the stored passphrase
       

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
-import 'package:crypto/crypto.dart';
 
 class Argon2Service {
   static const int _saltLength = 32;
@@ -28,6 +27,7 @@ class Argon2Service {
 
   /// Hashes a password using Argon2id (matching backend implementation)
   Future<String> hashPassword(String password) async {
+    password = password.trim();
     final salt = _generateSalt();
 
     final secretKey = SecretKey(utf8.encode(password));
@@ -50,33 +50,58 @@ class Argon2Service {
 
   /// Verifies a password against a stored Argon2 hash
   Future<bool> verifyPassword(String password, String encodedHash) async {
+    password = password.trim();
     try {
-      // Parse the encoded hash
-      final parts = encodedHash.split('\$');
+      // Parse Argon2 hash format: $argon2id$v=19$m=...,t=...,p=...$saltB64$hashB64
+      final parts = encodedHash.split(r'$');
       if (parts.length != 6) {
         return false;
       }
 
-      // Extract salt and hash
+      if (parts[1] != 'argon2id' || parts[2] != 'v=19') {
+        return false;
+      }
+
+      final paramSection = parts[3];
       final saltB64 = parts[4];
       final hashB64 = parts[5];
+
+      // Parse parameters dynamically from m=...,t=...,p=...
+      int m = _memoryCost;
+      int t = _timeCost;
+      int p = _parallelism;
+      try {
+        for (final segment in paramSection.split(',')) {
+          final kv = segment.split('=');
+          if (kv.length == 2) {
+            switch (kv[0]) {
+              case 'm':
+                m = int.tryParse(kv[1]) ?? m;
+                break;
+              case 't':
+                t = int.tryParse(kv[1]) ?? t;
+                break;
+              case 'p':
+                p = int.tryParse(kv[1]) ?? p;
+                break;
+            }
+          }
+        }
+      } catch (e) {
+        return false;
+      }
 
       final salt = base64.decode(saltB64);
       final storedHash = base64.decode(hashB64);
 
-      // Hash the provided password with the same parameters
+      // Create Argon2id instance with parsed params
+      final argon2dyn = Argon2id(memory: m, parallelism: p, iterations: t, hashLength: storedHash.length);
+
       final secretKey = SecretKey(utf8.encode(password));
-      final nonce = Uint8List.fromList(salt);
+      final derived = await argon2dyn.deriveKey(secretKey: secretKey, nonce: salt);
+      final computed = await derived.extractBytes();
 
-      final computedHash = await _argon2.deriveKey(
-        secretKey: secretKey,
-        nonce: nonce,
-      );
-
-      final computedHashBytes = await computedHash.extractBytes();
-
-      // Use constant-time comparison to prevent timing attacks
-      return _constantTimeEquals(storedHash, computedHashBytes);
+      return _constantTimeEquals(storedHash, computed);
     } catch (e) {
       return false;
     }
@@ -96,26 +121,4 @@ class Argon2Service {
     return result == 0;
   }
 
-  /// Migrates from SHA-256 hash to Argon2 hash
-  Future<String?> migrateFromSha256(String password, String oldSha256Hash) async {
-    // Extract salt from old SHA-256 hash format: hash$salt:salt
-    if (!oldSha256Hash.contains('\$salt:')) {
-      return null;
-    }
-
-    final parts = oldSha256Hash.split('\$salt:');
-    final salt = parts[1];
-
-    // Verify the password matches the old hash
-    final bytes = utf8.encode(password + salt);
-    final digest = sha256.convert(bytes);
-    final computedHash = '${digest.toString()}\$salt:$salt';
-
-    if (computedHash == oldSha256Hash) {
-      // Password is correct, create new Argon2 hash
-      return await hashPassword(password);
-    }
-
-    return null;
-  }
 }

@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Overhaul authentication to resolve passcode rejection by fixing Argon2 parsing and adding input trimming, eliminate insecure SHA-256 fallback with Argon2-only enforcement, consolidate all storage to a passphrase-unlocked SQLCipher-encrypted database, derive all secrets dynamically from the passphrase, remove hardcoded values and mocks like predefined questions, and enhance biometrics with AES encryption to achieve military-grade security for the credential vault app.

@@ -22,9 +22,11 @@ dependencies:
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.0
   sqlite3_flutter_libs: ^0.5.0
+  hex: ^0.2.0
   path: ^1.8.3
   convert: ^3.1.1
   path_provider: ^2.1.1
+  local_auth: ^2.1.6
 
 dev_dependencies:
   flutter_test:
