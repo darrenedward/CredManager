@@ -22,7 +22,7 @@
 **Description:** Replace SQLite with SQLCipher, implement passphrase-derived encryption, consolidate all storage to encrypted DB
 
 **Subtasks:**
-- [ ] ST008: Write tests for SQLCipher integration and data encryption
+- [x] ST008: Write tests for SQLCipher integration and data encryption
 - [ ] ST009: Replace sqflite dependency with SQLCipher package
 - [ ] ST010: Implement passphrase-derived database encryption key
 - [ ] ST011: Migrate all authentication data to encrypted database
