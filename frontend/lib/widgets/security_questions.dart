@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 class SecurityQuestion {
   final String question;
   final bool isCustom;
-  final String? id; // For predefined questions
 
   SecurityQuestion({
     required this.question,
     this.isCustom = false,
-    this.id,
   });
 }
 

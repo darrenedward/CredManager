@@ -47,23 +47,23 @@ class JwtService {
     // Add issued at time if not present
     final now = DateTime.now();
     final Map<String, dynamic> fullPayload = Map<String, dynamic>.from(payload);
-    
+
     if (!fullPayload.containsKey('iat')) {
       fullPayload['iat'] = now.millisecondsSinceEpoch ~/ 1000;
     }
-    
+
     // Add expiration time (1 hour default)
     if (!fullPayload.containsKey('exp')) {
       final exp = now.add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000;
       fullPayload['exp'] = exp;
     }
-    
+
     // Create header
     final header = base64Url.encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'));
-    
+
     // Create payload
     final payloadEncoded = base64Url.encode(utf8.encode(jsonEncode(fullPayload)));
-    
+
     // Create signature
     final data = '$header.$payloadEncoded';
     final key = utf8.encode(secret);
@@ -71,7 +71,40 @@ class JwtService {
     final hmac = Hmac(sha256, key);
     final digest = hmac.convert(bytes);
     final signature = base64Url.encode(digest.bytes);
-    
+
+    return '$data.$signature';
+  }
+
+  /// Generates a JWT token using a derived secret key (Uint8List)
+  /// This is the secure implementation that uses passphrase-derived keys
+  static String generateTokenWithDerivedSecret(Map<String, dynamic> payload, Uint8List secretKey) {
+    // Add issued at time if not present
+    final now = DateTime.now();
+    final Map<String, dynamic> fullPayload = Map<String, dynamic>.from(payload);
+
+    if (!fullPayload.containsKey('iat')) {
+      fullPayload['iat'] = now.millisecondsSinceEpoch ~/ 1000;
+    }
+
+    // Add expiration time (1 hour default)
+    if (!fullPayload.containsKey('exp')) {
+      final exp = now.add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000;
+      fullPayload['exp'] = exp;
+    }
+
+    // Create header
+    final header = base64Url.encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'));
+
+    // Create payload
+    final payloadEncoded = base64Url.encode(utf8.encode(jsonEncode(fullPayload)));
+
+    // Create signature using derived key
+    final data = '$header.$payloadEncoded';
+    final bytes = utf8.encode(data);
+    final hmac = Hmac(sha256, secretKey);
+    final digest = hmac.convert(bytes);
+    final signature = base64Url.encode(digest.bytes);
+
     return '$data.$signature';
   }
 
@@ -81,11 +114,11 @@ class JwtService {
       // Split token into parts
       final parts = token.split('.');
       if (parts.length != 3) return false;
-      
+
       final header = parts[0];
       final payload = parts[1];
       final signature = parts[2];
-      
+
       // Recreate signature
       final data = '$header.$payload';
       final key = utf8.encode(secret);
@@ -93,10 +126,39 @@ class JwtService {
       final hmac = Hmac(sha256, key);
       final digest = hmac.convert(bytes);
       final expectedSignature = base64Url.encode(digest.bytes);
-      
+
       // Compare signatures
       if (signature != expectedSignature) return false;
-      
+
+      // Check expiration
+      return !isTokenExpired(token);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Verifies a JWT token using a derived secret key (Uint8List)
+  /// This is the secure implementation that uses passphrase-derived keys
+  static bool verifyTokenWithDerivedSecret(String token, Uint8List secretKey) {
+    try {
+      // Split token into parts
+      final parts = token.split('.');
+      if (parts.length != 3) return false;
+
+      final header = parts[0];
+      final payload = parts[1];
+      final signature = parts[2];
+
+      // Recreate signature using derived key
+      final data = '$header.$payload';
+      final bytes = utf8.encode(data);
+      final hmac = Hmac(sha256, secretKey);
+      final digest = hmac.convert(bytes);
+      final expectedSignature = base64Url.encode(digest.bytes);
+
+      // Compare signatures
+      if (signature != expectedSignature) return false;
+
       // Check expiration
       return !isTokenExpired(token);
     } catch (e) {

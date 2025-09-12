@@ -219,22 +219,13 @@ firebase-debug.*.log*
 local.properties
 .flutter-plugins-dependencies
 
-# Go back to project root
-cd ../../..
-
-# Check what files are ready to be committed
-git status
-
-# Add all the new and updated files
-git add .
-
-# Commit everything
-git commit -m "Complete project restructure: Flutter-only credential manager with encrypted SQLite
-
-- Removed all Go backend dependencies and references
-- Implemented encrypted SQLite storage with AES-256-GCM
-- Added comprehensive build system for all platforms
-- Updated all documentation to reflect new architecture
-- Created master build script and platform-specific scripts
-- Added comprehensive .gitignore for Flutter development
-- Ready for production deployment across all platforms"
+# Additional ignores from frontend/.gitignore
+*.class
+*.pyc
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/

@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 import '../utils/constants.dart';
 import 'storage_service.dart';
 import 'jwt_service.dart';
 import 'argon2_service.dart';
+import 'key_derivation_service.dart';
 
 class AuthService {
-  static const String _baseUrl = AppConstants.apiBaseUrl; // 'http://localhost:8080/api';
   final StorageService _storageService = StorageService();
   final Argon2Service _argon2Service = Argon2Service();
   
@@ -73,7 +74,7 @@ class AuthService {
       await _storageService.setFirstTime(false);
       await _storageService.setLoggedIn(true);
       
-      // Generate a local JWT token for automatic login
+      // Generate a local JWT token for automatic login using derived secret
       final payload = {
         'sub': 'local_user',
         'iss': 'api_key_manager',
@@ -81,10 +82,11 @@ class AuthService {
         'iat': DateTime.now().millisecondsSinceEpoch ~/ 1000,
         'exp': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000,
       };
-      
-      final secret = 'local_secret_key';
-      final token = JwtService.generateToken(payload, secret);
-      print('Generated JWT token: $token');
+
+      // Derive JWT secret from passphrase
+      final jwtSecret = await KeyDerivationService.deriveJwtSecret(passphrase);
+      final token = JwtService.generateTokenWithDerivedSecret(payload, jwtSecret);
+      print('Generated JWT token with derived secret: $token');
       await _storageService.storeToken(token);
       
       return token;
@@ -117,8 +119,8 @@ class AuthService {
       
       // Mark as logged in
       await _storageService.setLoggedIn(true);
-      
-      // Generate a local JWT token
+
+      // Generate a local JWT token using derived secret
       final payload = {
         'sub': 'local_user',
         'iss': 'api_key_manager',
@@ -126,9 +128,14 @@ class AuthService {
         'iat': DateTime.now().millisecondsSinceEpoch ~/ 1000,
         'exp': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000,
       };
-      
-      final secret = 'local_secret_key';
-      final token = JwtService.generateToken(payload, secret);
+
+      // Derive JWT secret from passphrase
+      final jwtSecret = await KeyDerivationService.deriveJwtSecret(passphrase);
+      final token = JwtService.generateTokenWithDerivedSecret(payload, Uint8List.fromList(jwtSecret));
+
+      // Store the derived JWT secret securely for verification
+      await _storageService.storeJwtSecret(jwtSecret);
+
       await _storageService.storeToken(token);
       
       return token;
@@ -255,9 +262,14 @@ class AuthService {
         'aud': 'api_key_manager_recovery',
         'exp': DateTime.now().add(Duration(minutes: 10)).millisecondsSinceEpoch ~/ 1000,
       };
-      
-      final secret = 'recovery_secret_key';
-      return JwtService.generateToken(payload, secret);
+
+      // Get the stored JWT secret for recovery token
+      final jwtSecret = await _storageService.getJwtSecret();
+      if (jwtSecret == null) {
+        return null;
+      }
+
+      return JwtService.generateTokenWithDerivedSecret(payload, Uint8List.fromList(jwtSecret));
     } catch (e) {
       return null;
     }
@@ -269,12 +281,12 @@ class AuthService {
       newPassphrase = newPassphrase.trim();
       // In a real implementation, we would verify the token first
       // For now, we'll just update the stored passphrase
-      
+
       // Store new passphrase hash locally using Argon2
       final hash = await _hashPassphrase(newPassphrase);
       await _storageService.storePassphraseHash(hash);
-      
-      // Generate a new JWT token for automatic login
+
+      // Generate a new JWT token for automatic login using derived secret
       final payload = {
         'sub': 'local_user',
         'iss': 'api_key_manager',
@@ -282,11 +294,15 @@ class AuthService {
         'iat': DateTime.now().millisecondsSinceEpoch ~/ 1000,
         'exp': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000,
       };
-      
-      final secret = 'local_secret_key';
-      final newToken = JwtService.generateToken(payload, secret);
+
+      // Derive new JWT secret from new passphrase
+      final jwtSecret = await KeyDerivationService.deriveJwtSecret(newPassphrase);
+      final newToken = JwtService.generateTokenWithDerivedSecret(payload, Uint8List.fromList(jwtSecret));
+
+      // Store the new derived JWT secret securely
+      await _storageService.storeJwtSecret(jwtSecret);
       await _storageService.storeToken(newToken);
-      
+
       return newToken;
     } catch (e) {
       rethrow;
@@ -327,10 +343,15 @@ class AuthService {
       if (JwtService.isTokenExpired(token)) {
         return false;
       }
-      
-      // Verify the token signature
-      final secret = 'local_secret_key';
-      return JwtService.verifyToken(token, secret);
+
+      // Get the stored JWT secret
+      final jwtSecret = await _storageService.getJwtSecret();
+      if (jwtSecret == null) {
+        return false;
+      }
+
+      // Verify the token signature using derived secret
+      return JwtService.verifyTokenWithDerivedSecret(token, Uint8List.fromList(jwtSecret));
     } catch (e) {
       return false;
     }

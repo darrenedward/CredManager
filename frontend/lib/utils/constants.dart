@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class AppConstants {
   static const String appName = 'Cred Manager';
   static const String appTagline = 'Your secrets are safe with me';
-  static const String apiBaseUrl = 'http://localhost:8080/api'; // Adjust for production and desktop targets
   static const int defaultSessionTimeout = 30; // minutes
 
   // 🎨 **Material 3 Color Palette**
@@ -61,11 +60,4 @@ Users of this application do so at their own risk. The developers assume no resp
 This software is free to use and distribute under the MIT License.
 ''';
 
-  static const List<String> predefinedSecurityQuestions = [
-    'What is the name of your first pet?',
-    'What is your mother\'s maiden name?',
-    'What is the name of the street you grew up on?',
-    'What is your favorite book?',
-    'What is the name of your first school?',
-  ];
 }

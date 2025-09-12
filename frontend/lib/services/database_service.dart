@@ -7,12 +7,12 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hex/hex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:crypto/crypto.dart';
 import 'argon2_service.dart';
 import 'encryption_service.dart';
 
 class DatabaseService {
-  static const String _databaseName = 'api_key_manager.db';
-  static const int _databaseVersion = 3;
+  static const int _databaseVersion = 4;
 
   static dynamic _database; // Can be sqlcipher.Database or Database (FFI)
   static DatabaseService? _instance;
@@ -35,11 +35,11 @@ class DatabaseService {
 
   static Future<void> setPassphrase(String passphrase) async {
     _passphrase = passphrase;
-    
+
     // Generate or retrieve salt for encryption key
     final instance = DatabaseService.instance;
     String? saltB64;
-    
+
     try {
       // Try to get salt from existing database if available
       if (_database != null) {
@@ -49,7 +49,7 @@ class DatabaseService {
       // Ignore errors when database isn't available yet
       saltB64 = null;
     }
-    
+
     if (saltB64 == null) {
       // Generate new salt
       final salt = instance._encryptionService.generateEncryptionSalt(16);
@@ -57,11 +57,17 @@ class DatabaseService {
     } else {
       _encryptionSalt = Uint8List.fromList(base64.decode(saltB64));
     }
-    
-    // Derive encryption key
-    _encryptionKey = await instance._encryptionService
-        .deriveEncryptionKey(passphrase, _encryptionSalt!);
-    
+
+    try {
+      // Derive encryption key
+      _encryptionKey = await instance._encryptionService
+          .deriveEncryptionKey(passphrase, _encryptionSalt!);
+    } catch (e) {
+      print('Failed to derive encryption key: $e');
+      _encryptionKey = null;
+      rethrow;
+    }
+
     // Re-init DB if already open
     if (_database != null) {
       await _database!.close();
@@ -178,10 +184,11 @@ class DatabaseService {
 
   /// Gets the platform-specific database path
   Future<String> _getDatabasePath() async {
+    final databaseName = await _getDatabaseName();
     if (Platform.isAndroid || Platform.isIOS) {
       // Mobile platforms - use app documents directory
       final documentsDirectory = await sqlcipher.getDatabasesPath();
-      return join(documentsDirectory, _databaseName);
+      return join(documentsDirectory, databaseName);
     } else {
       // Desktop platforms - use application documents directory
       try {
@@ -205,7 +212,7 @@ class DatabaseService {
           }
         }
 
-        return join(appDataDir, _databaseName);
+        return join(appDataDir, databaseName);
       } catch (e) {
         // Fallback to user home directory
         final userHome = Platform.environment['HOME'] ??
@@ -230,9 +237,18 @@ class DatabaseService {
           }
         }
 
-        return join(appDataDir, _databaseName);
+        return join(appDataDir, databaseName);
       }
     }
+  }
+
+  /// Gets the database name dynamically
+  Future<String> _getDatabaseName() async {
+    // Use a hash of the app identifier for uniqueness
+    final appIdentifier = 'cred_manager_v1';
+    final bytes = utf8.encode(appIdentifier);
+    final digest = sha256.convert(bytes);
+    return '${digest.toString().substring(0, 16)}.db';
   }
 
   /// Creates the database schema
@@ -370,6 +386,11 @@ class DatabaseService {
     if (oldVersion < 3) {
       await _migrateToVersion3(db);
     }
+
+    // Migration from version 3 to 4: Add JWT secret storage
+    if (oldVersion < 4) {
+      await _migrateToVersion4(db);
+    }
   }
 
   /// Migrates database to version 2 (adds security_questions table)
@@ -415,6 +436,18 @@ class DatabaseService {
     });
 
     print('Successfully migrated to version 3');
+  }
+
+  Future<void> _migrateToVersion4(dynamic db) async {
+    print(
+        'Migrating to version 4: Adding JWT secret storage to app_metadata');
+
+    await db.transaction((txn) async {
+      await txn.execute(
+          'ALTER TABLE app_metadata ADD COLUMN encrypted_jwt_secret TEXT');
+    });
+
+    print('Successfully migrated to version 4');
   }
 
   /// Called when database is opened
@@ -574,6 +607,23 @@ class DatabaseService {
     print('Deleted encrypted JWT token from database');
   }
 
+  /// Stores encrypted JWT secret key in database
+  Future<void> storeEncryptedJwtSecret(String encryptedSecret) async {
+    await updateMetadata('encrypted_jwt_secret', encryptedSecret);
+    print('Stored encrypted JWT secret key in database');
+  }
+
+  /// Retrieves encrypted JWT secret key from database
+  Future<String?> getEncryptedJwtSecret() async {
+    return await getMetadata('encrypted_jwt_secret');
+  }
+
+  /// Deletes encrypted JWT secret key from database
+  Future<void> deleteEncryptedJwtSecret() async {
+    await delete('app_metadata', where: 'key = ?', whereArgs: ['encrypted_jwt_secret']);
+    print('Deleted encrypted JWT secret key from database');
+  }
+
   /// Sets first time flag in database
   Future<void> setFirstTimeFlag(bool isFirstTime) async {
     await updateMetadata('is_first_time', isFirstTime ? '1' : '0');
@@ -614,6 +664,7 @@ class DatabaseService {
   Future<void> clearAllAuthData() async {
     await deleteEncryptedPassphraseHash();
     await deleteEncryptedToken();
+    await deleteEncryptedJwtSecret();
     await setLoggedInFlag(false);
     await setFirstTimeFlag(true);
     await setSetupCompletedFlag(false);

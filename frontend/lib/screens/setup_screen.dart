@@ -24,17 +24,6 @@ class _SetupScreenState extends State<SetupScreen> {
   bool _isLoading = false;
   String? _error;
 
-  // Predefined security questions
-  final List<String> _predefinedQuestions = [
-    'What is the name of your first pet?',
-    'What is your mother\'s maiden name?',
-    'What is the name of the street you grew up on?',
-    'What is your favorite book?',
-    'What is the name of your first school?',
-  ];
-
-  // Selected predefined questions (minimum 3 required total)
-  List<String> _selectedPredefinedQuestions = [];
   
   // Custom questions (optional)
   final List<String> _customQuestions = ['', ''];
@@ -45,12 +34,7 @@ class _SetupScreenState extends State<SetupScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize with first three predefined questions
-    if (_predefinedQuestions.length >= 3) {
-      _selectedPredefinedQuestions = _predefinedQuestions.take(3).toList();
-    }
-    
-    // Initialize answer controllers for selected questions + custom questions
+    // Initialize answer controllers for custom questions only
     _updateAnswerControllers();
   }
 
@@ -60,10 +44,9 @@ class _SetupScreenState extends State<SetupScreen> {
       controller.dispose();
     }
     _answerControllers.clear();
-    
-    // Create controllers for selected predefined questions + custom questions
-    final totalQuestions = _selectedPredefinedQuestions.length + 
-                          _customQuestions.where((q) => q.trim().isNotEmpty).length;
+
+    // Create controllers for custom questions only
+    final totalQuestions = _customQuestions.where((q) => q.trim().isNotEmpty).length;
     _answerControllers.addAll(List.generate(totalQuestions, (_) => TextEditingController()));
   }
 
@@ -107,16 +90,15 @@ class _SetupScreenState extends State<SetupScreen> {
         return true;
         
       case 1: // Security questions step
-        // Check that we have at least 3 questions total (predefined + custom with content)
-        final totalQuestions = _selectedPredefinedQuestions.length + 
-                              _customQuestions.where((q) => q.trim().isNotEmpty).length;
-        
+        // Check that we have at least 3 custom questions with content
+        final totalQuestions = _customQuestions.where((q) => q.trim().isNotEmpty).length;
+
         if (totalQuestions < 3) {
-          _setError('Please select at least 3 security questions in total');
+          _setError('Please create at least 3 custom security questions');
           return false;
         }
-        
-        // Check that custom questions (if not empty) are valid
+
+        // Check that custom questions are valid (minimum 10 characters)
         for (int i = 0; i < _customQuestions.length; i++) {
           if (_customQuestions[i].trim().isNotEmpty) {
             if (_customQuestions[i].trim().length < 10) {
@@ -125,20 +107,9 @@ class _SetupScreenState extends State<SetupScreen> {
             }
           }
         }
-        
-        // Check that answers for all questions are provided
+
+        // Check that answers for all custom questions are provided
         int answerIndex = 0;
-        // Check answers for selected predefined questions
-        for (int i = 0; i < _selectedPredefinedQuestions.length; i++) {
-          final answerError = validateAnswerError(_answerControllers[answerIndex].text);
-          if (answerError != null) {
-            _setError('Answer for question ${i + 1}: $answerError');
-            return false;
-          }
-          answerIndex++;
-        }
-        
-        // Check answers for custom questions (that have content)
         for (int i = 0; i < _customQuestions.length; i++) {
           if (_customQuestions[i].trim().isNotEmpty) {
             final answerError = validateAnswerError(_answerControllers[answerIndex].text);
@@ -149,7 +120,7 @@ class _SetupScreenState extends State<SetupScreen> {
             answerIndex++;
           }
         }
-        
+
         return true;
         
       default:
@@ -181,36 +152,23 @@ class _SetupScreenState extends State<SetupScreen> {
     try {
       print('Starting setup completion process');
       
-      // Prepare security questions data
+      // Prepare security questions data (custom questions only)
       final List<Map<String, String>> securityQuestions = [];
-      
-      // Add predefined questions
-      print('Adding ${_selectedPredefinedQuestions.length} predefined questions');
-      for (int i = 0; i < _selectedPredefinedQuestions.length; i++) {
-        final question = _selectedPredefinedQuestions[i];
-        final answer = _answerControllers[i].text;
-        print('Adding predefined question $i: $question with answer: $answer');
-        securityQuestions.add({
-          'question': question,
-          'answer': answer,
-          'isCustom': 'false',
-        });
-      }
-      
+
       // Add custom questions (only those with content)
-      int customAnswerIndex = _selectedPredefinedQuestions.length;
       print('Adding ${_customQuestions.length} custom questions');
+      int answerIndex = 0;
       for (int i = 0; i < _customQuestions.length; i++) {
         if (_customQuestions[i].trim().isNotEmpty) {
           final question = _customQuestions[i];
-          final answer = _answerControllers[customAnswerIndex].text;
+          final answer = _answerControllers[answerIndex].text;
           print('Adding custom question $i: $question with answer: $answer');
           securityQuestions.add({
             'question': question,
             'answer': answer,
             'isCustom': 'true',
           });
-          customAnswerIndex++;
+          answerIndex++;
         }
       }
       
@@ -283,20 +241,6 @@ class _SetupScreenState extends State<SetupScreen> {
     });
   }
 
-  void _onPredefinedQuestionToggle(String question, bool selected) {
-    setState(() {
-      if (selected) {
-        // Add question if not already selected
-        if (!_selectedPredefinedQuestions.contains(question)) {
-          _selectedPredefinedQuestions.add(question);
-        }
-      } else {
-        // Remove question if already selected
-        _selectedPredefinedQuestions.remove(question);
-      }
-      _updateAnswerControllers(); // Update controllers when predefined questions change
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -407,11 +351,11 @@ class _SetupScreenState extends State<SetupScreen> {
                     state: _currentStep > 0 ? StepState.complete : StepState.indexed,
                   ),
                   Step(
-                    title: const Text('Security Questions'),
+                    title: const Text('Create Security Questions'),
                     content: _buildSecurityQuestionsStep(),
                     isActive: _currentStep == 1,
                     state: _currentStep > 1 ? StepState.complete : StepState.indexed,
-                    subtitle: _currentStep == 1 ? const Text('Preview before finalizing') : null,
+                    subtitle: _currentStep == 1 ? const Text('Create custom questions') : null,
                   ),
                   Step(
                     title: const Text('Complete'),
@@ -448,56 +392,35 @@ class _SetupScreenState extends State<SetupScreen> {
   }
 
   Widget _buildSecurityQuestionsStep() {
-    // Create security questions list: selected predefined + custom with content
-    final List<SecurityQuestion> questions = [
-      ..._selectedPredefinedQuestions.map((q) => SecurityQuestion(question: q, isCustom: false)),
-      ..._customQuestions
-          .where((q) => q.trim().isNotEmpty)
-          .map((q) => SecurityQuestion(question: q, isCustom: true)),
-    ];
-    
+    // Create security questions list: custom questions only
+    final List<SecurityQuestion> questions = _customQuestions
+        .where((q) => q.trim().isNotEmpty)
+        .map((q) => SecurityQuestion(question: q, isCustom: true))
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Select at least 3 security questions (predefined and/or custom):',
+          'Create at least 3 custom security questions:',
           style: TextStyle(fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 15),
-        
-        // Predefined questions selection
-        const Text('Predefined Questions (select at least 3):', style: TextStyle(fontWeight: FontWeight.bold)),
+
+        // Custom questions only
+        const Text('Custom Security Questions (required):', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
-        ..._predefinedQuestions.map((question) {
-          final isSelected = _selectedPredefinedQuestions.contains(question);
-          return CheckboxListTile(
-            title: Text(question),
-            value: isSelected,
-            onChanged: _isLoading
-                ? null
-                : (bool? selected) {
-                    _onPredefinedQuestionToggle(question, selected ?? false);
-                  },
-            controlAffinity: ListTileControlAffinity.leading,
-          );
-        }).toList(),
-        
-        const SizedBox(height: 15),
-        
-        // Custom questions
-        const Text('Custom Questions (optional):', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
-        
+
         SecurityQuestionsWidget(
           questions: questions,
           answerControllers: _answerControllers,
           isLoading: _isLoading,
           onCustomQuestionChanged: _onCustomQuestionChanged,
         ),
-        
+
         const SizedBox(height: 10),
         const Text(
-          'Note: You need at least 3 security questions in total. Custom questions are optional.',
+          'Note: You must create at least 3 custom security questions. Each question must be at least 10 characters long.',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
       ],

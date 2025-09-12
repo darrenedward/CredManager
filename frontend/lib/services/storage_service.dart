@@ -87,6 +87,33 @@ class StorageService {
     print('Stored encrypted JWT token in database');
   }
 
+  // Encrypted database storage for JWT secret key
+  Future<void> storeJwtSecret(List<int> secretKey) async {
+    // Encrypt the JWT secret key before storing in database
+    final encryptedSecret = await _encryptionService.encryptData(base64Encode(secretKey));
+    await DatabaseService.instance.storeEncryptedJwtSecret(encryptedSecret);
+    print('Stored encrypted JWT secret key in database');
+  }
+
+  Future<List<int>?> getJwtSecret() async {
+    final encryptedSecret = await DatabaseService.instance.getEncryptedJwtSecret();
+    if (encryptedSecret == null) return null;
+
+    try {
+      // Decrypt the JWT secret key from database
+      final decryptedSecret = await _encryptionService.decryptData(encryptedSecret);
+      return base64Decode(decryptedSecret);
+    } catch (e) {
+      print('Error decrypting JWT secret key: $e');
+      return null;
+    }
+  }
+
+  Future<void> deleteJwtSecret() async {
+    await DatabaseService.instance.deleteEncryptedJwtSecret();
+    print('Deleted JWT secret key from database');
+  }
+
   Future<String?> getToken() async {
     final encryptedToken = await DatabaseService.instance.getEncryptedToken();
     if (encryptedToken == null) return null;
