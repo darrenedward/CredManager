@@ -17,7 +17,7 @@
 - [x] ST007: Verify all authentication tests pass with new implementation
 
 ### PT002: Encrypted Database Integration
-**Status:** [ ] TODO
+**Status:** [x] COMPLETE
 **Effort:** L (5-7 days)
 **Description:** Replace SQLite with SQLCipher, implement passphrase-derived encryption, consolidate all storage to encrypted DB
 
@@ -25,11 +25,13 @@
 - [x] ST008: Write tests for SQLCipher integration and data encryption
 - [x] ST009: Replace sqflite dependency with SQLCipher package
 - [x] ST010: Implement passphrase-derived database encryption key
-- [ ] ST011: Migrate all authentication data to encrypted database
-- [ ] ST012: Remove SharedPreferences and SecureStorage usage for auth data
-- [ ] ST013: Implement database schema for consolidated storage
-- [ ] ST014: Add database encryption validation tests
-- [ ] ST015: Verify all database encryption tests pass
+- [x] ST011: Migrate all authentication data to encrypted database
+- [x] ST012: Remove SharedPreferences and SecureStorage usage for auth data ✅ *COMPLETED*
+- [x] **SQLCipher Linux Desktop Compatibility Fix** - Fixed SQLCipher plugin compatibility issue on Linux desktop by implementing platform-aware database service using sqflite_common_ffi for desktop and sqflite_sqlcipher for mobile ✅ *COMPLETED*
+- [x] **Support Documentation Update** - Enhanced support screen with comprehensive FAQ section explaining biometric authentication availability, security features, and platform limitations without exposing implementation details ✅ *COMPLETED*
+- [x] ST013: Implement database schema for consolidated storage ✅ *COMPLETED*
+- [x] ST014: Add database encryption validation tests ✅ *COMPLETED*
+- [x] ST015: Verify all database encryption tests pass ✅ *COMPLETED*
 
 ### PT003: Dynamic Secrets and Hardcode Removal
 **Status:** [ ] TODO

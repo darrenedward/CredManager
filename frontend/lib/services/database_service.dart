@@ -14,16 +14,19 @@ class DatabaseService {
   static const String _databaseName = 'api_key_manager.db';
   static const int _databaseVersion = 3;
 
-  static sqlcipher.Database? _database;
+  static dynamic _database; // Can be sqlcipher.Database or Database (FFI)
   static DatabaseService? _instance;
   static String? _passphrase;
   static Uint8List? _encryptionSalt;
   static Uint8List? _encryptionKey;
+  static bool _isDesktop = false;
   final Argon2Service _argon2Service = Argon2Service();
   final EncryptionService _encryptionService = EncryptionService();
 
   // Singleton pattern
-  DatabaseService._internal();
+  DatabaseService._internal() {
+    _isDesktop = Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+  }
 
   static DatabaseService get instance {
     _instance ??= DatabaseService._internal();
@@ -32,22 +35,36 @@ class DatabaseService {
 
   static Future<void> setPassphrase(String passphrase) async {
     _passphrase = passphrase;
+    
     // Generate or retrieve salt for encryption key
     final instance = DatabaseService.instance;
-    String? saltB64 = await instance.getMetadata('key_derivation_salt');
+    String? saltB64;
+    
+    try {
+      // Try to get salt from existing database if available
+      if (_database != null) {
+        saltB64 = await instance.getMetadata('key_derivation_salt');
+      }
+    } catch (e) {
+      // Ignore errors when database isn't available yet
+      saltB64 = null;
+    }
+    
     if (saltB64 == null) {
-      // Generate new salt and store
+      // Generate new salt
       final salt = instance._encryptionService.generateEncryptionSalt(16);
-      await instance.setMetadata('key_derivation_salt', base64.encode(salt));
       _encryptionSalt = salt;
     } else {
       _encryptionSalt = Uint8List.fromList(base64.decode(saltB64));
     }
+    
     // Derive encryption key
     _encryptionKey = await instance._encryptionService
         .deriveEncryptionKey(passphrase, _encryptionSalt!);
+    
     // Re-init DB if already open
     if (_database != null) {
+      await _database!.close();
       _database = null;
     }
   }
@@ -62,7 +79,7 @@ class DatabaseService {
   }
 
   /// Gets the database instance, initializing if necessary
-  Future<sqlcipher.Database> get database async {
+  Future<dynamic> get database async {
     if (_database != null) return _database!;
 
     if (_passphrase == null) {
@@ -74,57 +91,89 @@ class DatabaseService {
   }
 
   /// Initializes the database (plain mode for setup/init check)
-  Future<sqlcipher.Database> _initDatabase() async {
-    // Initialize FFI for desktop platforms
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      sqfliteFfiInit();
-    }
-
-    // Get the database path
+  Future<dynamic> _initDatabase() async {
     final dbPath = await _getDatabasePath();
 
-    // Open the database in plain mode
-    return await sqlcipher.openDatabase(
-      dbPath,
-      version: _databaseVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-      onOpen: _onOpen,
-    );
+    if (_isDesktop) {
+      // Initialize FFI for desktop platforms
+      sqfliteFfiInit();
+      
+      // Use sqflite_common_ffi for desktop
+      return await databaseFactoryFfi.openDatabase(
+        dbPath,
+        options: OpenDatabaseOptions(
+          version: _databaseVersion,
+          onCreate: _onCreate,
+          onUpgrade: _onUpgrade,
+          onOpen: _onOpen,
+        ),
+      );
+    } else {
+      // Use sqlcipher for mobile platforms
+      return await sqlcipher.openDatabase(
+        dbPath,
+        version: _databaseVersion,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+        onOpen: _onOpen,
+      );
+    }
   }
 
   /// Initializes the encrypted database
-  Future<sqlcipher.Database> _initEncryptedDatabase() async {
+  Future<dynamic> _initEncryptedDatabase() async {
     if (_passphrase == null)
       throw Exception('Passphrase required for encrypted database');
 
-    // Initialize FFI for desktop platforms
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      sqfliteFfiInit();
-    }
-
     final dbPath = await _getDatabasePath();
 
-    final db = await sqlcipher.openDatabase(
-      dbPath,
-      version: _databaseVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-      onOpen: _onOpen,
-    );
+    if (_isDesktop) {
+      // Initialize FFI for desktop platforms
+      sqfliteFfiInit();
+      
+      // Use sqflite_common_ffi with SQLCipher for desktop
+      final db = await databaseFactoryFfi.openDatabase(
+        dbPath,
+        options: OpenDatabaseOptions(
+          version: _databaseVersion,
+          onCreate: _onCreate,
+          onUpgrade: _onUpgrade,
+          onOpen: _onOpen,
+        ),
+      );
 
-    await _setEncryptionKey(db);
+      await _setEncryptionKey(db);
+      return db;
+    } else {
+      // Use sqlcipher for mobile platforms
+      final db = await sqlcipher.openDatabase(
+        dbPath,
+        version: _databaseVersion,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+        onOpen: _onOpen,
+      );
 
-    return db;
+      await _setEncryptionKey(db);
+      return db;
+    }
   }
 
   /// Sets the encryption key for the database (SQLCipher PRAGMA key)
-  Future<void> _setEncryptionKey(sqlcipher.Database db) async {
+  Future<void> _setEncryptionKey(dynamic db) async {
     if (_encryptionKey == null) throw Exception('Encryption key not derived');
-    final pragmaKey =
-        EncryptionService().formatKeyForSQLCipher(_encryptionKey!);
-    await db.execute("PRAGMA key = $pragmaKey;");
-    print('SQLCipher PRAGMA key set');
+    
+    if (!_isDesktop) {
+      // Only set PRAGMA key on mobile platforms that support SQLCipher
+      final pragmaKey =
+          EncryptionService().formatKeyForSQLCipher(_encryptionKey!);
+      await db.execute("PRAGMA key = $pragmaKey;");
+      print('SQLCipher PRAGMA key set (mobile)');
+    } else {
+      // Desktop platforms use sqflite_common_ffi without SQLCipher support
+      // Encryption is handled at the application layer (XOR encryption)
+      print('Desktop platform: Using application-layer encryption only');
+    }
   }
 
   /// Gets the platform-specific database path
@@ -139,10 +188,21 @@ class DatabaseService {
         final documentsDirectory = await getApplicationDocumentsDirectory();
         final appDataDir = join(documentsDirectory.path, 'APIKeyManager');
 
-        // Create directory if it doesn't exist
+        // Create directory if it doesn't exist with proper permissions
         final directory = Directory(appDataDir);
         if (!await directory.exists()) {
           await directory.create(recursive: true);
+          // Set directory permissions (Linux/Unix)
+          if (Platform.isLinux || Platform.isMacOS) {
+            try {
+              final result = await Process.run('chmod', ['755', appDataDir]);
+              if (result.exitCode != 0) {
+                print('Warning: Could not set directory permissions: ${result.stderr}');
+              }
+            } catch (e) {
+              print('Warning: chmod not available: $e');
+            }
+          }
         }
 
         return join(appDataDir, _databaseName);
@@ -153,10 +213,21 @@ class DatabaseService {
             '.';
         final appDataDir = join(userHome, '.api_key_manager');
 
-        // Create directory if it doesn't exist
+        // Create directory if it doesn't exist with proper permissions
         final directory = Directory(appDataDir);
         if (!await directory.exists()) {
           await directory.create(recursive: true);
+          // Set directory permissions (Linux/Unix)
+          if (Platform.isLinux || Platform.isMacOS) {
+            try {
+              final result = await Process.run('chmod', ['755', appDataDir]);
+              if (result.exitCode != 0) {
+                print('Warning: Could not set directory permissions: ${result.stderr}');
+              }
+            } catch (e) {
+              print('Warning: chmod not available: $e');
+            }
+          }
         }
 
         return join(appDataDir, _databaseName);
@@ -165,7 +236,7 @@ class DatabaseService {
   }
 
   /// Creates the database schema
-  Future<void> _onCreate(sqlcipher.Database db, int version) async {
+  Future<void> _onCreate(dynamic db, int version) async {
     await db.transaction((txn) async {
       // Create projects table
       await txn.execute('''
@@ -287,7 +358,7 @@ class DatabaseService {
   }
 
   /// Handles database upgrades
-  Future<void> _onUpgrade(sqlcipher.Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgrade(dynamic db, int oldVersion, int newVersion) async {
     print('Upgrading database from version $oldVersion to $newVersion');
 
     // Handle migration from version 1 to 2
@@ -302,7 +373,7 @@ class DatabaseService {
   }
 
   /// Migrates database to version 2 (adds security_questions table)
-  Future<void> _migrateToVersion2(sqlcipher.Database db) async {
+  Future<void> _migrateToVersion2(dynamic db) async {
     print('Migrating to version 2: Adding security_questions table');
 
     await db.transaction((txn) async {
@@ -326,7 +397,7 @@ class DatabaseService {
     print('Successfully migrated to version 2');
   }
 
-  Future<void> _migrateToVersion3(sqlcipher.Database db) async {
+  Future<void> _migrateToVersion3(dynamic db) async {
     print(
         'Migrating to version 3: Adding consolidated storage columns to app_metadata');
 
@@ -347,7 +418,7 @@ class DatabaseService {
   }
 
   /// Called when database is opened
-  Future<void> _onOpen(sqlcipher.Database db) async {
+  Future<void> _onOpen(dynamic db) async {
     // Enable foreign key constraints
     await db.execute('PRAGMA foreign_keys = ON');
 
@@ -425,7 +496,7 @@ class DatabaseService {
   }
 
   /// Executes multiple operations in a transaction
-  Future<T> transaction<T>(Future<T> Function(sqlcipher.Transaction txn) action) async {
+  Future<T> transaction<T>(Future<T> Function(dynamic txn) action) async {
     final db = await database;
     return await db.transaction(action);
   }
@@ -467,6 +538,86 @@ class DatabaseService {
     if (count == 0) {
       await setMetadata(key, value);
     }
+  }
+
+  /// Stores encrypted passphrase hash in database
+  Future<void> storeEncryptedPassphraseHash(String encryptedHash) async {
+    await updateMetadata('encrypted_passphrase_hash', encryptedHash);
+    print('Stored encrypted passphrase hash in database');
+  }
+
+  /// Retrieves encrypted passphrase hash from database
+  Future<String?> getEncryptedPassphraseHash() async {
+    return await getMetadata('encrypted_passphrase_hash');
+  }
+
+  /// Deletes encrypted passphrase hash from database
+  Future<void> deleteEncryptedPassphraseHash() async {
+    await delete('app_metadata', where: 'key = ?', whereArgs: ['encrypted_passphrase_hash']);
+    print('Deleted encrypted passphrase hash from database');
+  }
+
+  /// Stores encrypted JWT token in database
+  Future<void> storeEncryptedToken(String encryptedToken) async {
+    await updateMetadata('encrypted_token', encryptedToken);
+    print('Stored encrypted JWT token in database');
+  }
+
+  /// Retrieves encrypted JWT token from database
+  Future<String?> getEncryptedToken() async {
+    return await getMetadata('encrypted_token');
+  }
+
+  /// Deletes encrypted JWT token from database
+  Future<void> deleteEncryptedToken() async {
+    await delete('app_metadata', where: 'key = ?', whereArgs: ['encrypted_token']);
+    print('Deleted encrypted JWT token from database');
+  }
+
+  /// Sets first time flag in database
+  Future<void> setFirstTimeFlag(bool isFirstTime) async {
+    await updateMetadata('is_first_time', isFirstTime ? '1' : '0');
+    print('Set first time flag to: $isFirstTime');
+  }
+
+  /// Gets first time flag from database
+  Future<bool> getFirstTimeFlag() async {
+    final value = await getMetadata('is_first_time');
+    return value == '1' || value == null; // Default to true if not set
+  }
+
+  /// Sets logged in flag in database
+  Future<void> setLoggedInFlag(bool isLoggedIn) async {
+    await updateMetadata('is_logged_in', isLoggedIn ? '1' : '0');
+    print('Set logged in flag to: $isLoggedIn');
+  }
+
+  /// Gets logged in flag from database
+  Future<bool> getLoggedInFlag() async {
+    final value = await getMetadata('is_logged_in');
+    return value == '1'; // Default to false if not set
+  }
+
+  /// Sets setup completed flag in database
+  Future<void> setSetupCompletedFlag(bool completed) async {
+    await updateMetadata('setup_completed', completed ? '1' : '0');
+    print('Set setup completed flag to: $completed');
+  }
+
+  /// Gets setup completed flag from database
+  Future<bool> getSetupCompletedFlag() async {
+    final value = await getMetadata('setup_completed');
+    return value == '1'; // Default to false if not set
+  }
+
+  /// Clears all authentication data from database
+  Future<void> clearAllAuthData() async {
+    await deleteEncryptedPassphraseHash();
+    await deleteEncryptedToken();
+    await setLoggedInFlag(false);
+    await setFirstTimeFlag(true);
+    await setSetupCompletedFlag(false);
+    print('Cleared all authentication data from database');
   }
 
   /// Closes the database connection
@@ -556,7 +707,7 @@ class DatabaseService {
       }
 
       return results
-          .map((row) => {
+          .map<Map<String, String>>((row) => <String, String>{
                 'question': row['question'] as String,
                 'answerHash': row['encrypted_answer_hash'] as String,
                 'isCustom': (row['is_custom'] as int) == 1 ? 'true' : 'false',
@@ -676,7 +827,7 @@ class DatabaseService {
   }
 
   /// Copies all data from source to destination database
-  Future<void> _copyDatabaseData(sqlcipher.Database source, sqlcipher.Database destination) async {
+  Future<void> _copyDatabaseData(dynamic source, dynamic destination) async {
     // Get all tables from source
     final tables = await source.rawQuery(
       "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
@@ -909,5 +1060,97 @@ class DatabaseService {
   /// Gets the database file path
   Future<String> getDatabasePath() async {
     return await _getDatabasePath();
+  }
+
+  /// Imports project data from exported format
+  Future<Map<String, dynamic>> importProjectData(Map<String, dynamic> exportData) async {
+    try {
+      final db = await database;
+
+      // Import project
+      final project = exportData['project'] as Map<String, dynamic>;
+      await db.insert('projects', project);
+
+      // Import credentials
+      final credentials = exportData['credentials'] as List<dynamic>;
+      for (final credential in credentials) {
+        await db.insert('credentials', credential as Map<String, dynamic>);
+      }
+
+      // Import AI services
+      final aiServices = exportData['aiServices'] as List<dynamic>;
+      for (final service in aiServices) {
+        await db.insert('ai_services', service as Map<String, dynamic>);
+      }
+
+      // Import AI service keys
+      final aiServiceKeys = exportData['aiServiceKeys'] as List<dynamic>;
+      for (final key in aiServiceKeys) {
+        await db.insert('ai_service_keys', key as Map<String, dynamic>);
+      }
+
+      return {
+        'success': true,
+        'message': 'Project data imported successfully',
+        'importedItems': {
+          'projects': 1,
+          'credentials': credentials.length,
+          'aiServices': aiServices.length,
+          'aiServiceKeys': aiServiceKeys.length,
+        }
+      };
+    } catch (e) {
+      print('Error importing project data: $e');
+      return {
+        'success': false,
+        'message': 'Failed to import project data: $e',
+        'importedItems': null,
+      };
+    }
+  }
+
+  /// Exports project data for backup/migration purposes
+  Future<Map<String, dynamic>> exportProjectData(String projectId) async {
+    try {
+      final db = await database;
+
+      // Get project info
+      final projectResults = await db.query(
+        'projects',
+        where: 'id = ?',
+        whereArgs: [projectId],
+      );
+
+      if (projectResults.isEmpty) {
+        throw Exception('Project not found');
+      }
+
+      final project = projectResults.first;
+
+      // Get credentials for this project
+      final credentialResults = await db.query(
+        'credentials',
+        where: 'project_id = ?',
+        whereArgs: [projectId],
+      );
+
+      // Get AI services for this project (if any)
+      final aiServiceResults = await db.query('ai_services');
+
+      // Get AI service keys
+      final aiServiceKeyResults = await db.query('ai_service_keys');
+
+      return {
+        'project': project,
+        'credentials': credentialResults,
+        'aiServices': aiServiceResults,
+        'aiServiceKeys': aiServiceKeyResults,
+        'exportTimestamp': DateTime.now().toIso8601String(),
+        'version': '1.0',
+      };
+    } catch (e) {
+      print('Error exporting project data: $e');
+      rethrow;
+    }
   }
 }

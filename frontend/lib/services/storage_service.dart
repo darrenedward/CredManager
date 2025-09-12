@@ -1,29 +1,39 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'database_service.dart';
+import 'encryption_service.dart';
 
 class StorageService {
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
-  static const String _passphraseKey = 'secure_passphrase_hash';
+  // Legacy key for migration purposes only
   static const String _securityQuestionsKey = 'security_questions';
-  static const String _tokenKey = 'jwt_token';
-  static const String _isFirstTimeKey = 'is_first_time';
-  static const String _isLoggedInKey = 'is_logged_in';
-  static const String _setupCompletedKey = 'setup_completed';
+  
+  final EncryptionService _encryptionService = EncryptionService();
 
-  // Secure storage methods
+  // Encrypted database storage methods for authentication data
   Future<void> storePassphraseHash(String hash) async {
-    await _secureStorage.write(key: _passphraseKey, value: hash);
+    // Encrypt the passphrase hash before storing in database
+    final encryptedHash = await _encryptionService.encryptData(hash);
+    await DatabaseService.instance.storeEncryptedPassphraseHash(encryptedHash);
+    print('Stored encrypted passphrase hash in database');
   }
 
   Future<String?> getPassphraseHash() async {
-    return await _secureStorage.read(key: _passphraseKey);
+    final encryptedHash = await DatabaseService.instance.getEncryptedPassphraseHash();
+    if (encryptedHash == null) return null;
+    
+    try {
+      // Decrypt the passphrase hash from database
+      return await _encryptionService.decryptData(encryptedHash);
+    } catch (e) {
+      print('Error decrypting passphrase hash: $e');
+      return null;
+    }
   }
 
   Future<void> deletePassphraseHash() async {
-    await _secureStorage.delete(key: _passphraseKey);
+    await DatabaseService.instance.deleteEncryptedPassphraseHash();
+    print('Deleted passphrase hash from database');
   }
 
   Future<void> storeSecurityQuestions(List<Map<String, String>> questions) async {
@@ -69,67 +79,80 @@ class StorageService {
     return null;
   }
 
+  // Encrypted database storage for JWT tokens
   Future<void> storeToken(String token) async {
-    await _secureStorage.write(key: _tokenKey, value: token);
+    // Encrypt the JWT token before storing in database
+    final encryptedToken = await _encryptionService.encryptData(token);
+    await DatabaseService.instance.storeEncryptedToken(encryptedToken);
+    print('Stored encrypted JWT token in database');
   }
 
   Future<String?> getToken() async {
-    return await _secureStorage.read(key: _tokenKey);
+    final encryptedToken = await DatabaseService.instance.getEncryptedToken();
+    if (encryptedToken == null) return null;
+    
+    try {
+      // Decrypt the JWT token from database
+      return await _encryptionService.decryptData(encryptedToken);
+    } catch (e) {
+      print('Error decrypting JWT token: $e');
+      return null;
+    }
   }
 
   Future<void> deleteToken() async {
-    await _secureStorage.delete(key: _tokenKey);
+    await DatabaseService.instance.deleteEncryptedToken();
+    print('Deleted JWT token from database');
   }
 
-  // Local storage for flags
+  // Encrypted database storage for application flags
   Future<void> setFirstTime(bool isFirstTime) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isFirstTimeKey, isFirstTime);
+    await DatabaseService.instance.setFirstTimeFlag(isFirstTime);
   }
 
   Future<bool> isFirstTime() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_isFirstTimeKey) ?? true;
+    return await DatabaseService.instance.getFirstTimeFlag();
   }
 
   Future<void> setLoggedIn(bool isLoggedIn) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isLoggedInKey, isLoggedIn);
+    await DatabaseService.instance.setLoggedInFlag(isLoggedIn);
   }
 
   Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_isLoggedInKey) ?? false;
+    return await DatabaseService.instance.getLoggedInFlag();
   }
 
-  // Setup completion flag methods
+  // Setup completion flag methods using encrypted database
   Future<void> setSetupCompleted(bool completed) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_setupCompletedKey, completed);
-    print('Setup completion flag set to: $completed');
+    await DatabaseService.instance.setSetupCompletedFlag(completed);
   }
 
   Future<bool> getSetupCompleted() async {
-    final prefs = await SharedPreferences.getInstance();
-    final completed = prefs.getBool(_setupCompletedKey) ?? false;
-    print('Setup completion flag retrieved: $completed');
-    return completed;
+    return await DatabaseService.instance.getSetupCompletedFlag();
   }
 
   Future<void> clearAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    await _secureStorage.deleteAll();
-    print('All storage cleared including setup completion flag');
+    // Clear all authentication data from encrypted database
+    await DatabaseService.instance.clearAllAuthData();
+    
+    // Also clear any remaining SharedPreferences data for migration compatibility
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      print('Cleared legacy SharedPreferences data');
+    } catch (e) {
+      print('Error clearing SharedPreferences: $e');
+    }
+    
+    print('All authentication storage cleared');
   }
 
   // Reset setup for testing/debugging purposes
   Future<void> resetSetup() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_setupCompletedKey, false);
-    await prefs.setBool(_isFirstTimeKey, true);
-    await _secureStorage.delete(key: _passphraseKey);
-    await _secureStorage.delete(key: _tokenKey);
+    await DatabaseService.instance.setSetupCompletedFlag(false);
+    await DatabaseService.instance.setFirstTimeFlag(true);
+    await DatabaseService.instance.deleteEncryptedPassphraseHash();
+    await DatabaseService.instance.deleteEncryptedToken();
     print('Setup reset - app will show setup screen on next launch');
   }
   
@@ -155,8 +178,8 @@ class StorageService {
     final isExpired = await isTokenExpired();
     if (isExpired) {
       await deleteToken();
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_isLoggedInKey, false);
+      await DatabaseService.instance.setLoggedInFlag(false);
+      print('Cleaned up expired token and set logged in flag to false');
     }
   }
 
@@ -187,5 +210,17 @@ class StorageService {
       print('Error during security questions migration: $e');
       // Don't throw - migration failure shouldn't break the app
     }
+  }
+
+  /// Sets biometric authentication enabled flag
+  Future<void> setBiometricEnabled(bool enabled) async {
+    await DatabaseService.instance.updateMetadata('biometric_enabled', enabled ? '1' : '0');
+    print('Set biometric enabled flag to: $enabled');
+  }
+
+  /// Gets biometric authentication enabled flag
+  Future<bool> getBiometricEnabled() async {
+    final value = await DatabaseService.instance.getMetadata('biometric_enabled');
+    return value == '1';
   }
 }

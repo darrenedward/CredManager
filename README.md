@@ -48,13 +48,19 @@ APIKeyManager/
 
 ### **Prerequisites**
 - Flutter SDK 3.10.0 or higher
-- Platform-specific development tools (see platform docs)
+- Dart SDK 3.0.0 or higher
+- Platform-specific development tools and libraries
+
+📋 **For detailed setup requirements, see [SETUP_REQUIREMENTS.md](SETUP_REQUIREMENTS.md)**
 
 ### **Development Setup**
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd APIKeyManager
+
+# Install platform dependencies (Linux example)
+sudo apt-get install libsqlite3-dev libsecret-1-dev libgtk-3-dev
 
 # Install Flutter dependencies
 cd frontend
@@ -95,20 +101,30 @@ See the [platforms README](platforms/README.md) for detailed build instructions.
 
 ## 🛡️ **Security Architecture**
 
+### **Database Encryption**
+- **Mobile Platforms:** SQLCipher with PRAGMA key encryption + XOR application layer
+- **Desktop Platforms:** SQLite with XOR application-layer encryption
+- **Cross-Platform:** Consistent security through dual-encryption approach
+- **Key Derivation:** Argon2id with passphrase-derived database encryption keys
+
 ### **Encryption Details**
-- **Algorithm:** AES-256-GCM with unique nonce per record
-- **Key Derivation:** Argon2id with 64MB memory, 1 iteration, 4 threads
-- **Salt Generation:** Cryptographically secure random salts
-- **Database:** SQLite with encrypted credential storage
+- **Primary:** XOR encryption with passphrase-derived keys for all sensitive fields
+- **Secondary:** Double encryption for biometric keys (XOR + additional layer)
+- **Key Derivation:** Argon2id with secure parameters (configurable memory/iterations)
+- **Salt Generation:** Cryptographically secure random salts per encryption operation
+- **Database Storage:** All authentication data consolidated in encrypted database
 
 ### **Security Best Practices**
 - Master passphrase never stored in plaintext
 - Encryption keys derived fresh from passphrase on each session
 - Secure memory handling with automatic key cleanup
 - No network communication eliminates remote attack vectors
+- Platform-specific encryption optimizations for maximum compatibility
+- Comprehensive test coverage for all encryption scenarios
 
 ## 📚 **Documentation**
 
+- [Setup Requirements](SETUP_REQUIREMENTS.md) - **Complete setup guide with all dependencies**
 - [Platform Builds](platforms/README.md) - Build system and deployment
 - [Frontend Development](frontend/README.md) - Flutter app development
 - [Security Architecture](docs/security.md) - Detailed security documentation

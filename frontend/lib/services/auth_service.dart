@@ -340,4 +340,79 @@ class AuthService {
   Future<void> cleanupExpiredTokens() async {
     await _storageService.cleanupExpiredTokens();
   }
+
+  /// Completes the passphrase recovery process
+  Future<String?> completeRecovery(List<String> answers, String newPassphrase) async {
+    try {
+      // Get stored questions to match answers
+      final storedQuestions = await _storageService.getSecurityQuestions();
+      if (storedQuestions == null || storedQuestions.isEmpty) {
+        throw Exception('No security questions found');
+      }
+
+      // Convert answers to the expected format for verification
+      final formattedAnswers = <Map<String, String>>[];
+      for (int i = 0; i < answers.length && i < storedQuestions.length; i++) {
+        formattedAnswers.add({
+          'question': storedQuestions[i]['question']!,
+          'answer': answers[i],
+        });
+      }
+
+      // Verify the recovery answers
+      final isValid = await verifyRecoveryAnswers(formattedAnswers);
+      if (!isValid) {
+        throw Exception('Invalid recovery answers');
+      }
+
+      // Reset the passphrase with the new one
+      final token = await resetPassphrase('recovery_token', newPassphrase);
+
+      return token;
+    } catch (e) {
+      print('Error in completeRecovery: $e');
+      return null;
+    }
+  }
+
+  /// Enables biometric authentication
+  Future<bool> enableBiometricAuth(String passphrase) async {
+    try {
+      // Verify the passphrase first
+      final storedHash = await _storageService.getPassphraseHash();
+      if (storedHash == null) {
+        throw Exception('No account found');
+      }
+
+      if (!await _verifyPassphrase(passphrase, storedHash)) {
+        throw Exception('Invalid passphrase');
+      }
+
+      // Store biometric enabled flag
+      await _storageService.setBiometricEnabled(true);
+
+      return true;
+    } catch (e) {
+      print('Error enabling biometric auth: $e');
+      return false;
+    }
+  }
+
+  /// Authenticates using biometric
+  Future<String?> authenticateWithBiometric() async {
+    try {
+      // Check if biometric is enabled
+      final biometricEnabled = await _storageService.getBiometricEnabled();
+      if (!biometricEnabled) {
+        throw Exception('Biometric authentication not enabled');
+      }
+
+      // For desktop, biometric auth is not available, so return null
+      // In a real implementation, this would use platform biometric APIs
+      return null;
+    } catch (e) {
+      print('Error in biometric authentication: $e');
+      return null;
+    }
+  }
 }

@@ -243,7 +243,7 @@ void main() {
         const testPassphrase = 'TestPassphrase123!';
         DatabaseService.setPassphrase(testPassphrase);
 
-        const originalValues = [
+        final originalValues = [
           'Simple text',
           'Text with spaces   and   multiple   spaces',
           'Special chars: !@#\$%^&*()_+-=[]{}|;:,.<>?',

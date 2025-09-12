@@ -1,7 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'database_service.dart';
+import 'encryption_service.dart';
 
 /// Service for handling biometric authentication
 class BiometricAuthService {
@@ -9,7 +10,7 @@ class BiometricAuthService {
   static const String _biometricKeyKey = 'biometric_key';
   
   final LocalAuthentication _localAuth = LocalAuthentication();
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  final EncryptionService _encryptionService = EncryptionService();
 
   /// Check if biometric authentication is available on the device
   Future<bool> isBiometricAvailable() async {
@@ -50,7 +51,7 @@ class BiometricAuthService {
   /// Check if biometric authentication is enabled in settings
   Future<bool> isBiometricEnabled() async {
     try {
-      final String? enabled = await _secureStorage.read(key: _biometricEnabledKey);
+      final String? enabled = await DatabaseService.instance.getMetadata(_biometricEnabledKey);
       return enabled == 'true';
     } catch (e) {
       print('Error checking biometric enabled status: $e');
@@ -61,7 +62,8 @@ class BiometricAuthService {
   /// Enable or disable biometric authentication
   Future<void> setBiometricEnabled(bool enabled) async {
     try {
-      await _secureStorage.write(key: _biometricEnabledKey, value: enabled.toString());
+      await DatabaseService.instance.updateMetadata(_biometricEnabledKey, enabled.toString());
+      print('Set biometric enabled to: $enabled');
     } catch (e) {
       print('Error setting biometric enabled status: $e');
       throw Exception('Failed to update biometric settings');
@@ -176,7 +178,10 @@ class BiometricAuthService {
   /// Store encrypted master key for biometric access
   Future<void> storeBiometricKey(String encryptedKey) async {
     try {
-      await _secureStorage.write(key: _biometricKeyKey, value: encryptedKey);
+      // Double-encrypt the biometric key before storing in database
+      final doubleEncryptedKey = await _encryptionService.encryptData(encryptedKey);
+      await DatabaseService.instance.updateMetadata(_biometricKeyKey, doubleEncryptedKey);
+      print('Stored encrypted biometric key in database');
     } catch (e) {
       print('Error storing biometric key: $e');
       throw Exception('Failed to store biometric key');
@@ -186,7 +191,11 @@ class BiometricAuthService {
   /// Retrieve encrypted master key for biometric access
   Future<String?> getBiometricKey() async {
     try {
-      return await _secureStorage.read(key: _biometricKeyKey);
+      final doubleEncryptedKey = await DatabaseService.instance.getMetadata(_biometricKeyKey);
+      if (doubleEncryptedKey == null) return null;
+      
+      // Decrypt the biometric key from database
+      return await _encryptionService.decryptData(doubleEncryptedKey);
     } catch (e) {
       print('Error retrieving biometric key: $e');
       return null;
@@ -196,7 +205,8 @@ class BiometricAuthService {
   /// Remove stored biometric key
   Future<void> removeBiometricKey() async {
     try {
-      await _secureStorage.delete(key: _biometricKeyKey);
+      await DatabaseService.instance.delete('app_metadata', where: 'key = ?', whereArgs: [_biometricKeyKey]);
+      print('Removed biometric key from database');
     } catch (e) {
       print('Error removing biometric key: $e');
       throw Exception('Failed to remove biometric key');

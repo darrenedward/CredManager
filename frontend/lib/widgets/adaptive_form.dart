@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/responsive_service.dart';
 import '../services/biometric_auth_service.dart';
 import '../utils/constants.dart';
+import 'adaptive_card.dart' show AdaptiveText;
 
 /// Adaptive form that adjusts layout and spacing based on screen size
 class AdaptiveForm extends StatelessWidget {

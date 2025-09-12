@@ -771,6 +771,58 @@ class SupportScreen extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 30),
+
+              // FAQ Section
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.quiz,
+                              color: AppConstants.primaryColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Frequently Asked Questions',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildFAQSection(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 40),
             ],
           ),
@@ -1260,6 +1312,113 @@ class SupportScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFAQSection() {
+    return Column(
+      children: [
+        _FAQExpansionTile(
+          title: 'Why does biometric authentication show "Not Available"?',
+          content: 'Biometric authentication requires compatible hardware like fingerprint readers, Face ID cameras, or Windows Hello. On desktop systems like Linux, these features may not be available or supported. The app works perfectly without biometrics - it\'s an optional convenience feature, not a security requirement.',
+          icon: Icons.fingerprint,
+        ),
+        const SizedBox(height: 8),
+        _FAQExpansionTile(
+          title: 'How secure is my data storage?',
+          content: 'All your data is encrypted using military-grade encryption standards. Your master passphrase protects everything, and data never leaves your device unless you explicitly export it. The app uses multiple layers of security including encrypted databases and secure memory handling.',
+          icon: Icons.security,
+        ),
+        const SizedBox(height: 8),
+        _FAQExpansionTile(
+          title: 'What platforms support biometric authentication?',
+          content: 'Biometric authentication is available on:\n• Android devices with fingerprint/face unlock\n• iOS devices with Touch ID or Face ID\n• Windows devices with Windows Hello\n• macOS devices with Touch ID\n• Linux systems with compatible fingerprint hardware',
+          icon: Icons.devices,
+        ),
+        const SizedBox(height: 8),
+        _FAQExpansionTile(
+          title: 'Can I use the app without biometrics?',
+          content: 'Absolutely! Biometric authentication is entirely optional. The app is designed to work fully with just your master passphrase. Biometrics simply provide a convenient way to unlock the app more quickly on supported devices.',
+          icon: Icons.lock,
+        ),
+        const SizedBox(height: 8),
+        _FAQExpansionTile(
+          title: 'How does offline storage work?',
+          content: 'All your credentials are stored locally on your device in an encrypted database. Nothing is sent to external servers or cloud services. This ensures complete privacy and allows the app to work without an internet connection.',
+          icon: Icons.cloud_off,
+        ),
+        const SizedBox(height: 8),
+        _FAQExpansionTile(
+          title: 'What happens if I lose my device?',
+          content: 'Your data remains secure because it\'s encrypted with your master passphrase. Without the passphrase, the data cannot be accessed. This is why regular backups are important - you can restore your data on a new device using your backup file and passphrase.',
+          icon: Icons.phone_android,
+        ),
+        const SizedBox(height: 8),
+        _FAQExpansionTile(
+          title: 'Can I sync data between devices?',
+          content: 'Currently, the app is designed for single-device use with manual backup/restore for transferring data. You can export your data from one device and import it on another. Cloud synchronization may be added in future versions while maintaining security.',
+          icon: Icons.sync,
+        ),
+      ],
+    );
+  }
+
+  Widget _FAQExpansionTile({
+    required String title,
+    required String content,
+    required IconData icon,
+  }) {
+    return Builder(
+      builder: (context) => Card(
+        elevation: 1,
+        color: AppConstants.cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Theme(
+          data: Theme.of(context).copyWith(
+          dividerColor: Colors.transparent,
+        ),
+          child: ExpansionTile(
+            leading: Icon(
+              icon,
+              color: AppConstants.primaryColor,
+              size: 20,
+            ),
+            title: Text(
+              title,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppConstants.primaryColor,
+              ),
+            ),
+            iconColor: AppConstants.primaryColor,
+            collapsedIconColor: AppConstants.primaryColor,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  bottom: 16.0,
+                  top: 0.0,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

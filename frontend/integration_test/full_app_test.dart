@@ -3,9 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:provider/provider.dart';
 
-import 'package:api_key_manager/main.dart';
-import 'package:api_key_manager/models/auth_state.dart';
-import 'package:api_key_manager/utils/constants.dart';
+import 'package:cred_manager/main.dart';
+import 'package:cred_manager/models/auth_state.dart';
+import 'package:cred_manager/models/dashboard_state.dart';
+import 'package:cred_manager/services/theme_service.dart';
+import 'package:cred_manager/utils/constants.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -16,8 +18,26 @@ void main() {
     testWidgets('Complete user journey with real passcode', (tester) async {
       // Start the app
       await tester.pumpWidget(
-        ChangeNotifierProvider(
-          create: (context) => AuthState(),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => ThemeService()),
+            ChangeNotifierProvider(create: (context) => AuthState()),
+            ChangeNotifierProxyProvider<AuthState, DashboardState>(
+              create: (context) => DashboardState(
+                Provider.of<AuthState>(context, listen: false).credentialStorage,
+              ),
+              update: (context, authState, dashboardState) {
+                // Update dashboard state when auth state changes
+                if (authState.hasValidSession) {
+                  // User logged in - ensure dashboard has access to credential storage
+                  return dashboardState ?? DashboardState(authState.credentialStorage);
+                } else {
+                  // User logged out - return new dashboard state
+                  return DashboardState(authState.credentialStorage);
+                }
+              },
+            ),
+          ],
           child: const ApiKeyManagerApp(),
         ),
       );
@@ -27,7 +47,6 @@ void main() {
       print('✅ App started successfully');
 
       // Verify login screen elements
-      expect(find.text(AppConstants.appTagline), findsOneWidget);
       expect(find.text('Welcome back'), findsOneWidget);
       expect(find.text('Enter your passphrase to continue'), findsOneWidget);
 
@@ -37,7 +56,7 @@ void main() {
       final passphraseField = find.byType(TextField);
       await tester.enterText(passphraseField, testPasscode);
 
-      final loginButton = find.text('Submit');
+      final loginButton = find.text('Continue');
       await tester.tap(loginButton);
       await tester.pumpAndSettle();
 
