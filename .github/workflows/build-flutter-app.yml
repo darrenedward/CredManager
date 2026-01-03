@@ -115,6 +115,47 @@ jobs:
           path: release/cred-manager_1.0.0_amd64.deb
           retention-days: 30
 
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Flutter desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build macOS release
+        working-directory: frontend
+        run: flutter build macos --release
+
+      - name: Package macOS App
+        run: |
+          mkdir -p release/macos
+          cp -R frontend/build/macos/Build/Products/Release/*.app release/macos/
+
+      - name: Create macOS zip archive
+        run: |
+          cd release/macos
+          zip -r ../cred-manager-macos-x64.zip .
+
+      - name: Upload macOS zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-macos-zip
+          path: release/cred-manager-macos-x64.zip
+          retention-days: 30
+
   build-windows:
     runs-on: windows-latest
     steps:
