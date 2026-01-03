@@ -291,7 +291,8 @@ void main() {
         await tester.pump();
 
         // Should show appropriate error without leaking information
-        expect(find.textContaining(testCase['shouldContain']!), findsOneWidget);
+        // Error may appear in TextField errorText and/or SnackBar
+        expect(find.textContaining(testCase['shouldContain']!), findsWidgets);
 
         // Should NOT leak account existence information
         expect(find.textContaining('account'), findsNothing);
@@ -341,7 +342,7 @@ void main() {
         await tester.pump();
 
         // Should show error but not be locked out yet
-        expect(find.textContaining('failed'), findsOneWidget);
+        expect(find.textContaining('failed'), findsWidgets);
       }
 
       print('✅ Rate limiting UI behavior validated');
