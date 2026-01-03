@@ -858,6 +858,8 @@ class DashboardState extends ChangeNotifier {
           entries: updatedEntries,
           updatedAt: DateTime.now(),
         );
+        // Explicitly notify listeners to update UI
+        notifyListeners();
       }
 
       return true;
@@ -891,6 +893,8 @@ class DashboardState extends ChangeNotifier {
             entries: updatedEntries,
             updatedAt: DateTime.now(),
           );
+          // Explicitly notify listeners to update UI
+          notifyListeners();
         }
       }
 
@@ -922,6 +926,8 @@ class DashboardState extends ChangeNotifier {
           entries: updatedEntries,
           updatedAt: DateTime.now(),
         );
+        // Explicitly notify listeners to update UI
+        notifyListeners();
       }
 
       return true;

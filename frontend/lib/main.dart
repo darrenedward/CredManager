@@ -21,7 +21,7 @@ void main() async {
     await windowManager.setTitle('Cred Manager - Keep your secrets safe with me');
     // Set window icon if possible
     try {
-      await windowManager.setIcon('data/flutter_assets/assets/icons/shield_icon.svg');
+      await windowManager.setIcon('assets/icons/shield_icon.svg');
     } catch (e) {
       // Icon setting may not work on all platforms
     }
