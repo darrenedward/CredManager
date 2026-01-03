@@ -1,5 +1,6 @@
 import '../models/project.dart';
 import '../models/ai_service.dart';
+import '../models/password_vault.dart';
 import 'database_service.dart';
 import 'encryption_service.dart';
 
@@ -439,12 +440,16 @@ class CredentialStorageService {
     final credentialCount = await _db.rawQuery('SELECT COUNT(*) as count FROM credentials');
     final serviceCount = await _db.rawQuery('SELECT COUNT(*) as count FROM ai_services');
     final keyCount = await _db.rawQuery('SELECT COUNT(*) as count FROM ai_service_keys');
+    final vaultCount = await _db.rawQuery('SELECT COUNT(*) as count FROM password_vaults');
+    final passwordCount = await _db.rawQuery('SELECT COUNT(*) as count FROM password_entries');
 
     return {
       'projects': projectCount.first['count'] as int,
       'credentials': credentialCount.first['count'] as int,
       'ai_services': serviceCount.first['count'] as int,
       'ai_service_keys': keyCount.first['count'] as int,
+      'password_vaults': vaultCount.first['count'] as int,
+      'password_entries': passwordCount.first['count'] as int,
     };
   }
 
@@ -484,10 +489,269 @@ class CredentialStorageService {
           whereArgs: [key['id']],
         );
       }
+
+      // Re-encrypt all password entries
+      final passwords = await txn.query('password_entries');
+      for (final password in passwords) {
+        final encryptedValue = password['encrypted_value'] as String;
+        final decryptedValue = await _encryption.decrypt(encryptedValue, oldPassphrase);
+        final newEncryptedValue = await _encryption.encrypt(decryptedValue, newPassphrase);
+
+        await txn.update(
+          'password_entries',
+          {'encrypted_value': newEncryptedValue},
+          where: 'id = ?',
+          whereArgs: [password['id']],
+        );
+      }
     });
 
     // Update current passphrase
     _currentPassphrase = newPassphrase;
     _encryption.clearKeyCache();
+  }
+
+  // ==================== PASSWORD VAULT OPERATIONS ====================
+
+  /// Creates a new password vault
+  Future<PasswordVault> createPasswordVault({
+    required String name,
+    String? description,
+    String? icon,
+  }) async {
+    final now = DateTime.now();
+    final vault = PasswordVault(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+      description: description,
+      icon: icon,
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    await _db.insert('password_vaults', vault.toMap());
+    return vault;
+  }
+
+  /// Gets all password vaults with their entries
+  Future<List<PasswordVault>> getAllPasswordVaults() async {
+    _validatePassphrase();
+
+    final vaultMaps = await _db.query(
+      'password_vaults',
+      orderBy: 'updated_at DESC',
+    );
+
+    final vaults = <PasswordVault>[];
+
+    for (final vaultMap in vaultMaps) {
+      final entries = await _getPasswordEntriesForVault(vaultMap['id'] as String);
+      vaults.add(PasswordVault.fromMap(vaultMap, entries: entries));
+    }
+
+    return vaults;
+  }
+
+  /// Gets a specific password vault by ID
+  Future<PasswordVault?> getPasswordVault(String id) async {
+    _validatePassphrase();
+
+    final vaultMaps = await _db.query(
+      'password_vaults',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (vaultMaps.isEmpty) return null;
+
+    final entries = await _getPasswordEntriesForVault(id);
+    return PasswordVault.fromMap(vaultMaps.first, entries: entries);
+  }
+
+  /// Updates a password vault
+  Future<PasswordVault> updatePasswordVault(PasswordVault vault) async {
+    final updatedVault = vault.copyWith(updatedAt: DateTime.now());
+
+    await _db.update(
+      'password_vaults',
+      updatedVault.toMap(),
+      where: 'id = ?',
+      whereArgs: [vault.id],
+    );
+
+    return updatedVault;
+  }
+
+  /// Deletes a password vault and all its entries
+  Future<void> deletePasswordVault(String id) async {
+    await _db.delete('password_vaults', where: 'id = ?', whereArgs: [id]);
+    // Entries are automatically deleted due to foreign key constraint
+  }
+
+  /// Gets all password entries for a specific vault (with decryption)
+  Future<List<PasswordEntry>> _getPasswordEntriesForVault(String vaultId) async {
+    _validatePassphrase();
+
+    final entryMaps = await _db.query(
+      'password_entries',
+      where: 'vault_id = ?',
+      whereArgs: [vaultId],
+      orderBy: 'updated_at DESC',
+    );
+
+    final entries = <PasswordEntry>[];
+
+    for (final entryMap in entryMaps) {
+      try {
+        final encryptedValue = entryMap['encrypted_value'] as String;
+        final decryptedValue = await _encryption.decrypt(encryptedValue, _currentPassphrase!);
+
+        entries.add(PasswordEntry.fromMap({...entryMap, 'value': decryptedValue}));
+      } catch (e) {
+        print('Failed to decrypt password entry ${entryMap['id']}: $e');
+        // Skip corrupted entries
+      }
+    }
+
+    return entries;
+  }
+
+  /// Creates a new password entry
+  Future<PasswordEntry> createPasswordEntry({
+    required String vaultId,
+    required String name,
+    required String value,
+    String? username,
+    String? email,
+    String? url,
+    String? notes,
+    String? tags,
+  }) async {
+    _validatePassphrase();
+
+    final now = DateTime.now();
+    final entry = PasswordEntry(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      vaultId: vaultId,
+      name: name,
+      value: value,
+      username: username,
+      email: email,
+      url: url,
+      notes: notes,
+      tags: tags,
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    // Encrypt the value before storing
+    final encryptedValue = await _encryption.encrypt(value, _currentPassphrase!);
+
+    await _db.insert('password_entries', {
+      ...entry.toMap(),
+      'encrypted_value': encryptedValue,
+    });
+
+    // Update vault's updated_at timestamp
+    await _db.update(
+      'password_vaults',
+      {'updated_at': now.millisecondsSinceEpoch},
+      where: 'id = ?',
+      whereArgs: [vaultId],
+    );
+
+    return entry;
+  }
+
+  /// Updates a password entry
+  Future<PasswordEntry> updatePasswordEntry(PasswordEntry entry) async {
+    _validatePassphrase();
+
+    final updatedEntry = entry.copyWith(updatedAt: DateTime.now());
+
+    // Encrypt the value before storing
+    final encryptedValue = await _encryption.encrypt(updatedEntry.value, _currentPassphrase!);
+
+    await _db.update(
+      'password_entries',
+      {
+        ...updatedEntry.toMap(),
+        'encrypted_value': encryptedValue,
+      },
+      where: 'id = ?',
+      whereArgs: [entry.id],
+    );
+
+    // Update vault's updated_at timestamp
+    await _db.update(
+      'password_vaults',
+      {'updated_at': updatedEntry.updatedAt.millisecondsSinceEpoch},
+      where: 'id = ?',
+      whereArgs: [entry.vaultId],
+    );
+
+    return updatedEntry;
+  }
+
+  /// Deletes a password entry
+  Future<void> deletePasswordEntry(String id, String vaultId) async {
+    await _db.delete('password_entries', where: 'id = ?', whereArgs: [id]);
+
+    // Update vault's updated_at timestamp
+    await _db.update(
+      'password_vaults',
+      {'updated_at': DateTime.now().millisecondsSinceEpoch},
+      where: 'id = ?',
+      whereArgs: [vaultId],
+    );
+  }
+
+  /// Searches for password vaults by name
+  Future<List<PasswordVault>> searchPasswordVaults(String query) async {
+    _validatePassphrase();
+
+    final vaultMaps = await _db.query(
+      'password_vaults',
+      where: 'name LIKE ?',
+      whereArgs: ['%$query%'],
+      orderBy: 'updated_at DESC',
+    );
+
+    final vaults = <PasswordVault>[];
+
+    for (final vaultMap in vaultMaps) {
+      final entries = await _getPasswordEntriesForVault(vaultMap['id'] as String);
+      vaults.add(PasswordVault.fromMap(vaultMap, entries: entries));
+    }
+
+    return vaults;
+  }
+
+  /// Searches for password entries by name, username, or URL
+  Future<List<PasswordEntry>> searchPasswordEntries(String query) async {
+    _validatePassphrase();
+
+    final entryMaps = await _db.query(
+      'password_entries',
+      where: 'name LIKE ? OR username LIKE ? OR url LIKE ?',
+      whereArgs: ['%$query%', '%$query%', '%$query%'],
+      orderBy: 'updated_at DESC',
+    );
+
+    final entries = <PasswordEntry>[];
+
+    for (final entryMap in entryMaps) {
+      try {
+        final encryptedValue = entryMap['encrypted_value'] as String;
+        final decryptedValue = await _encryption.decrypt(encryptedValue, _currentPassphrase!);
+
+        entries.add(PasswordEntry.fromMap({...entryMap, 'value': decryptedValue}));
+      } catch (e) {
+        print('Failed to decrypt password entry ${entryMap['id']}: $e');
+        // Skip corrupted entries
+      }
+    }
+
+    return entries;
   }
 }

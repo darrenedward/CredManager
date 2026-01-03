@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/project.dart';
 import '../models/ai_service.dart';
+import '../models/password_vault.dart';
 import '../services/credential_storage_service.dart';
 
 class DashboardState extends ChangeNotifier {
@@ -16,7 +17,8 @@ class DashboardState extends ChangeNotifier {
   // Data State
   List<Project> _projects = [];
   List<AiService> _aiServices = [];
-  
+  List<PasswordVault> _passwordVaults = [];
+
   // Getters
   String get currentView => _currentView;
   String get currentSection => _currentSection;
@@ -25,6 +27,7 @@ class DashboardState extends ChangeNotifier {
   String? get error => _error;
   List<Project> get projects => _projects;
   List<AiService> get aiServices => _aiServices;
+  List<PasswordVault> get passwordVaults => _passwordVaults;
   
   DashboardState(this._credentialStorage);
   
@@ -103,6 +106,19 @@ class DashboardState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void showPasswordVaultManagement() {
+    _currentView = 'password_vault_management';
+    _currentSelectedItem = null;
+    notifyListeners();
+  }
+
+  void selectPasswordVault(String vaultId) {
+    _currentView = 'password_vault_detail';
+    _currentSection = 'passwords';
+    _currentSelectedItem = vaultId;
+    notifyListeners();
+  }
+
   /// Sets the current view
   void setCurrentView(String view) {
     _currentView = view;
@@ -136,7 +152,15 @@ class DashboardState extends ChangeNotifier {
     _currentSelectedItem = serviceId;
     notifyListeners();
   }
-  
+
+  /// Navigates to a specific password vault
+  void navigateToPasswordVault(String vaultId) {
+    _currentView = 'password_vault_detail';
+    _currentSection = 'passwords';
+    _currentSelectedItem = vaultId;
+    notifyListeners();
+  }
+
   // ==================== DATA OPERATIONS ====================
   
   /// Loads all data from the database
@@ -144,16 +168,18 @@ class DashboardState extends ChangeNotifier {
     try {
       setLoading(true);
       clearError();
-      
-      // Load projects and AI services in parallel
+
+      // Load projects, AI services, and password vaults in parallel
       final results = await Future.wait([
         _credentialStorage.getAllProjects(),
         _credentialStorage.getAllAiServices(),
+        _credentialStorage.getAllPasswordVaults(),
       ]);
-      
+
       _projects = results[0] as List<Project>;
       _aiServices = results[1] as List<AiService>;
-      
+      _passwordVaults = results[2] as List<PasswordVault>;
+
     } catch (e) {
       setError('Failed to load data: $e');
       print('Error loading dashboard data: $e');
@@ -685,9 +711,15 @@ class DashboardState extends ChangeNotifier {
         await _credentialStorage.deleteAiService(service.id);
       }
 
+      // Clear all password vaults from storage
+      for (final vault in _passwordVaults) {
+        await _credentialStorage.deletePasswordVault(vault.id);
+      }
+
       // Clear local state
       _projects.clear();
       _aiServices.clear();
+      _passwordVaults.clear();
       _currentView = 'overview';
 
       notifyListeners();
@@ -695,6 +727,208 @@ class DashboardState extends ChangeNotifier {
       setError('Failed to clear all data: $e');
       print('Error clearing all data: $e');
       rethrow;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ==================== PASSWORD VAULT OPERATIONS ====================
+
+  /// Creates a new password vault
+  Future<PasswordVault?> createPasswordVault(String name, {String? description}) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      final vault = await _credentialStorage.createPasswordVault(
+        name: name,
+        description: description,
+      );
+
+      // Add to local list
+      _passwordVaults.insert(0, vault);
+
+      // Navigate to the new vault
+      navigateToPasswordVault(vault.id);
+
+      return vault;
+    } catch (e) {
+      setError('Failed to create password vault: $e');
+      print('Error creating password vault: $e');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Updates a password vault
+  Future<bool> updatePasswordVault(PasswordVault vault) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      final updatedVault = await _credentialStorage.updatePasswordVault(vault);
+
+      // Update in local list
+      final index = _passwordVaults.indexWhere((v) => v.id == vault.id);
+      if (index != -1) {
+        _passwordVaults[index] = updatedVault;
+      }
+
+      return true;
+    } catch (e) {
+      setError('Failed to update password vault: $e');
+      print('Error updating password vault: $e');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Deletes a password vault
+  Future<bool> deletePasswordVault(String vaultId) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      await _credentialStorage.deletePasswordVault(vaultId);
+
+      // Remove from local list
+      _passwordVaults.removeWhere((v) => v.id == vaultId);
+
+      // Navigate away if we were viewing this vault
+      if (_currentSelectedItem == vaultId) {
+        setCurrentView('overview');
+        setCurrentSelectedItem(null);
+      }
+
+      return true;
+    } catch (e) {
+      setError('Failed to delete password vault: $e');
+      print('Error deleting password vault: $e');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Gets a specific password vault by ID
+  PasswordVault? getPasswordVault(String id) {
+    try {
+      return _passwordVaults.firstWhere((v) => v.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Creates a new password entry in a vault
+  Future<bool> createPasswordEntry({
+    required String vaultId,
+    required String name,
+    required String value,
+    String? username,
+    String? email,
+    String? url,
+    String? notes,
+    String? tags,
+  }) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      final entry = await _credentialStorage.createPasswordEntry(
+        vaultId: vaultId,
+        name: name,
+        value: value,
+        username: username,
+        email: email,
+        url: url,
+        notes: notes,
+        tags: tags,
+      );
+
+      // Update the vault in local list
+      final vaultIndex = _passwordVaults.indexWhere((v) => v.id == vaultId);
+      if (vaultIndex != -1) {
+        final vault = _passwordVaults[vaultIndex];
+        final updatedEntries = List<PasswordEntry>.from(vault.entries);
+        updatedEntries.insert(0, entry);
+
+        _passwordVaults[vaultIndex] = vault.copyWith(
+          entries: updatedEntries,
+          updatedAt: DateTime.now(),
+        );
+      }
+
+      return true;
+    } catch (e) {
+      setError('Failed to create password entry: $e');
+      print('Error creating password entry: $e');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Updates a password entry
+  Future<bool> updatePasswordEntry(PasswordEntry entry) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      final updatedEntry = await _credentialStorage.updatePasswordEntry(entry);
+
+      // Update the vault in local list
+      final vaultIndex = _passwordVaults.indexWhere((v) => v.id == entry.vaultId);
+      if (vaultIndex != -1) {
+        final vault = _passwordVaults[vaultIndex];
+        final entryIndex = vault.entries.indexWhere((e) => e.id == entry.id);
+        if (entryIndex != -1) {
+          final updatedEntries = List<PasswordEntry>.from(vault.entries);
+          updatedEntries[entryIndex] = updatedEntry;
+
+          _passwordVaults[vaultIndex] = vault.copyWith(
+            entries: updatedEntries,
+            updatedAt: DateTime.now(),
+          );
+        }
+      }
+
+      return true;
+    } catch (e) {
+      setError('Failed to update password entry: $e');
+      print('Error updating password entry: $e');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Deletes a password entry
+  Future<bool> deletePasswordEntry(String entryId, String vaultId) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      await _credentialStorage.deletePasswordEntry(entryId, vaultId);
+
+      // Update the vault in local list
+      final vaultIndex = _passwordVaults.indexWhere((v) => v.id == vaultId);
+      if (vaultIndex != -1) {
+        final vault = _passwordVaults[vaultIndex];
+        final updatedEntries = vault.entries.where((e) => e.id != entryId).toList();
+
+        _passwordVaults[vaultIndex] = vault.copyWith(
+          entries: updatedEntries,
+          updatedAt: DateTime.now(),
+        );
+      }
+
+      return true;
+    } catch (e) {
+      setError('Failed to delete password entry: $e');
+      print('Error deleting password entry: $e');
+      return false;
     } finally {
       setLoading(false);
     }

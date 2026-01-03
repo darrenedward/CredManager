@@ -168,6 +168,20 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
                   }
                 },
               ),
+              const SizedBox(height: 8),
+              _buildNavigationItem(
+                context,
+                icon: Icons.lock_outline,
+                title: 'Passwords',
+                subtitle: 'Password Vault',
+                isSelected: dashboardState.currentView == 'password_vault_management',
+                onTap: () {
+                  dashboardState.showPasswordVaultManagement();
+                  if (ResponsiveService.isMobile(context)) {
+                    Navigator.pop(context); // Close drawer on mobile
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -284,6 +298,10 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
         return _buildAiServiceManagementContent(context, dashboardState);
       case 'ai_service_detail':
         return _buildAiServiceDetailContent(context, dashboardState);
+      case 'password_vault_management':
+        return _buildPasswordVaultManagementContent(context, dashboardState);
+      case 'password_vault_detail':
+        return _buildPasswordVaultDetailContent(context, dashboardState);
       default:
         return _buildDashboardContent(context, dashboardState);
     }
@@ -3256,6 +3274,632 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('API key deletion - Coming soon')),
               );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build password vault management content
+  Widget _buildPasswordVaultManagementContent(BuildContext context, DashboardState dashboardState) {
+    final vaults = dashboardState.passwordVaults;
+
+    return SingleChildScrollView(
+      padding: ResponsiveService.getResponsivePadding(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AdaptiveText(
+                'Password Vaults',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppConstants.primaryColor,
+                ),
+              ),
+              AdaptiveIconButton(
+                icon: const Icon(Icons.add),
+                tooltip: 'Create Password Vault',
+                onPressed: () => _showAddPasswordVaultDialog(context, dashboardState),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          AdaptiveText(
+            'Securely store and manage your passwords',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Password vaults grid
+          if (vaults.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(48),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.lock_outline,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    AdaptiveText(
+                      'No Password Vaults Yet',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    AdaptiveText(
+                      'Create your first password vault to get started',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => _showAddPasswordVaultDialog(context, dashboardState),
+                      icon: const Icon(Icons.add),
+                      label: const AdaptiveText('Create Password Vault'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppConstants.primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            AdaptiveGrid(
+              children: vaults.map((vault) {
+                return AdaptiveCard(
+                  onTap: () {
+                    dashboardState.selectPasswordVault(vault.id);
+                    ResponsiveService.triggerLightHaptic();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.lock,
+                              color: AppConstants.primaryColor,
+                              size: 32,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AdaptiveText(
+                                    vault.name,
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (vault.description != null)
+                                    AdaptiveText(
+                                      vault.description!,
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Colors.grey[600],
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.more_vert),
+                              onPressed: () => _showPasswordVaultOptions(context, vault, dashboardState),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        AdaptiveText(
+                          '${vault.entryCount} ${vault.entryCount == 1 ? 'password' : 'passwords'}',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Build password vault detail content
+  Widget _buildPasswordVaultDetailContent(BuildContext context, DashboardState dashboardState) {
+    final vaultId = dashboardState.currentSelectedItem;
+    final vault = vaultId != null ? dashboardState.getPasswordVault(vaultId) : null;
+
+    if (vault == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            AdaptiveText(
+              'Password Vault Not Found',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // Header
+        Container(
+          padding: ResponsiveService.getResponsivePadding(context),
+          decoration: BoxDecoration(
+            color: AppConstants.primaryColor.withValues(alpha: 0.1),
+            border: Border(
+              bottom: BorderSide(
+                color: AppConstants.primaryColor.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  dashboardState.showPasswordVaultManagement();
+                  ResponsiveService.triggerLightHaptic();
+                },
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AdaptiveText(
+                      vault.name,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (vault.description != null)
+                      AdaptiveText(
+                        vault.description!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit),
+                tooltip: 'Edit Vault',
+                onPressed: () => _showEditPasswordVaultDialog(context, vault, dashboardState),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                tooltip: 'Delete Vault',
+                onPressed: () => _showDeletePasswordVaultDialog(context, vault, dashboardState),
+              ),
+            ],
+          ),
+        ),
+        // Password entries list
+        Expanded(
+          child: vault.entries.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.vpn_key,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      AdaptiveText(
+                        'No Passwords Yet',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      AdaptiveText(
+                        'Add your first password to this vault',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => _showAddPasswordEntryDialog(context, vault, dashboardState),
+                        icon: const Icon(Icons.add),
+                        label: const AdaptiveText('Add Password'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppConstants.primaryColor,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: ResponsiveService.getResponsivePadding(context),
+                  itemCount: vault.entries.length,
+                  itemBuilder: (context, index) {
+                    final entry = vault.entries[index];
+                    return AdaptiveCard(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: const Icon(Icons.vpn_key),
+                        title: AdaptiveText(entry.name),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (entry.username != null)
+                              AdaptiveText('User: ${entry.username}'),
+                            if (entry.url != null)
+                              AdaptiveText(entry.url!, style: TextStyle(color: Colors.blue)),
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.content_copy),
+                              onPressed: () => _copyPasswordToClipboard(context, entry),
+                              tooltip: 'Copy Password',
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.more_vert),
+                              onPressed: () => _showPasswordEntryOptions(context, entry, vault, dashboardState),
+                            ),
+                          ],
+                        ),
+                        onTap: () => _showPasswordEntryDetails(context, entry, vault, dashboardState),
+                      ),
+                    );
+                  },
+                ),
+        ),
+        // Floating action button
+        FloatingActionButton(
+          onPressed: () => _showAddPasswordEntryDialog(context, vault, dashboardState),
+          backgroundColor: AppConstants.primaryColor,
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  /// Show add password vault dialog
+  void _showAddPasswordVaultDialog(BuildContext context, DashboardState dashboardState) {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Create Password Vault'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Vault Name',
+                hintText: 'e.g., Personal, Work, Social Media',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description (Optional)',
+                hintText: 'Brief description of this vault',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (nameController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a vault name')),
+                );
+                return;
+              }
+              Navigator.pop(context);
+              await dashboardState.createPasswordVault(
+                nameController.text.trim(),
+                description: descriptionController.text.trim().isEmpty
+                    ? null
+                    : descriptionController.text.trim(),
+              );
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show edit password vault dialog
+  void _showEditPasswordVaultDialog(BuildContext context, dynamic vault, DashboardState dashboardState) {
+    // TODO: Implement edit vault dialog
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Edit vault dialog - Coming soon')),
+    );
+  }
+
+  /// Show delete password vault dialog
+  void _showDeletePasswordVaultDialog(BuildContext context, dynamic vault, DashboardState dashboardState) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Password Vault'),
+        content: Text('Are you sure you want to delete "${vault.name}"? All passwords in this vault will be permanently deleted.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await dashboardState.deletePasswordVault(vault.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Password vault deleted')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show password vault options
+  void _showPasswordVaultOptions(BuildContext context, dynamic vault, DashboardState dashboardState) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit Vault'),
+              onTap: () {
+                Navigator.pop(context);
+                _showEditPasswordVaultDialog(context, vault, dashboardState);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Delete Vault', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                _showDeletePasswordVaultDialog(context, vault, dashboardState);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Show add password entry dialog
+  void _showAddPasswordEntryDialog(BuildContext context, dynamic vault, DashboardState dashboardState) {
+    // TODO: Implement full add password entry dialog with password generator
+    final nameController = TextEditingController();
+    final usernameController = TextEditingController();
+    final passwordController = TextEditingController();
+    final urlController = TextEditingController();
+    final notesController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Password'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g., Gmail, Netflix, Bank',
+                  border: OutlineInputBorder(),
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username/Email',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: urlController,
+                decoration: const InputDecoration(
+                  labelText: 'URL (Optional)',
+                  hintText: 'https://example.com',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Notes (Optional)',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 2,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (nameController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter name and password')),
+                );
+                return;
+              }
+              Navigator.pop(context);
+              await dashboardState.createPasswordEntry(
+                vaultId: vault.id,
+                name: nameController.text.trim(),
+                value: passwordController.text.trim(),
+                username: usernameController.text.trim().isEmpty ? null : usernameController.text.trim(),
+                url: urlController.text.trim().isEmpty ? null : urlController.text.trim(),
+                notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+              );
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Password saved')),
+                );
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show password entry details
+  void _showPasswordEntryDetails(BuildContext context, dynamic entry, dynamic vault, DashboardState dashboardState) {
+    // TODO: Implement full password entry details view with show/hide password
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Password details - Coming soon')),
+    );
+  }
+
+  /// Show password entry options
+  void _showPasswordEntryOptions(BuildContext context, dynamic entry, dynamic vault, DashboardState dashboardState) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.visibility),
+              title: const Text('View Details'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPasswordEntryDetails(context, entry, vault, dashboardState);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Implement edit password entry
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Edit password - Coming soon')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Delete', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                _showDeletePasswordEntryDialog(context, entry, vault, dashboardState);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Copy password to clipboard
+  void _copyPasswordToClipboard(BuildContext context, dynamic entry) {
+    // TODO: Implement actual clipboard copy
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Password for "${entry.name}" copied to clipboard')),
+    );
+  }
+
+  /// Show delete password entry dialog
+  void _showDeletePasswordEntryDialog(BuildContext context, dynamic entry, dynamic vault, DashboardState dashboardState) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Password'),
+        content: Text('Are you sure you want to delete "${entry.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await dashboardState.deletePasswordEntry(entry.id, vault.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Password deleted')),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Delete'),

@@ -12,7 +12,7 @@ import 'argon2_service.dart';
 import 'encryption_service.dart';
 
 class DatabaseService {
-  static const int _databaseVersion = 4;
+  static const int _databaseVersion = 5;
 
   static dynamic _database; // Can be sqlcipher.Database or Database (FFI)
   static DatabaseService? _instance;
@@ -352,6 +352,36 @@ class DatabaseService {
         )
       ''');
 
+      // Create password vaults table
+      await txn.execute('''
+        CREATE TABLE password_vaults (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          description TEXT,
+          icon TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )
+      ''');
+
+      // Create password entries table
+      await txn.execute('''
+        CREATE TABLE password_entries (
+          id TEXT PRIMARY KEY,
+          vault_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          encrypted_value TEXT NOT NULL,
+          username TEXT,
+          email TEXT,
+          url TEXT,
+          notes TEXT,
+          tags TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL,
+          FOREIGN KEY (vault_id) REFERENCES password_vaults(id) ON DELETE CASCADE
+        )
+      ''');
+
       // Create indexes for better performance
       await txn.execute(
           'CREATE INDEX idx_credentials_project_id ON credentials(project_id)');
@@ -365,6 +395,10 @@ class DatabaseService {
           'CREATE INDEX idx_ai_services_updated_at ON ai_services(updated_at DESC)');
       await txn
           .execute('CREATE INDEX idx_app_metadata_key ON app_metadata(key)');
+      await txn.execute(
+          'CREATE INDEX idx_password_entries_vault_id ON password_entries(vault_id)');
+      await txn.execute(
+          'CREATE INDEX idx_password_vaults_updated_at ON password_vaults(updated_at DESC)');
 
       // Insert initial metadata
       await txn.insert('app_metadata', {
@@ -413,6 +447,11 @@ class DatabaseService {
     // Migration from version 3 to 4: Add JWT secret storage
     if (oldVersion < 4) {
       await _migrateToVersion4(db);
+    }
+
+    // Migration from version 4 to 5: Add password vaults and password entries
+    if (oldVersion < 5) {
+      await _migrateToVersion5(db);
     }
   }
 
@@ -471,6 +510,50 @@ class DatabaseService {
     });
 
     print('Successfully migrated to version 4');
+  }
+
+  Future<void> _migrateToVersion5(dynamic db) async {
+    print('Migrating to version 5: Adding password vaults and password entries tables');
+
+    await db.transaction((txn) async {
+      // Create password vaults table
+      await txn.execute('''
+        CREATE TABLE IF NOT EXISTS password_vaults (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          description TEXT,
+          icon TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )
+      ''');
+
+      // Create password entries table
+      await txn.execute('''
+        CREATE TABLE IF NOT EXISTS password_entries (
+          id TEXT PRIMARY KEY,
+          vault_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          encrypted_value TEXT NOT NULL,
+          username TEXT,
+          email TEXT,
+          url TEXT,
+          notes TEXT,
+          tags TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL,
+          FOREIGN KEY (vault_id) REFERENCES password_vaults(id) ON DELETE CASCADE
+        )
+      ''');
+
+      // Create indexes for password tables
+      await txn.execute(
+          'CREATE INDEX IF NOT EXISTS idx_password_entries_vault_id ON password_entries(vault_id)');
+      await txn.execute(
+          'CREATE INDEX IF NOT EXISTS idx_password_vaults_updated_at ON password_vaults(updated_at DESC)');
+    });
+
+    print('Successfully migrated to version 5');
   }
 
   /// Called when database is opened
