@@ -1,7 +1,0 @@
-Build Information
-=================
-Platform: Linux x64
-Build Type: Release
-Build Time: Wed 10 Sep 2025 17:37:29 NZST
-Flutter Version: Flutter 3.32.8 • channel stable • https://github.com/flutter/flutter.git
-Dart Version: Dart SDK version: 3.8.1 (stable) (Wed May 28 00:47:25 2025 -0700) on "linux_x64"

@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Cred Manager
-Comment=Secure API Key Management
-Exec=/usr/bin/cred-manager-startup
-Icon=cred-manager
-Terminal=false
-Type=Application
-Categories=Utility;Security;
-StartupWMClass=cred-manager
