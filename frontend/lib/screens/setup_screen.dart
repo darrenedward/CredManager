@@ -5,6 +5,8 @@ import '../widgets/security_questions.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 import '../services/biometric_auth_service.dart';
+import '../services/emergency_backup_service.dart';
+import '../services/emergency_kit_pdf_service.dart';
 import '../utils/validation.dart';
 import '../utils/constants.dart';
 import 'setup_success_screen.dart';
@@ -22,6 +24,8 @@ class _SetupScreenState extends State<SetupScreen> {
   final AuthService _authService = AuthService();
   final StorageService _storageService = StorageService();
   final BiometricAuthService _biometricService = BiometricAuthService();
+  final EmergencyBackupService _backupService = EmergencyBackupService();
+  final EmergencyKitPdfService _pdfService = EmergencyKitPdfService();
   int _currentStep = 0;
   bool _isLoading = false;
   String? _error;
@@ -34,6 +38,11 @@ class _SetupScreenState extends State<SetupScreen> {
   bool _biometricAvailable = false;
   bool _enableBiometric = false;
   String _biometricType = 'Biometric';
+
+  // Emergency kit setup state
+  bool _emergencyKitGenerated = false;
+  String? _generatedBackupCode;
+  BackupCodeFormat _selectedBackupFormat = BackupCodeFormat.bip39;
 
   // Selected predefined questions
   final List<String?> _selectedQuestions = List.filled(3, null);
@@ -309,6 +318,170 @@ class _SetupScreenState extends State<SetupScreen> {
     });
   }
 
+  Future<void> _generateEmergencyKit() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      // Generate backup code
+      final backupCode = await _backupService.generateBackupCode(
+        format: _selectedBackupFormat,
+      );
+
+      // Hash and store it
+      final hashedCode = await _backupService.hashBackupCode(backupCode);
+      await _backupService.storeBackupCodeHash(hashedCode);
+
+      setState(() {
+        _generatedBackupCode = backupCode;
+        _emergencyKitGenerated = true;
+        _isLoading = false;
+      });
+
+      // Show the emergency kit dialog
+      if (mounted) {
+        _showEmergencyKitDialog();
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _error = 'Failed to generate emergency kit. Please try again.';
+      });
+    }
+  }
+
+  void _showEmergencyKitDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.security, color: Colors.orange[700]),
+            const SizedBox(width: 10),
+            const Text('Emergency Kit Generated'),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange[200]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.warning_amber_rounded, color: Colors.orange[700], size: 20),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'IMPORTANT: Save Your Emergency Kit',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'This backup code is the ONLY way to recover your account if you forget your passphrase. Save it now in a secure location.',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Your Emergency Backup Code:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Text(
+                  _generatedBackupCode ?? '',
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'What to do next:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text('• Download and print the PDF emergency kit'),
+              const Text('• Store it in a secure, private location'),
+              const Text('• Do NOT share this code with anyone'),
+              const Text('• This code can only be used ONCE'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await _pdfService.saveEmergencyKitPdf(
+                backupCode: _generatedBackupCode!,
+                username: null,
+              );
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Emergency kit PDF saved!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+            child: const Text('Download PDF'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppConstants.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('I\'ve Saved It'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  int _getTotalSteps() {
+    // Base steps: Passphrase, Security Questions, Complete
+    int steps = 3;
+    // Add biometric step if available
+    if (_biometricAvailable) steps++;
+    // Add emergency kit step (always included)
+    steps++;
+    return steps;
+  }
+
+  int _getEmergencyKitStepIndex() {
+    // Emergency kit comes after biometric (if available) or after security questions
+    return _biometricAvailable ? 3 : 2;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -369,7 +542,7 @@ class _SetupScreenState extends State<SetupScreen> {
                   ? () => setState(() => _currentStep--)
                   : null,
                 onStepTapped: (step) {
-                  final totalSteps = _biometricAvailable ? 4 : 3;
+                  final totalSteps = _getTotalSteps();
                   setState(() {
                     // Ensure step is within valid range
                     if (step >= 0 && step < totalSteps) {
@@ -378,8 +551,10 @@ class _SetupScreenState extends State<SetupScreen> {
                   });
                 },
                 controlsBuilder: (context, details) {
-                  final totalSteps = _biometricAvailable ? 4 : 3;
+                  final totalSteps = _getTotalSteps();
+                  final emergencyKitStep = _getEmergencyKitStepIndex();
                   final isFinalStep = _currentStep == totalSteps - 1;
+                  final isEmergencyKitStep = _currentStep == emergencyKitStep;
 
                   // Customize controls for the final step
                   if (isFinalStep) {
@@ -401,6 +576,52 @@ class _SetupScreenState extends State<SetupScreen> {
                                 )
                               : const Text('Finalize Setup'),
                         ),
+                      ],
+                    );
+                  }
+                  // Emergency kit step - generate or skip
+                  else if (isEmergencyKitStep) {
+                    return Row(
+                      children: [
+                        if (details.onStepCancel != null)
+                          TextButton(
+                            onPressed: details.onStepCancel,
+                            child: const Text('Back'),
+                          ),
+                        const SizedBox(width: 10),
+                        if (_emergencyKitGenerated)
+                          ElevatedButton(
+                            onPressed: details.onStepContinue,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppConstants.primaryColor,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Continue'),
+                          )
+                        else
+                          Row(
+                            children: [
+                              TextButton(
+                                onPressed: details.onStepContinue,
+                                child: const Text('Skip for Now'),
+                              ),
+                              const SizedBox(width: 10),
+                              ElevatedButton(
+                                onPressed: _isLoading ? null : _generateEmergencyKit,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange[700],
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : const Text('Generate Emergency Kit'),
+                              ),
+                            ],
+                          ),
                       ],
                     );
                   }
@@ -470,6 +691,16 @@ class _SetupScreenState extends State<SetupScreen> {
                        subtitle: _currentStep == 2 ? const Text('Optional convenience feature') : null,
                      ),
                    ],
+                   // Emergency kit step (always included)
+                   Step(
+                     title: const Text('Emergency Backup Kit'),
+                     content: _buildEmergencyKitStep(),
+                     isActive: _currentStep == _getEmergencyKitStepIndex(),
+                     state: _currentStep > _getEmergencyKitStepIndex() ? StepState.complete : StepState.indexed,
+                     subtitle: _currentStep == _getEmergencyKitStepIndex()
+                         ? const Text('Strongly recommended for account recovery')
+                         : null,
+                   ),
                    Step(
                      title: const Text('Complete'),
                      content: Column(
@@ -493,6 +724,51 @@ class _SetupScreenState extends State<SetupScreen> {
                              style: TextStyle(fontSize: 14, color: Colors.green[700]),
                            ),
                          ],
+                         if (_emergencyKitGenerated) ...[
+                           const SizedBox(height: 20),
+                           Container(
+                             padding: const EdgeInsets.all(12),
+                             decoration: BoxDecoration(
+                               color: Colors.green[50],
+                               borderRadius: BorderRadius.circular(8),
+                               border: Border.all(color: Colors.green[200]!),
+                             ),
+                             child: const Row(
+                               children: [
+                                 Icon(Icons.check_circle, color: Colors.green, size: 20),
+                                 SizedBox(width: 8),
+                                 Expanded(
+                                   child: Text(
+                                     'Emergency kit has been generated and saved.',
+                                     style: TextStyle(color: Colors.green),
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ),
+                         ] else ...[
+                           const SizedBox(height: 20),
+                           Container(
+                             padding: const EdgeInsets.all(12),
+                             decoration: BoxDecoration(
+                               color: Colors.orange[50],
+                               borderRadius: BorderRadius.circular(8),
+                               border: Border.all(color: Colors.orange[200]!),
+                             ),
+                             child: const Row(
+                               children: [
+                                 Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+                                 SizedBox(width: 8),
+                                 Expanded(
+                                   child: Text(
+                                     'You skipped the emergency kit. You can generate it later in Settings.',
+                                     style: TextStyle(color: Colors.orange),
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ),
+                         ],
                          const SizedBox(height: 20),
                          const Text(
                            'Click "Finalize Setup" to complete your account configuration and proceed to the dashboard.',
@@ -501,7 +777,7 @@ class _SetupScreenState extends State<SetupScreen> {
                          ),
                        ],
                      ),
-                     isActive: _currentStep == (_biometricAvailable ? 3 : 2),
+                     isActive: _currentStep == (_getTotalSteps() - 1),
                    ),
                  ],
               ),
@@ -658,6 +934,166 @@ class _SetupScreenState extends State<SetupScreen> {
                     '$_biometricType will not be enabled. You can enable it later in Settings.',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildEmergencyKitStep() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Emergency Backup Kit',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.orange[200]!),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.security, color: Colors.orange[700], size: 24),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Protect Your Account',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Generate an emergency backup kit with a unique recovery code. This is the ONLY way to recover your account if you forget your passphrase.',
+                style: TextStyle(fontSize: 14, color: Colors.black87),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        if (!_emergencyKitGenerated) ...[
+          const Text(
+            'Choose Backup Code Format:',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: RadioListTile<BackupCodeFormat>(
+                  title: const Text('24-Word Phrase'),
+                  subtitle: const Text('Easier to write down'),
+                  value: BackupCodeFormat.bip39,
+                  groupValue: _selectedBackupFormat,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedBackupFormat = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+              Expanded(
+                child: RadioListTile<BackupCodeFormat>(
+                  title: const Text('Base32 Code'),
+                  subtitle: const Text('Compact format'),
+                  value: BackupCodeFormat.base32,
+                  groupValue: _selectedBackupFormat,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedBackupFormat = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.blue[200]!),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'After generating, you\'ll be able to download a printable PDF with your backup code and storage instructions.',
+                    style: TextStyle(fontSize: 13, color: Colors.black87),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ] else ...[
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.green[200]!),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green[700], size: 24),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Emergency Kit Generated!',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green[700],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Your emergency backup code has been generated. Make sure you have saved the PDF in a secure location.',
+                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+                const SizedBox(height: 10),
+                TextButton.icon(
+                  onPressed: () async {
+                    await _pdfService.saveEmergencyKitPdf(
+                      backupCode: _generatedBackupCode!,
+                      username: null,
+                    );
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Emergency kit PDF saved!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.download),
+                  label: const Text('Download PDF Again'),
                 ),
               ],
             ),
