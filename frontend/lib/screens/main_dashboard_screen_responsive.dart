@@ -3308,7 +3308,7 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
                   color: AppConstants.primaryColor,
                 ),
               ),
-              AdaptiveIconButton(
+              IconButton(
                 icon: const Icon(Icons.add),
                 tooltip: 'Create Password Vault',
                 onPressed: () => _showAddPasswordVaultDialog(context, dashboardState),
