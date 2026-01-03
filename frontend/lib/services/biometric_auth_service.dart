@@ -231,10 +231,10 @@ class BiometricAuthService {
   /// Store encrypted master key for biometric access
   Future<void> storeBiometricKey(String encryptedKey) async {
     try {
-      // Double-encrypt the biometric key before storing in database
-      final doubleEncryptedKey = await _encryptionService.encryptData(encryptedKey);
-      await DatabaseService.instance.updateMetadata(_biometricKeyKey, doubleEncryptedKey);
-      print('Stored encrypted biometric key in database');
+      // Use AES-GCM encryption for biometric key storage (stronger than XOR)
+      final aesEncryptedKey = await _encryptionService.encryptBiometricKey(encryptedKey);
+      await DatabaseService.instance.updateMetadata(_biometricKeyKey, aesEncryptedKey);
+      print('Stored AES-GCM encrypted biometric key in database');
     } catch (e) {
       print('Error storing biometric key: $e');
       throw Exception('Failed to store biometric key');
@@ -244,11 +244,11 @@ class BiometricAuthService {
   /// Retrieve encrypted master key for biometric access
   Future<String?> getBiometricKey() async {
     try {
-      final doubleEncryptedKey = await DatabaseService.instance.getMetadata(_biometricKeyKey);
-      if (doubleEncryptedKey == null) return null;
-      
-      // Decrypt the biometric key from database
-      return await _encryptionService.decryptData(doubleEncryptedKey);
+      final aesEncryptedKey = await DatabaseService.instance.getMetadata(_biometricKeyKey);
+      if (aesEncryptedKey == null) return null;
+
+      // Decrypt the biometric key from database using AES-GCM
+      return await _encryptionService.decryptBiometricKey(aesEncryptedKey);
     } catch (e) {
       print('Error retrieving biometric key: $e');
       return null;
