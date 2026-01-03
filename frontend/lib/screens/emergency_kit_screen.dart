@@ -329,7 +329,7 @@ class _EmergencyKitScreenState extends State<EmergencyKitScreen> {
                       children: [
                         Icon(Icons.warning_amber_rounded, color: Colors.amber[700]),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -341,7 +341,7 @@ class _EmergencyKitScreenState extends State<EmergencyKitScreen> {
                                   color: Colors.orange.shade900,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
                                 'Generate a backup code to recover your account if you forget your passphrase. '
                                 'Store it in a secure location.',
