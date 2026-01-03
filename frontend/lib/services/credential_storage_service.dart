@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../models/project.dart';
 import '../models/ai_service.dart';
 import '../models/password_vault.dart';
