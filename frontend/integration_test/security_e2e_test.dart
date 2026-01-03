@@ -278,8 +278,8 @@ void main() {
       // Test various error conditions without information leakage
       final testCases = [
         {'input': '', 'shouldContain': 'required'},
-        {'input': 'short', 'shouldContain': 'at least'},
-        {'input': 'wrongpassword123!', 'shouldContain': 'Invalid passphrase'},
+        {'input': 'short', 'shouldContain': '12 characters'},
+        {'input': 'wrongpassword123!', 'shouldContain': 'Login failed'},
       ];
 
       for (final testCase in testCases) {
@@ -341,7 +341,7 @@ void main() {
         await tester.pump();
 
         // Should show error but not be locked out yet
-        expect(find.textContaining('Invalid'), findsOneWidget);
+        expect(find.textContaining('failed'), findsOneWidget);
       }
 
       print('✅ Rate limiting UI behavior validated');
