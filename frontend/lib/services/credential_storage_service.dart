@@ -44,6 +44,8 @@ class CredentialStorageService {
     required String name,
     String? description,
   }) async {
+    _validatePassphrase();
+
     final now = DateTime.now();
     final project = Project(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -94,6 +96,8 @@ class CredentialStorageService {
   
   /// Updates a project
   Future<Project> updateProject(Project project) async {
+    _validatePassphrase();
+
     final updatedProject = project.copyWith(updatedAt: DateTime.now());
     
     await _db.update(
@@ -108,6 +112,8 @@ class CredentialStorageService {
   
   /// Deletes a project and all its credentials
   Future<void> deleteProject(String id) async {
+    _validatePassphrase();
+
     await _db.delete('projects', where: 'id = ?', whereArgs: [id]);
     // Credentials are automatically deleted due to foreign key constraint
   }
@@ -207,6 +213,8 @@ class CredentialStorageService {
   
   /// Deletes a credential
   Future<void> deleteCredential(String id, String projectId) async {
+    _validatePassphrase();
+
     await _db.delete('credentials', where: 'id = ?', whereArgs: [id]);
     
     // Update project's updated_at timestamp
@@ -225,6 +233,8 @@ class CredentialStorageService {
     required String name,
     String? description,
   }) async {
+    _validatePassphrase();
+
     final now = DateTime.now();
     final service = AiService(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -275,6 +285,8 @@ class CredentialStorageService {
   
   /// Updates an AI service
   Future<AiService> updateAiService(AiService service) async {
+    _validatePassphrase();
+
     final updatedService = service.copyWith(updatedAt: DateTime.now());
     
     await _db.update(
@@ -289,6 +301,8 @@ class CredentialStorageService {
   
   /// Deletes an AI service and all its keys
   Future<void> deleteAiService(String id) async {
+    _validatePassphrase();
+
     await _db.delete('ai_services', where: 'id = ?', whereArgs: [id]);
     // Keys are automatically deleted due to foreign key constraint
   }
@@ -388,6 +402,8 @@ class CredentialStorageService {
 
   /// Deletes an AI service key
   Future<void> deleteAiServiceKey(String id, String serviceId) async {
+    _validatePassphrase();
+
     await _db.delete('ai_service_keys', where: 'id = ?', whereArgs: [id]);
 
     // Update service's updated_at timestamp
@@ -528,6 +544,8 @@ class CredentialStorageService {
     String? description,
     String? icon,
   }) async {
+    _validatePassphrase();
+
     final now = DateTime.now();
     final vault = PasswordVault(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -579,6 +597,8 @@ class CredentialStorageService {
 
   /// Updates a password vault
   Future<PasswordVault> updatePasswordVault(PasswordVault vault) async {
+    _validatePassphrase();
+
     final updatedVault = vault.copyWith(updatedAt: DateTime.now());
 
     await _db.update(
@@ -593,6 +613,8 @@ class CredentialStorageService {
 
   /// Deletes a password vault and all its entries
   Future<void> deletePasswordVault(String id) async {
+    _validatePassphrase();
+
     await _db.delete('password_vaults', where: 'id = ?', whereArgs: [id]);
     // Entries are automatically deleted due to foreign key constraint
   }
@@ -704,6 +726,8 @@ class CredentialStorageService {
 
   /// Deletes a password entry
   Future<void> deletePasswordEntry(String id, String vaultId) async {
+    _validatePassphrase();
+
     await _db.delete('password_entries', where: 'id = ?', whereArgs: [id]);
 
     // Update vault's updated_at timestamp
