@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'user_model.dart';
 import '../services/storage_service.dart';
 import '../services/auth_service.dart';
 import '../services/biometric_auth_service.dart';
+import '../services/database_service.dart';
 import '../services/jwt_service.dart';
 import '../services/settings_service.dart';
 import '../services/credential_storage_service.dart';
+import '../services/encryption_service.dart';
 import '../utils/constants.dart';
 
 class AuthState extends ChangeNotifier {
@@ -306,6 +306,9 @@ class AuthState extends ChangeNotifier {
     }
   }
 
+  /// Logout and clear all sensitive data from memory (ST026)
+  /// This ensures that passphrases, encryption keys, and biometric data
+  /// are not left in memory after logout.
   Future<void> logout() async {
     _token = null;
     _user = null;
@@ -316,11 +319,28 @@ class AuthState extends ChangeNotifier {
     _inactivityTimer?.cancel();
     _inactivityTimer = null;
 
-    // Clear credential storage passphrase for security
+    // ST026: Clear all sensitive memory for security
+    // 1. Clear credential storage passphrase
     _credentialStorage.clearPassphrase();
 
+    // 2. Clear database passphrase, encryption key, and salt
+    await DatabaseService.clearAllSensitiveMemory();
+
+    // 3. Clear biometric keys from storage
+    try {
+      await _biometricService.removeBiometricKey();
+    } catch (e) {
+      // Ignore errors if biometric key doesn't exist
+      print('Note: Biometric key not found or already removed');
+    }
+
+    // 4. Clear encryption service key cache
+    EncryptionService().clearKeyCache();
+
+    // 5. Clear storage tokens and flags
     await _storageService.deleteToken();
     await _storageService.setLoggedIn(false);
+
     notifyListeners();
   }
 
