@@ -8,6 +8,7 @@ import '../models/dashboard_state.dart';
 import '../services/theme_service.dart';
 import '../services/biometric_auth_service.dart';
 import '../utils/constants.dart';
+import 'emergency_kit_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -572,6 +573,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Icons.backup,
               AppConstants.supportIconColor5,
               [
+                ListTile(
+                  title: const Text('Emergency Backup Kit'),
+                  subtitle: const Text('Generate and download your emergency recovery kit'),
+                  leading: const Icon(Icons.security_rounded, color: Colors.orange),
+                  trailing: const Icon(Icons.chevron_right, size: 20),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const EmergencyKitScreen()),
+                    );
+                  },
+                ),
+                const Divider(),
                 _buildSwitchSetting(
                   'Enable Backup Phrase',
                   'Generate a recovery phrase for account access',
