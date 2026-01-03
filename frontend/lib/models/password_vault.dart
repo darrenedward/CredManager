@@ -126,7 +126,7 @@ class PasswordEntry {
       id: map['id'] as String,
       vaultId: map['vault_id'] as String,
       name: map['name'] as String,
-      value: map['value'] as String, // Should be decrypted before creating
+      value: map['value'] as String? ?? '', // Should be decrypted before creating; default to empty if missing
       username: map['username'] as String?,
       email: map['email'] as String?,
       url: map['url'] as String?,
