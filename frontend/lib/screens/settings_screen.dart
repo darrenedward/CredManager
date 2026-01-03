@@ -7,6 +7,7 @@ import '../models/auth_state.dart';
 import '../models/dashboard_state.dart';
 import '../services/theme_service.dart';
 import '../services/biometric_auth_service.dart';
+import '../services/emergency_backup_service.dart';
 import '../utils/constants.dart';
 import 'emergency_kit_screen.dart';
 
@@ -23,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // Services
   final BiometricAuthService _biometricService = BiometricAuthService();
+  final EmergencyBackupService _backupService = EmergencyBackupService();
 
   // Security Settings
   int _selectedTimeout = AppConstants.defaultSessionTimeout;
@@ -48,6 +50,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _enableBackupPhrase = false;
   bool _autoBackup = false;
   int _backupFrequency = 7; // days
+  bool _hasBackupCode = false;
+  bool _backupCodeUsed = false;
 
   // UI Settings
   bool _darkMode = false;
@@ -70,9 +74,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadCurrentSettings() async {
     final authState = Provider.of<AuthState>(context, listen: false);
     final biometricEnabled = await _biometricService.isBiometricEnabled();
+    final hasBackupCode = await _backupService.hasBackupCode();
+    final backupCodeUsed = await _backupService.wasBackupCodeUsed();
     setState(() {
       _selectedTimeout = authState.sessionTimeoutMinutes;
       _biometricEnabled = biometricEnabled;
+      _hasBackupCode = hasBackupCode;
+      _backupCodeUsed = backupCodeUsed;
     });
   }
 
@@ -367,6 +375,71 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
+            // Emergency Kit Reminder
+            if (!_hasBackupCode || _backupCodeUsed)
+              Container(
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange[300]!, width: 2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          _backupCodeUsed ? Icons.warning_amber_rounded : Icons.info_outline,
+                          color: Colors.orange[700],
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _backupCodeUsed
+                                ? 'Emergency Kit Used - Regenerate Now'
+                                : 'No Emergency Kit Found',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange[900],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _backupCodeUsed
+                          ? 'Your previous emergency backup code has been used. Generate a new one to ensure you can always recover your account.'
+                          : 'Protect your account by generating an emergency backup kit. This is the only way to recover your account if you forget your passphrase.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.orange[800],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const EmergencyKitScreen()),
+                        );
+                      },
+                      icon: const Icon(Icons.security),
+                      label: const Text('Generate Emergency Kit'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange[700],
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 44),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             // Security Settings
             _buildExpandableCard(
               'security',
