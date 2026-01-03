@@ -288,7 +288,7 @@ void main() {
 
         final continueButton = find.text('Continue');
         await tester.tap(continueButton);
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         // Should show appropriate error without leaking information
         // Error may appear in TextField errorText and/or SnackBar
@@ -339,7 +339,7 @@ void main() {
       for (int i = 0; i < 3; i++) {
         await tester.enterText(passphraseField, 'WrongPassword${i}!');
         await tester.tap(continueButton);
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         // Should show error but not be locked out yet
         expect(find.textContaining('failed'), findsWidgets);
