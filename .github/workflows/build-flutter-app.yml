@@ -61,6 +61,60 @@ jobs:
           path: release/cred-manager-linux-x64.tar.gz
           retention-days: 30
 
+      - name: Create Debian package
+        run: |
+          mkdir -p debian-package/cred-manager/usr/local/bin
+          mkdir -p debian-package/cred-manager/DEBIAN
+          mkdir -p debian-package/cred-manager/usr/share/applications
+          mkdir -p debian-package/cred-manager/usr/share/pixmaps
+
+          # Copy application files
+          cp -r frontend/build/linux/x64/release/bundle/* debian-package/cred-manager/usr/local/bin/
+
+          # Create desktop entry
+          cat > debian-package/cred-manager/usr/share/applications/cred-manager.desktop << 'EOF'
+          [Desktop Entry]
+          Name=Cred Manager
+          Comment=Secure credential management application
+          Exec=/usr/local/bin/cred_manager
+          Icon=cred-manager
+          Type=Application
+          Categories=Utility;Security;
+          Terminal=false
+          EOF
+
+          # Copy icon if exists
+          if [ -f frontend/assets/icons/shield_icon.svg ]; then
+            cp frontend/assets/icons/shield_icon.svg debian-package/cred-manager/usr/share/pixmaps/cred-manager.svg
+          fi
+
+          # Create control file
+          cat > debian-package/cred-manager/DEBIAN/control << 'EOF'
+          Package: cred-manager
+          Version: 1.0.0
+          Architecture: amd64
+          Maintainer: Darren Edward <darrenedward@users.noreply.github.com>
+          Description: Cred Manager - Secure credential management
+           A cross-platform credential manager with encrypted storage,
+           biometric authentication, and emergency backup recovery.
+          Depends: libgtk-3-0, liblzma5, libsecret-1-0
+          EOF
+
+          # Set permissions
+          chmod -R 755 debian-package/cred-manager/usr
+          chmod 644 debian-package/cred-manager/DEBIAN/control
+
+          # Build the package
+          dpkg-deb --build debian-package/cred-manager
+          mv debian-package/cred-manager.deb release/cred-manager_1.0.0_amd64.deb
+
+      - name: Upload Debian package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-linux-deb
+          path: release/cred-manager_1.0.0_amd64.deb
+          retention-days: 30
+
   test:
     runs-on: ubuntu-latest
     steps:
