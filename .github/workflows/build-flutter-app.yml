@@ -1,0 +1,254 @@
+name: Build Flutter Desktop App
+
+on:
+  push:
+    branches: [ main, develop, auth-security-overhaul ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev \
+            libstdc++-12-dev
+
+      - name: Setup Flutter desktop
+        run: flutter config --enable-linux-desktop
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build Linux release
+        working-directory: frontend
+        run: flutter build linux --release
+
+      - name: Package Linux App
+        run: |
+          mkdir -p release/linux
+          cp -r frontend/build/linux/x64/release/bundle/* release/linux/
+
+      - name: Create Linux tarball
+        run: |
+          cd release/linux
+          tar czf ../cred-manager-linux-x64.tar.gz .
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-linux
+          path: release/cred-manager-linux-x64.tar.gz
+          retention-days: 30
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Flutter desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build Windows release
+        working-directory: frontend
+        run: flutter build windows --release
+
+      - name: Package Windows App
+        run: |
+          mkdir release
+          Copy-Item -Recurse frontend\build\windows\runner\Release\* release\
+
+      - name: Create Windows zip
+        run: |
+          Compress-Archive -Path release\* -DestinationPath cred-manager-windows-x64.zip
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-windows
+          path: cred-manager-windows-x64.zip
+          retention-days: 30
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Flutter desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build macOS release
+        working-directory: frontend
+        run: flutter build macos --release
+
+      - name: Create macOS app bundle
+        run: |
+          mkdir -p release
+          cp -r frontend/build/macos/Build/Products/Release/cred-manager.app release/
+
+      - name: Create macOS zip
+        run: |
+          cd release
+          zip -r ../cred-manager-macos-x64.zip cred-manager.app
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-macos
+          path: cred-manager-macos-x64.zip
+          retention-days: 30
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build Android APK
+        working-directory: frontend
+        run: flutter build apk --release
+
+      - name: Build Android App Bundle
+        working-directory: frontend
+        run: flutter build appbundle --release
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-android-apk
+          path: frontend/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: Upload Android App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-android-aab
+          path: frontend/build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build iOS (no codesign)
+        working-directory: frontend
+        run: flutter build ios --release --no-codesign
+
+      - name: Create iOS zip
+        run: |
+          cd frontend/build/ios/iphoneos
+          zip -r ../../../../cred-manager-ios.zip Runner.app
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-ios
+          path: cred-manager-ios.zip
+          retention-days: 30
+
+  # Run tests on all platforms
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Analyze code
+        working-directory: frontend
+        run: flutter analyze
+
+      - name: Run unit tests
+        working-directory: frontend
+        run: flutter test
+
+      - name: Run integration tests
+        working-directory: frontend
+        run: flutter test integration_test --tags=e2e

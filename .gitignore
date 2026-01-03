@@ -1,231 +1,103 @@
-# Credential Manager - Git Ignore File
-# =====================================
-
-# Flutter/Dart specific
-# ----------------------
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# Flutter/Dart
+build/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
 .pub-cache/
 .pub/
-/build/
+pubspec.lock
 
-# Web related
-lib/generated_plugin_registrant.dart
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-# Platform Build Outputs
-# -----------------------
-# All platform build directories
-platforms/*/builds/
-platforms/*/binaries/
-
-# Specific build artifacts
-platforms/linux/builds/
-platforms/windows/builds/
-platforms/macos/builds/
-platforms/android/builds/
-platforms/iphone/builds/
-
-# Build cache and temporary files
-platforms/.flutter_cache/
-platforms/**/release_*/
-platforms/**/debug_*/
-platforms/**/latest
-
-# IDE & Editor Files
-# ------------------
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
+# IDE
 .idea/
-
-# VS Code related
 .vscode/
-.claude
-.cursor
-.kombai
-.qodo
-
-# Emacs
-*~
-
-# Vim
+*.iml
 *.swp
 *.swo
-
-# Operating System Files
-# ----------------------
-# macOS
+*~
 .DS_Store
-.AppleDouble
-.LSOverride
 
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+# Android
+android/**/gradle-wrapper.jar
+android/.gradle
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/**/GeneratedPluginRegistrant.java
+android/key.properties
+*.jks
+*.keystore
+
+# iOS/macOS
+ios/Pods/
+ios/.symlinks/
+ios/profile
+ios/DerivedData/
+ios/Flutter.generated.xcconfig
+ios/Flutter.generated.env
+ios/Flutter.framework
+ios/Flutter.podspec
+ios/.generated/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+macos/Pods/
+macos/.symlinks/
+macos/profile
+macos/DerivedData/
+macos/Flutter.generated.xcconfig
 
 # Linux
-*~
+linux/flutter/ephemeral/
 
-# Development & Testing
-# ---------------------
-# Coverage reports
+# Windows
+windows/flutter/ephemeral/
+
+# Web
+web/
+
+# Encryption/Sensitive files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.key
+*.pem
+*.cert
+*.secrets
+*.env
+.env.*
+
+# Test coverage
 coverage/
-lcov.info
-
-# Test related
-test/.test_coverage.dart
-test_driver/screenshots/
+test_coverage/
 
 # Logs
 *.log
-logs/
-*.log.*
 
-# Database files (development)
-*.db
-*.sqlite
-*.sqlite3
+# Temporary files
+*.tmp
+*.temp
+*.cache
 
-# Environment & Configuration
-# ---------------------------
-# Environment variables
-.env
-.env.local
-.env.*.local
+# Backup files
+*.bak
+*.backup
 
-# API keys and secrets (if any config files are used)
-**/secrets.json
-**/api_keys.json
-**/config.local.*
-
-# Build Tools & Dependencies
-# ---------------------------
-# Node modules (if using any web tools)
+# Node modules (if any)
 node_modules/
 
-# Python (if using any Python tools)
+# Python (if any)
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+venv/
+env/
 
-# Temporary files
-# ---------------
-*.tmp
-*.temp
-*.bak
-*.backup
-*~
-
-# Archive files
-*.zip
-*.tar.gz
-*.rar
-*.7z
-
-# Platform Specific Ignores
-# --------------------------
-# Android
-android/app/google-services.json
-android/key.properties
-android/app/upload-keystore.jks
-android/app/debug-keystore.jks
-
-# iOS
-ios/Runner/GoogleService-Info.plist
-ios/firebase_app_id_file.json
-ios/Runner.xcworkspace/xcshareddata/
-ios/Flutter/flutter_export_environment.sh
-
-# Windows
-windows/flutter/generated_plugin_registrant.cc
-windows/flutter/generated_plugin_registrant.h
-
-# Linux
-linux/flutter/generated_plugin_registrant.cc
-linux/flutter/generated_plugin_registrant.h
-
-# macOS
-macos/Flutter/GeneratedPluginRegistrant.swift
-macos/Flutter/flutter_export_environment.sh
-
-# Web
-web/favicon.png
-web/icons/
-web/manifest.json
-
-# Distribution & Release
-# ----------------------
-# Release archives
-*.apk
-*.aab
-*.ipa
-*.dmg
-*.exe
-*.msi
-*.deb
-*.rpm
-*.tar.xz
-
-# Signing certificates and keys
-*.p12
-*.keystore
-*.jks
-*.pem
-*.key
-*.crt
-*.cer
-
-# Documentation builds
-docs/_build/
-docs/.doctrees/
-
-# Miscellaneous
-# -------------
-# Firebase
-.firebase/
-firebase-debug.log*
-firebase-debug.*.log*
-
-# FVM (Flutter Version Management)
-.fvm/
-
-# Mason (Dart code generation)
-.mason/
-
-# Generated files
-*.g.dart
-*.freezed.dart
-*.gr.dart
-
-# Local development
-local.properties
-.flutter-plugins-dependencies
-
-# Additional ignores from frontend/.gitignore
-*.class
-*.pyc
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# OS specific
+Thumbs.db
+.DS_Store
