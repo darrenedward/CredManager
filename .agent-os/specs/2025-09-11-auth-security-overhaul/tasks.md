@@ -82,7 +82,7 @@
 - Security validation tests cover timing attacks and data extraction
 
 ### PT006: Emergency Backup Passphrase Kit
-**Status:** [ ] TODO
+**Status:** [x] COMPLETE ✅
 **Effort:** L (5-7 days)
 **Description:** Implement emergency backup passphrase system following industry best practices (1Password Emergency Kit, Bitwarden Emergency Sheet) with printable PDF, secure recovery code generation, and safe storage guidance
 
@@ -91,12 +91,19 @@
 - [x] ST038: Design emergency kit PDF template with brand styling ✅ *COMPLETED* (Professional A4 landscape PDF with security warnings)
 - [x] ST039: Implement secure backup code generation (cryptographically random, 256-bit entropy) ✅ *COMPLETED* (BIP39 and Base32 formats supported)
 - [x] ST040: Create PDF generation service with QR code option ✅ *COMPLETED* (10/10 tests passing, QR placeholder for UI integration)
-- [ ] ST041: Build emergency kit UI screen with download/print functionality
-- [ ] ST042: Add backup code verification and redemption flow
+- [x] ST041: Build emergency kit UI screen with download/print functionality ✅ *COMPLETED* (Full-featured screen with generation, viewing, PDF download)
+- [x] ST042: Add backup code verification and redemption flow ✅ *COMPLETED* (Tabbed recovery screen with backup code verification)
 - [x] ST043: Implement safe storage guidance and security warnings ✅ *COMPLETED* (Comprehensive security guidelines in PDF)
-- [ ] ST044: Add emergency kit setup prompt during initial onboarding
-- [ ] ST045: Add settings reminder for users without emergency kit
-- [ ] ST046: Verify all emergency kit tests pass
+- [x] ST044: Add emergency kit setup prompt during initial onboarding ✅ *COMPLETED* (New step in setup wizard with skip option)
+- [x] ST045: Add settings reminder for users without emergency kit ✅ *COMPLETED* (Prominent banner in settings for missing/used kits)
+- [x] ST046: Verify all emergency kit tests pass ✅ *COMPLETED* (21/21 emergency kit tests passing)
+
+**Notes:**
+- Emergency backup kit fully integrated into onboarding flow
+- Users can generate kit during setup or later in settings
+- Settings screen shows reminder if no kit exists or if code was used
+- Recovery screen supports both security questions and backup codes
+- All emergency kit functionality tested and working correctly
 
 ## Dependencies
 - PT001 → PT002 (Argon2 fixes needed before DB integration)
