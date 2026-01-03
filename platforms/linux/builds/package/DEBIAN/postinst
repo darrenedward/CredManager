@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Post-installation script for Cred Manager
+
+APP_NAME="cred-manager"
+DATA_DIR="/var/lib/$APP_NAME"
+LOG_DIR="/var/log"
+
+# Create data directory
+mkdir -p "$DATA_DIR"
+mkdir -p "$LOG_DIR"
+
+# Set permissions
+chown root:root "$DATA_DIR"
+chmod 755 "$DATA_DIR"
+
+# Make binary executable
+chmod +x "/usr/lib/$APP_NAME/api_key_manager"
+
+# Initialize database if migration file exists
+if [ -f "$DATA_DIR/001_init.sql" ]; then
+    echo "Database migration file found"
+    # Note: Database initialization would happen when server first starts
+fi
+
+# Update desktop database
+if command -v update-desktop-database &> /dev/null; then
+    update-desktop-database
+fi
+
+# Update icon cache
+if command -v gtk-update-icon-cache &> /dev/null; then
+    gtk-update-icon-cache -f /usr/share/icons/hicolor/ 2>/dev/null || true
+fi
+
+echo "Cred Manager installation completed successfully!"
+echo "You can now launch it from your applications menu."

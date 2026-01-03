@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Cred Manager Startup Script
+# Launches Flutter frontend (fully local with integrated Argon2 security)
+
+APP_NAME="cred-manager"
+APP_DIR="/usr/lib/$APP_NAME"
+
+# Launch Flutter frontend
+echo "Starting Cred Manager (local-only with Argon2 security)..."
+cd "$APP_DIR"
+LOG_FILE="/tmp/cred_manager.log"
+echo "Starting Cred Manager at $(date)" > "$LOG_FILE"
+./api_key_manager >> "$LOG_FILE" 2>&1 &
+echo "Cred Manager started, check log at $LOG_FILE" >&2

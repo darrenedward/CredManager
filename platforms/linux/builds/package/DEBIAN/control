@@ -1,0 +1,16 @@
+Package: cred-manager
+Version: 1.0.0
+Architecture: amd64
+Maintainer: Darren Edward House of Jones
+Description: Cred Manager - Secure API Key Management
+ A desktop application for securely managing API keys, credentials,
+ and sensitive data with local encryption and authentication.
+ .
+ Features:
+  * Local encrypted storage
+  * Secure authentication
+  * Project-based organization
+  * Password generation
+  * Cross-platform support
+Depends: libc6 (>= 2.17), libgtk-3-0 (>= 3.10), libglib2.0-0 (>= 2.37), libx11-6, libxss1, libasound2, libdrm2, libxcomposite1, libxdamage1, libxrandr2, libgbm1
+Homepage: https://github.com/yourusername/cred-manager
