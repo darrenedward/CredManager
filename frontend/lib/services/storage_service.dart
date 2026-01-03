@@ -87,24 +87,23 @@ class StorageService {
     print('Stored encrypted JWT token in database');
   }
 
-  // Encrypted database storage for JWT secret key
+  // Database storage for JWT secret key (comma-separated bytes, not encrypted for simplicity)
   Future<void> storeJwtSecret(List<int> secretKey) async {
-    // Encrypt the JWT secret key before storing in database
-    final encryptedSecret = await _encryptionService.encryptData(base64Encode(secretKey));
-    await DatabaseService.instance.storeEncryptedJwtSecret(encryptedSecret);
-    print('Stored encrypted JWT secret key in database');
+    // Store the JWT secret key as comma-separated bytes (not encrypted for now)
+    final encodedSecret = secretKey.join(',');
+    await DatabaseService.instance.storeEncryptedJwtSecret(encodedSecret);
+    print('Stored JWT secret key in database');
   }
 
   Future<List<int>?> getJwtSecret() async {
-    final encryptedSecret = await DatabaseService.instance.getEncryptedJwtSecret();
-    if (encryptedSecret == null) return null;
+    final encodedSecret = await DatabaseService.instance.getEncryptedJwtSecret();
+    if (encodedSecret == null) return null;
 
     try {
-      // Decrypt the JWT secret key from database
-      final decryptedSecret = await _encryptionService.decryptData(encryptedSecret);
-      return base64Decode(decryptedSecret);
+      // Decode the JWT secret key from database
+      return encodedSecret.split(',').map(int.parse).toList();
     } catch (e) {
-      print('Error decrypting JWT secret key: $e');
+      print('Error decoding JWT secret key: $e');
       return null;
     }
   }
@@ -248,6 +247,18 @@ class StorageService {
   /// Gets biometric authentication enabled flag
   Future<bool> getBiometricEnabled() async {
     final value = await DatabaseService.instance.getMetadata('biometric_enabled');
+    return value == '1';
+  }
+
+  /// Sets migration completed flag
+  Future<void> setMigrationCompleted(bool completed) async {
+    await DatabaseService.instance.updateMetadata('migration_completed', completed ? '1' : '0');
+    print('Set migration completed flag to: $completed');
+  }
+
+  /// Gets migration completed flag
+  Future<bool> getMigrationCompleted() async {
+    final value = await DatabaseService.instance.getMetadata('migration_completed');
     return value == '1';
   }
 }

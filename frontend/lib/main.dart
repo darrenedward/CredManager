@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 import 'screens/setup_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/recovery_screen.dart';
@@ -12,7 +13,20 @@ import 'models/dashboard_state.dart';
 import 'services/theme_service.dart';
 import 'utils/constants.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setTitle('Cred Manager - Keep your secrets safe with me');
+    // Set window icon if possible
+    try {
+      await windowManager.setIcon('data/flutter_assets/assets/icons/shield_icon.png');
+    } catch (e) {
+      // Icon setting may not work on all platforms
+    }
+  });
+
   runApp(
     MultiProvider(
       providers: [

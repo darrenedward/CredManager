@@ -182,6 +182,9 @@ class AuthState extends ChangeNotifier {
         print('DEBUG: AuthState.login - no token received');
         setError('Login failed. Please try again.');
       }
+    } on LockoutException catch (e) {
+      print('DEBUG: AuthState.login - lockout exception: $e');
+      setError('Too many login attempts. Please try again later.');
     } catch (e) {
       print('DEBUG: AuthState.login - exception: $e');
       setError('Login failed. Please try again.');
@@ -190,8 +193,8 @@ class AuthState extends ChangeNotifier {
     }
   }
 
-  /// Enable biometric authentication and store encrypted passphrase
-  Future<bool> enableBiometricAuth(String passphrase) async {
+  /// Enable biometric authentication for quick unlock (no passphrase storage needed)
+  Future<bool> enableBiometricAuth() async {
     try {
       setLoading(true);
       setError(null);
@@ -204,21 +207,19 @@ class AuthState extends ChangeNotifier {
       }
 
       // Test biometric authentication first
-      final authResult = await _biometricService.authenticateWithBiometrics(
-        localizedReason: 'Authenticate to enable biometric login',
+      final authResult = await _biometricService.testBiometricAuthentication(
+        localizedReason: 'Test biometric authentication for quick unlock',
       );
 
       if (!authResult.success) {
-        setError(authResult.errorMessage ?? 'Biometric authentication failed');
+        setError(authResult.errorMessage ?? 'Biometric authentication test failed');
         return false;
       }
 
-      // Encrypt and store the passphrase
-      final encryptedPassphrase = await _encryptPassphraseForBiometric(passphrase);
-      await _biometricService.storeBiometricKey(encryptedPassphrase);
+      // Enable biometric for quick unlock
       await _biometricService.setBiometricEnabled(true);
 
-      print('DEBUG: Biometric authentication enabled successfully');
+      print('DEBUG: Biometric authentication enabled for quick unlock');
       return true;
     } catch (e) {
       print('DEBUG: Error enabling biometric auth: $e');
@@ -229,8 +230,8 @@ class AuthState extends ChangeNotifier {
     }
   }
 
-  /// Login using biometric authentication
-  Future<bool> loginWithBiometric() async {
+  /// Perform biometric quick unlock (after passphrase login)
+  Future<bool> performBiometricQuickUnlock() async {
     try {
       setLoading(true);
       setError(null);
@@ -242,9 +243,9 @@ class AuthState extends ChangeNotifier {
         return false;
       }
 
-      // Authenticate with biometrics
-      final authResult = await _biometricService.authenticateWithBiometrics(
-        localizedReason: 'Authenticate to access your credentials',
+      // Authenticate with biometrics for quick unlock
+      final authResult = await _biometricService.authenticateForQuickUnlock(
+        localizedReason: 'Use biometric for quick unlock',
       );
 
       if (!authResult.success) {
@@ -252,26 +253,12 @@ class AuthState extends ChangeNotifier {
         return false;
       }
 
-      // Retrieve and decrypt the stored passphrase
-      final encryptedPassphrase = await _biometricService.getBiometricKey();
-      if (encryptedPassphrase == null) {
-        setError('No stored passphrase found. Please re-enable biometric authentication.');
-        await _biometricService.setBiometricEnabled(false);
-        return false;
-      }
-
-      final passphrase = await _decryptPassphraseFromBiometric(encryptedPassphrase);
-      if (passphrase == null) {
-        setError('Failed to decrypt stored passphrase');
-        return false;
-      }
-
-      // Use the decrypted passphrase to login normally
-      await login(passphrase);
-      return isLoggedIn;
+      // Biometric authentication successful - user can proceed
+      print('DEBUG: Biometric quick unlock successful');
+      return true;
     } catch (e) {
-      print('DEBUG: Error with biometric login: $e');
-      setError('Biometric login failed');
+      print('DEBUG: Error with biometric quick unlock: $e');
+      setError('Biometric quick unlock failed');
       return false;
     } finally {
       setLoading(false);
@@ -300,24 +287,6 @@ class AuthState extends ChangeNotifier {
     return await _biometricService.isBiometricEnabled();
   }
 
-  /// Encrypt passphrase for biometric storage
-  Future<String> _encryptPassphraseForBiometric(String passphrase) async {
-    // For simplicity, use base64 encoding
-    // In production, use proper AES encryption with a secure key
-    final bytes = utf8.encode(passphrase);
-    return base64.encode(bytes);
-  }
-
-  /// Decrypt passphrase from biometric storage
-  Future<String?> _decryptPassphraseFromBiometric(String encryptedPassphrase) async {
-    try {
-      final bytes = base64.decode(encryptedPassphrase);
-      return utf8.decode(bytes);
-    } catch (e) {
-      print('DEBUG: Error decrypting passphrase: $e');
-      return null;
-    }
-  }
 
   Future<void> recoverPassphrase(List<String> answers) async {
     try {

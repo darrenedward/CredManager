@@ -66,20 +66,23 @@ class _AuthFormState extends State<AuthForm> {
             onSubmitted: (_) => widget.onSubmit?.call(),
           ),
         ],
-        const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: widget.isLoading ? null : widget.onSubmit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppConstants.primaryColor,
-              foregroundColor: Colors.white,
+        if (widget.onSubmit != null) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: widget.isLoading ? null : widget.onSubmit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppConstants.primaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: widget.isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text('Continue'),
             ),
-            child: widget.isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text('Continue'),
           ),
-        ),
+        ],
+        const SizedBox(height: 10), // Always add bottom spacing
       ],
     );
   }

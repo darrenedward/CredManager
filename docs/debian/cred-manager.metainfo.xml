@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>cred-manager.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Proprietary</project_license>
+  <name>Cred Manager</name>
+  <summary>Secure API Key Management</summary>
+  <description>
+    <p>
+      Cred Manager is a secure, local-only desktop application for managing API keys,
+      credentials, and sensitive data with enterprise-grade security.
+    </p>
+    <p>
+      Features include Argon2 password hashing, SQLCipher database encryption,
+      biometric authentication support, and project-based organization.
+    </p>
+    <p>
+      All data is stored locally with strong encryption - no network connectivity required.
+    </p>
+  </description>
+  <launchable type="desktop-id">cred-manager.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main dashboard showing credential management</caption>
+      <image>https://example.com/screenshots/dashboard.png</image>
+    </screenshot>
+  </screenshots>
+  <categories>
+    <category>Utility</category>
+    <category>Security</category>
+    <category>Office</category>
+  </categories>
+  <keywords>
+    <keyword>credentials</keyword>
+    <keyword>password</keyword>
+    <keyword>security</keyword>
+    <keyword>encryption</keyword>
+    <keyword>api</keyword>
+    <keyword>keys</keyword>
+  </keywords>
+  <url type="homepage">https://github.com/yourusername/cred-manager</url>
+  <url type="bugtracker">https://github.com/yourusername/cred-manager/issues</url>
+  <provides>
+    <binary>cred-manager-startup</binary>
+  </provides>
+  <developer_name>Darren Edward House of Jones</developer_name>
+  <releases>
+    <release version="1.0.0" date="2025-09-13">
+      <description>
+        <p>Initial stable release with full security features.</p>
+      </description>
+    </release>
+  </releases>
+  <content_rating type="oars-1.1" />
+</component>

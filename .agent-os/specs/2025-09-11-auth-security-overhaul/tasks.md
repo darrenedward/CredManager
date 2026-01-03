@@ -75,10 +75,28 @@
 - [ ] ST035: Perform comprehensive end-to-end security testing
 - [ ] ST036: Verify all migration and security validation tests pass
 
+### PT006: Emergency Backup Passphrase Kit
+**Status:** [ ] TODO
+**Effort:** L (5-7 days)
+**Description:** Implement emergency backup passphrase system following industry best practices (1Password Emergency Kit, Bitwarden Emergency Sheet) with printable PDF, secure recovery code generation, and safe storage guidance
+
+**Subtasks:**
+- [ ] ST037: Write tests for backup code generation and validation
+- [ ] ST038: Design emergency kit PDF template with brand styling
+- [ ] ST039: Implement secure backup code generation (cryptographically random, 256-bit entropy)
+- [ ] ST040: Create PDF generation service with QR code option
+- [ ] ST041: Build emergency kit UI screen with download/print functionality
+- [ ] ST042: Add backup code verification and redemption flow
+- [ ] ST043: Implement safe storage guidance and security warnings
+- [ ] ST044: Add emergency kit setup prompt during initial onboarding
+- [ ] ST045: Add settings reminder for users without emergency kit
+- [ ] ST046: Verify all emergency kit tests pass
+
 ## Dependencies
 - PT001 → PT002 (Argon2 fixes needed before DB integration)
 - PT002 → PT003 (Encrypted DB needed for dynamic secrets)
 - PT003 → PT004 (Dynamic secrets needed for enhanced security)
+- PT003 → PT006 (Dynamic secrets needed for backup code encryption)
 - All tasks → PT005 (All components needed for migration testing)
 
 ## Technical Requirements

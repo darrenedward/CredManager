@@ -6,6 +6,7 @@ import 'dart:io';
 import '../models/auth_state.dart';
 import '../models/dashboard_state.dart';
 import '../services/theme_service.dart';
+import '../services/biometric_auth_service.dart';
 import '../utils/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -18,6 +19,9 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   // Accordion state
   String? _expandedCard;
+
+  // Services
+  final BiometricAuthService _biometricService = BiometricAuthService();
 
   // Security Settings
   int _selectedTimeout = AppConstants.defaultSessionTimeout;
@@ -64,8 +68,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadCurrentSettings() async {
     final authState = Provider.of<AuthState>(context, listen: false);
+    final biometricEnabled = await _biometricService.isBiometricEnabled();
     setState(() {
       _selectedTimeout = authState.sessionTimeoutMinutes;
+      _biometricEnabled = biometricEnabled;
     });
   }
 
@@ -77,6 +83,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final authState = Provider.of<AuthState>(context, listen: false);
       await authState.updateSessionTimeout(_selectedTimeout);
+
+      // Save biometric setting
+      await _biometricService.setBiometricEnabled(_biometricEnabled);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -380,7 +389,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(),
                 _buildSwitchSetting(
                   'Biometric Authentication',
-                  'Use fingerprint or face unlock',
+                  'Use fingerprint or face unlock for quick access after passphrase login',
                   _biometricEnabled,
                   (value) => setState(() => _biometricEnabled = value),
                 ),

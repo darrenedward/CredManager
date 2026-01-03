@@ -16,6 +16,7 @@ class SecurityQuestionsWidget extends StatefulWidget {
   final bool isRecovery;
   final bool isLoading;
   final Function(int, String)? onCustomQuestionChanged;
+  final List<String>? predefinedQuestions;
 
   const SecurityQuestionsWidget({
     super.key,
@@ -24,6 +25,7 @@ class SecurityQuestionsWidget extends StatefulWidget {
     this.isRecovery = false,
     this.isLoading = false,
     this.onCustomQuestionChanged,
+    this.predefinedQuestions,
   });
 
   @override
@@ -32,6 +34,7 @@ class SecurityQuestionsWidget extends StatefulWidget {
 
 class _SecurityQuestionsWidgetState extends State<SecurityQuestionsWidget> {
   late List<TextEditingController> _questionControllers;
+  List<String?> _selectedQuestions = [];
 
   @override
   void initState() {
@@ -40,6 +43,22 @@ class _SecurityQuestionsWidgetState extends State<SecurityQuestionsWidget> {
       widget.questions.length,
       (index) => TextEditingController(text: widget.questions[index].question),
     );
+    _selectedQuestions = List.generate(widget.questions.length, (index) => widget.questions[index].question.isNotEmpty ? widget.questions[index].question : null);
+  }
+
+  @override
+  void didUpdateWidget(covariant SecurityQuestionsWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.questions.length != widget.questions.length) {
+      for (var controller in _questionControllers) {
+        controller.dispose();
+      }
+      _questionControllers = List.generate(
+        widget.questions.length,
+        (index) => TextEditingController(text: widget.questions[index].question),
+      );
+      _selectedQuestions = List.generate(widget.questions.length, (index) => widget.questions[index].question.isNotEmpty ? widget.questions[index].question : null);
+    }
   }
 
   @override
@@ -52,6 +71,7 @@ class _SecurityQuestionsWidgetState extends State<SecurityQuestionsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    int controllerIndex = -1;
     return Column(
       children: [
         const Text(
@@ -61,6 +81,8 @@ class _SecurityQuestionsWidgetState extends State<SecurityQuestionsWidget> {
         const SizedBox(height: 10),
         ...List.generate(widget.questions.length, (index) {
           final question = widget.questions[index];
+          final isSelected = _selectedQuestions[index] != null && _selectedQuestions[index]!.isNotEmpty;
+          if (isSelected) controllerIndex++;
           return Padding(
             padding: const EdgeInsets.only(bottom: 15),
             child: Column(
@@ -79,6 +101,22 @@ class _SecurityQuestionsWidgetState extends State<SecurityQuestionsWidget> {
                     },
                   ),
                   const SizedBox(height: 5),
+                ] else if (widget.predefinedQuestions != null) ...[
+                  DropdownButtonFormField<String>(
+                    value: _selectedQuestions[index],
+                    items: widget.predefinedQuestions!.map((q) => DropdownMenuItem(value: q, child: Text(q))).toList(),
+                    onChanged: widget.isLoading || widget.isRecovery ? null : (value) {
+                      setState(() {
+                        _selectedQuestions[index] = value;
+                      });
+                      widget.onCustomQuestionChanged?.call(index, value ?? '');
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Select Security Question',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
                 ] else ...[
                   Text(
                     'Question ${index + 1}: ${question.question}',
@@ -86,15 +124,17 @@ class _SecurityQuestionsWidgetState extends State<SecurityQuestionsWidget> {
                   ),
                   const SizedBox(height: 5),
                 ],
-                TextField(
-                  controller: widget.answerControllers?[index],
-                  obscureText: !widget.isRecovery, // Hide answers in setup, show in recovery
-                  enabled: !widget.isLoading,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Answer',
+                if (isSelected) ...[
+                  TextField(
+                    controller: widget.answerControllers?[controllerIndex],
+                    obscureText: !widget.isRecovery, // Hide answers in setup, show in recovery
+                    enabled: !widget.isLoading,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      labelText: 'Answer',
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           );

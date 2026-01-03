@@ -70,9 +70,9 @@ class BiometricAuthService {
     }
   }
 
-  /// Authenticate using biometrics
-  Future<BiometricAuthResult> authenticateWithBiometrics({
-    String localizedReason = 'Please authenticate to access your credentials',
+  /// Authenticate using biometrics for quick unlock (after passphrase login)
+  Future<BiometricAuthResult> authenticateForQuickUnlock({
+    String localizedReason = 'Use biometric for quick unlock',
     bool useErrorDialogs = true,
     bool stickyAuth = false,
   }) async {
@@ -114,6 +114,59 @@ class BiometricAuthService {
           success: false,
           errorType: BiometricAuthError.userCancel,
           errorMessage: 'Authentication was cancelled by user',
+        );
+      }
+    } on PlatformException catch (e) {
+      return _handlePlatformException(e);
+    } on MissingPluginException {
+      return BiometricAuthResult(
+        success: false,
+        errorType: BiometricAuthError.notAvailable,
+        errorMessage: 'Biometric authentication is not supported on this platform',
+      );
+    } catch (e) {
+      return BiometricAuthResult(
+        success: false,
+        errorType: BiometricAuthError.unknown,
+        errorMessage: 'An unexpected error occurred: $e',
+      );
+    }
+  }
+
+  /// Test biometric authentication (for setup/enablement)
+  Future<BiometricAuthResult> testBiometricAuthentication({
+    String localizedReason = 'Test biometric authentication',
+    bool useErrorDialogs = true,
+    bool stickyAuth = false,
+  }) async {
+    try {
+      // Check if biometric is available
+      final bool isAvailable = await isBiometricAvailable();
+      if (!isAvailable) {
+        return BiometricAuthResult(
+          success: false,
+          errorType: BiometricAuthError.notAvailable,
+          errorMessage: 'Biometric authentication is not available on this device',
+        );
+      }
+
+      // Perform test authentication
+      final bool didAuthenticate = await _localAuth.authenticate(
+        localizedReason: localizedReason,
+        options: AuthenticationOptions(
+          useErrorDialogs: useErrorDialogs,
+          stickyAuth: stickyAuth,
+          biometricOnly: true,
+        ),
+      );
+
+      if (didAuthenticate) {
+        return BiometricAuthResult(success: true);
+      } else {
+        return BiometricAuthResult(
+          success: false,
+          errorType: BiometricAuthError.userCancel,
+          errorMessage: 'Test authentication was cancelled by user',
         );
       }
     } on PlatformException catch (e) {

@@ -1,0 +1,8 @@
+cred-manager (1.0.0) unstable; urgency=medium
+
+  * Initial Debian package release
+  * Local-only credential management application
+  * Argon2 security with SQLCipher encryption
+  * Flutter-based Linux desktop application
+
+ -- Darren Edward House of Jones <darren@houseofjones.com>  Wed, 13 Sep 2025 17:27:00 +1200

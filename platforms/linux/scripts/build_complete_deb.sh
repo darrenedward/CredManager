@@ -23,7 +23,7 @@ ARCH="amd64"
 MAINTAINER="Darren Edward House of Jones"
 
 # Directories
-PROJECT_ROOT="$(cd .. && cd .. && cd .. && pwd)"
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 BACKEND_DIR="$PROJECT_ROOT/backend"
 FRONTEND_DIR="$PROJECT_ROOT/frontend"
 BUILD_DIR="$PROJECT_ROOT/platforms/linux/builds"
@@ -130,15 +130,39 @@ copy_files() {
     print_status "Flutter frontend copied"
 
     # Copy icon
-    if [ -f "$FRONTEND_DIR/assets/icons/shield_icon.png" ]; then
-        cp "$FRONTEND_DIR/assets/icons/shield_icon.png" "$PACKAGE_DIR/usr/share/icons/hicolor/512x512/apps/$APP_NAME.png"
+    if [ -f "$FRONTEND_DIR/assets/icons/shield_icon.svg" ]; then
+        mkdir -p "$PACKAGE_DIR/usr/share/icons/hicolor/scalable/apps"
+        cp "$FRONTEND_DIR/assets/icons/shield_icon.svg" "$PACKAGE_DIR/usr/share/icons/hicolor/scalable/apps/$APP_NAME.svg"
         print_status "Icon copied"
     fi
 
-    # Copy database migration
-    if [ -f "$BACKEND_DIR/migrations/001_init.sql" ]; then
-        cp "$BACKEND_DIR/migrations/001_init.sql" "$PACKAGE_DIR/var/lib/$APP_NAME/"
-        print_status "Database migration copied"
+    # Copy documentation
+    mkdir -p "$PACKAGE_DIR/usr/share/doc/$APP_NAME"
+    if [ -f "docs/debian/README.Debian" ]; then
+        cp "docs/debian/README.Debian" "$PACKAGE_DIR/usr/share/doc/$APP_NAME/"
+        print_status "README.Debian documentation copied"
+    fi
+    if [ -f "docs/debian/changelog.Debian" ]; then
+        gzip -c "docs/debian/changelog.Debian" > "$PACKAGE_DIR/usr/share/doc/$APP_NAME/changelog.Debian.gz"
+        print_status "Changelog documentation copied"
+    fi
+    if [ -f "docs/debian/copyright" ]; then
+        cp "docs/debian/copyright" "$PACKAGE_DIR/usr/share/doc/$APP_NAME/"
+        print_status "Copyright documentation copied"
+    fi
+
+    # Copy man page
+    mkdir -p "$PACKAGE_DIR/usr/share/man/man1"
+    if [ -f "docs/debian/cred-manager.1" ]; then
+        gzip -c "docs/debian/cred-manager.1" > "$PACKAGE_DIR/usr/share/man/man1/cred-manager.1.gz"
+        print_status "Man page documentation copied"
+    fi
+
+    # Copy AppStream metainfo
+    mkdir -p "$PACKAGE_DIR/usr/share/metainfo"
+    if [ -f "docs/debian/cred-manager.metainfo.xml" ]; then
+        cp "docs/debian/cred-manager.metainfo.xml" "$PACKAGE_DIR/usr/share/metainfo/"
+        print_status "AppStream metainfo copied"
     fi
 }
 
@@ -161,7 +185,7 @@ Description: Cred Manager - Secure API Key Management
   * Project-based organization
   * Password generation
   * Cross-platform support
-Depends: libc6 (>= 2.17), libgtk-3-0 (>= 3.10), libglib2.0-0 (>= 2.37)
+Depends: libc6 (>= 2.17), libgtk-3-0 (>= 3.10), libglib2.0-0 (>= 2.37), libx11-6, libxss1, libasound2, libdrm2, libxcomposite1, libxdamage1, libxrandr2, libgbm1
 Homepage: https://github.com/yourusername/cred-manager
 EOF
 
@@ -203,7 +227,10 @@ APP_DIR="/usr/lib/$APP_NAME"
 # Launch Flutter frontend
 echo "Starting Cred Manager (local-only with Argon2 security)..."
 cd "$APP_DIR"
-exec ./cred-manager
+LOG_FILE="/tmp/cred_manager.log"
+echo "Starting Cred Manager at $(date)" > "$LOG_FILE"
+./api_key_manager >> "$LOG_FILE" 2>&1 &
+echo "Cred Manager started, check log at $LOG_FILE" >&2
 EOF
 
     # Make startup script executable
@@ -232,6 +259,9 @@ mkdir -p "$LOG_DIR"
 # Set permissions
 chown root:root "$DATA_DIR"
 chmod 755 "$DATA_DIR"
+
+# Make binary executable
+chmod +x "/usr/lib/$APP_NAME/api_key_manager"
 
 # Initialize database if migration file exists
 if [ -f "$DATA_DIR/001_init.sql" ]; then

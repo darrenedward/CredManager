@@ -1,0 +1,187 @@
+# Cred Manager - Secure API Key Management
+
+## Overview
+
+Cred Manager is a secure, local-only desktop application for managing API keys, credentials, and sensitive data. Built with Flutter and using Argon2 for password hashing and SQLCipher for encrypted database storage, it provides enterprise-grade security without requiring network connectivity.
+
+## Features
+
+- **Local Encryption**: All data is stored locally with SQLCipher encryption
+- **Secure Authentication**: Argon2-based passphrase hashing with security questions
+- **Biometric Support**: Optional fingerprint/face unlock (when available)
+- **Project Organization**: Group credentials by project
+- **Password Generation**: Built-in secure password generator
+- **Migration Support**: Automatic migration from legacy SHA-256 to Argon2
+- **Cross-Platform**: Linux desktop application
+
+## Installation
+
+### From DEB Package
+
+```bash
+sudo dpkg -i cred-manager_1.0.0_amd64.deb
+sudo apt-get install -f  # Install any missing dependencies
+```
+
+### Dependencies
+
+The application requires:
+- GTK 3.10+
+- GLib 2.37+
+- X11 libraries
+- Audio libraries (ALSA)
+- DRM libraries
+
+## Getting Started
+
+### First Time Setup
+
+1. Launch Cred Manager from your applications menu
+2. Create a strong passphrase (minimum 12 characters)
+3. Select and answer 3 security questions for recovery
+4. Optionally enable biometric authentication
+5. Complete setup
+
+### Daily Usage
+
+#### Adding Credentials
+
+1. From the dashboard, click "Add Credential"
+2. Enter:
+   - Service name
+   - Username/API key
+   - Password/secret
+   - Project (optional)
+   - Notes (optional)
+3. Click Save
+
+#### Managing Projects
+
+1. Use the project dropdown to filter credentials
+2. Create new projects as needed
+3. Organize credentials by project for better management
+
+#### Password Generation
+
+1. Click the "Generate Password" button
+2. Adjust length and complexity options
+3. Copy the generated password
+
+## Security Features
+
+### Passphrase Security
+
+- Minimum 12 characters
+- Argon2 hashing with high security parameters
+- No plaintext storage
+
+### Database Encryption
+
+- SQLCipher with AES-256 encryption
+- Key derived from passphrase
+- Encrypted at rest
+
+### Recovery System
+
+- 3 custom security questions
+- Answers hashed with Argon2
+- Recovery token generation
+
+### Biometric Authentication
+
+- Optional convenience feature
+- Requires device biometric support
+- Falls back to passphrase if unavailable
+
+## Troubleshooting
+
+### Application Won't Start
+
+**Symptoms**: App launches but immediately closes
+
+**Solutions**:
+1. Check system dependencies: `ldd /usr/lib/cred-manager/api_key_manager`
+2. Verify permissions: `ls -la /usr/lib/cred-manager/`
+3. Check logs: `cat /tmp/cred_manager.log`
+4. Run manually: `/usr/lib/cred-manager/api_key_manager`
+
+### Login Issues
+
+**Forgot Passphrase**:
+1. Click "Forgot Passphrase?" on login screen
+2. Answer security questions accurately
+3. Reset passphrase if questions are answered correctly
+
+**Biometric Not Working**:
+- Ensure device has biometric hardware
+- Check biometric settings in system preferences
+- Biometric is optional - use passphrase as fallback
+
+### Database Issues
+
+**Migration Problems**:
+- App automatically detects legacy data
+- Follow on-screen migration prompts
+- Contact support if migration fails
+
+**Corrupted Database**:
+- No automatic repair available
+- Backup important data
+- Reinstall and re-enter credentials
+
+### Performance Issues
+
+**Slow Startup**:
+- Check available RAM (minimum 2GB recommended)
+- Close other applications
+- Check disk space
+
+**UI Responsiveness**:
+- Ensure graphics drivers are up to date
+- Check X11/Wayland configuration
+
+## Configuration
+
+### Settings
+
+Access settings from the main dashboard:
+- Theme selection (light/dark)
+- Security preferences
+- Biometric settings
+
+### Data Location
+
+- Application data: `/var/lib/cred-manager/`
+- User data: `~/.local/share/cred-manager/`
+- Logs: `/tmp/cred_manager.log`
+
+## Security Best Practices
+
+1. **Strong Passphrase**: Use long, complex passphrases
+2. **Regular Backups**: Export credentials periodically
+3. **Security Questions**: Choose questions with memorable answers
+4. **Biometric**: Use as convenience, not primary security
+5. **Updates**: Keep the application updated
+
+## Uninstallation
+
+```bash
+sudo dpkg -r cred-manager
+# Or
+sudo apt-get remove cred-manager
+```
+
+## Support
+
+For issues not covered in this documentation:
+1. Check application logs
+2. Verify system compatibility
+3. Report issues with detailed information
+
+## License
+
+This application is proprietary software. See copyright file for details.
+
+## Version
+
+Current version: 1.0.0

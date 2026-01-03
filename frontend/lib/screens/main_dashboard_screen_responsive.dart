@@ -1093,7 +1093,7 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
       if (passphrase == null) return;
 
       final authState = Provider.of<AuthState>(context, listen: false);
-      final success = await authState.enableBiometricAuth(passphrase);
+      final success = await authState.enableBiometricAuth();
 
       if (mounted) {
         setState(() {}); // Refresh the UI

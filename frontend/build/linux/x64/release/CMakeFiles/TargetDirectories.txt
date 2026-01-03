@@ -25,6 +25,13 @@
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux/CMakeFiles/install.dir
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux/CMakeFiles/install/local.dir
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux/CMakeFiles/install/strip.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/CMakeFiles/edit_cache.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/CMakeFiles/rebuild_cache.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/CMakeFiles/list_install_components.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/CMakeFiles/install.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/CMakeFiles/install/local.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/CMakeFiles/install/strip.dir
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/CMakeFiles/sqlite3_flutter_libs_plugin.dir
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/CMakeFiles/edit_cache.dir
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/CMakeFiles/rebuild_cache.dir
@@ -32,3 +39,10 @@
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/CMakeFiles/install.dir
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/CMakeFiles/install/local.dir
 /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/CMakeFiles/install/strip.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/CMakeFiles/window_manager_plugin.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/CMakeFiles/edit_cache.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/CMakeFiles/rebuild_cache.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/CMakeFiles/list_install_components.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/CMakeFiles/install.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/CMakeFiles/install/local.dir
+/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/CMakeFiles/install/strip.dir

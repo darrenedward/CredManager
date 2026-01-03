@@ -1,0 +1,57 @@
+.TH CRED-MANAGER 1 "September 2025" "Cred Manager 1.0.0" "User Commands"
+.SH NAME
+cred-manager \- Secure API Key Management Application
+.SH SYNOPSIS
+.B cred-manager
+.SH DESCRIPTION
+Cred Manager is a secure, local-only desktop application for managing API keys,
+credentials, and sensitive data. It provides enterprise-grade security using
+Argon2 password hashing and SQLCipher database encryption.
+.PP
+The application features:
+.IP \(bu 2
+Local encrypted storage with SQLCipher
+.IP \(bu 2
+Argon2-based passphrase authentication
+.IP \(bu 2
+Security question recovery system
+.IP \(bu 2
+Optional biometric authentication
+.IP \(bu 2
+Project-based credential organization
+.IP \(bu 2
+Built-in password generator
+.SH OPTIONS
+Cred Manager is a GUI application and does not accept command-line options.
+Launch it from your desktop environment's application menu.
+.SH FILES
+.TP
+.I /usr/lib/cred-manager/
+Application installation directory
+.TP
+.I /var/lib/cred-manager/
+System data directory
+.TP
+.I ~/.local/share/cred-manager/
+User data directory
+.TP
+.I ~/.config/cred-manager/
+User configuration directory
+.SH ENVIRONMENT
+.TP
+.B DISPLAY
+X11 display for GUI rendering
+.TP
+.B WAYLAND_DISPLAY
+Wayland display for GUI rendering (preferred on modern systems)
+.SH SEE ALSO
+.BR dpkg (1),
+.BR apt (1)
+.SH AUTHOR
+Written by Darren Edward House of Jones.
+.SH COPYRIGHT
+Copyright \(co 2025 Darren Edward House of Jones. Licensed under proprietary terms.
+.SH BUGS
+Report bugs to the project maintainer.
+.SH NOTES
+This application runs completely offline and does not require network connectivity.

@@ -25,6 +25,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // Migration prompt state
+  String? _migrationMessage;
+  bool _showMigrationPrompt = false;
+
+
   @override
   void initState() {
     super.initState();
@@ -34,9 +39,32 @@ class _LoginScreenState extends State<LoginScreen> {
         _autoLogin(widget.autoLoginToken!);
       });
     } else {
-      // Check if biometric login is available and enabled
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Check migration status and biometric login availability
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _checkMigrationPrompt();
         _checkBiometricAutoLogin();
+      });
+    }
+  }
+
+  Future<void> _checkMigrationPrompt() async {
+    try {
+      final status = await _authService.checkMigrationStatus();
+      if (status['needsMigration'] == true && status['message'] != null) {
+        setState(() {
+          _migrationMessage = status['message'];
+          _showMigrationPrompt = true;
+        });
+      } else {
+        setState(() {
+          _migrationMessage = null;
+          _showMigrationPrompt = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _migrationMessage = null;
+        _showMigrationPrompt = false;
       });
     }
   }
@@ -104,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
       print('DEBUG: Starting biometric login');
       final authState = Provider.of<AuthState>(context, listen: false);
       
-      final success = await authState.loginWithBiometric();
+      final success = await authState.performBiometricQuickUnlock();
       
       if (success) {
         print('DEBUG: Biometric login successful');
@@ -228,6 +256,38 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
             const SizedBox(height: 20),
+
+            // Migration prompt UI
+            if (_showMigrationPrompt && _migrationMessage != null) ...[
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.yellow[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.yellow[700]!),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.upgrade, color: Colors.orange[800], size: 28),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _migrationMessage!,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
             const Text(
               'Welcome back',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -245,66 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             
-            // Biometric authentication button
-            FutureBuilder<bool>(
-              future: _biometricService.isBiometricAvailable(),
-              builder: (context, availableSnapshot) {
-                final isAvailable = availableSnapshot.data ?? false;
-                
-                if (!isAvailable) {
-                  return const SizedBox.shrink();
-                }
-                
-                return FutureBuilder<bool>(
-                  future: _biometricService.isBiometricEnabled(),
-                  builder: (context, enabledSnapshot) {
-                    final isEnabled = enabledSnapshot.data ?? false;
-                    
-                    if (!isEnabled) {
-                      return const SizedBox.shrink();
-                    }
-                    
-                    return Column(
-                      children: [
-                        FutureBuilder<String>(
-                          future: _biometricService.getPrimaryBiometricType(),
-                          builder: (context, typeSnapshot) {
-                            final biometricType = typeSnapshot.data ?? 'Biometric';
-                            
-                            return ElevatedButton.icon(
-                              onPressed: _isLoading ? null : _biometricLogin,
-                              icon: Icon(
-                                biometricType.toLowerCase().contains('face') 
-                                  ? Icons.face 
-                                  : Icons.fingerprint,
-                              ),
-                              label: Text('Use $biometricType'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppConstants.accentColor,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, 
-                                  vertical: 12
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'OR',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
+            // Biometric authentication button removed for PT006
             
             TextButton(
               onPressed: () {

@@ -208,13 +208,13 @@ build /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/lib
 #############################################
 # Order-only phony target for api_key_manager
 
-build cmake_object_order_depends_target_api_key_manager: phony || cmake_object_order_depends_target_flutter_secure_storage_linux_plugin cmake_object_order_depends_target_sqlite3_flutter_libs_plugin flutter/flutter_assemble
+build cmake_object_order_depends_target_api_key_manager: phony || cmake_object_order_depends_target_flutter_secure_storage_linux_plugin cmake_object_order_depends_target_screen_retriever_plugin cmake_object_order_depends_target_sqlite3_flutter_libs_plugin cmake_object_order_depends_target_window_manager_plugin flutter/flutter_assemble
 
 build runner/CMakeFiles/api_key_manager.dir/main.cc.o: CXX_COMPILER__api_key_manager_unscanned_Release /home/curryman/Websites/APIKeyManager/frontend/linux/runner/main.cc || cmake_object_order_depends_target_api_key_manager
   DEFINES = -DAPPLICATION_ID=\"com.example.api_key_manager\" -DNDEBUG
   DEP_FILE = runner/CMakeFiles/api_key_manager.dir/main.cc.o.d
   FLAGS = -O3 -DNDEBUG -Wall -Werror -O3 -pthread
-  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/include -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/screen_retriever/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux/include -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
   OBJECT_DIR = runner/CMakeFiles/api_key_manager.dir
   OBJECT_FILE_DIR = runner/CMakeFiles/api_key_manager.dir
   TARGET_COMPILE_PDB = runner/CMakeFiles/api_key_manager.dir/
@@ -224,7 +224,7 @@ build runner/CMakeFiles/api_key_manager.dir/my_application.cc.o: CXX_COMPILER__a
   DEFINES = -DAPPLICATION_ID=\"com.example.api_key_manager\" -DNDEBUG
   DEP_FILE = runner/CMakeFiles/api_key_manager.dir/my_application.cc.o.d
   FLAGS = -O3 -DNDEBUG -Wall -Werror -O3 -pthread
-  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/include -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/screen_retriever/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux/include -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
   OBJECT_DIR = runner/CMakeFiles/api_key_manager.dir
   OBJECT_FILE_DIR = runner/CMakeFiles/api_key_manager.dir
   TARGET_COMPILE_PDB = runner/CMakeFiles/api_key_manager.dir/
@@ -234,7 +234,7 @@ build runner/CMakeFiles/api_key_manager.dir/__/flutter/generated_plugin_registra
   DEFINES = -DAPPLICATION_ID=\"com.example.api_key_manager\" -DNDEBUG
   DEP_FILE = runner/CMakeFiles/api_key_manager.dir/__/flutter/generated_plugin_registrant.cc.o.d
   FLAGS = -O3 -DNDEBUG -Wall -Werror -O3 -pthread
-  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/include -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/screen_retriever/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/include -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux/include -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
   OBJECT_DIR = runner/CMakeFiles/api_key_manager.dir
   OBJECT_FILE_DIR = runner/CMakeFiles/api_key_manager.dir/__/flutter
   TARGET_COMPILE_PDB = runner/CMakeFiles/api_key_manager.dir/
@@ -248,11 +248,12 @@ build runner/CMakeFiles/api_key_manager.dir/__/flutter/generated_plugin_registra
 #############################################
 # Link the executable intermediates_do_not_run/api_key_manager
 
-build intermediates_do_not_run/api_key_manager: CXX_EXECUTABLE_LINKER__api_key_manager_Release runner/CMakeFiles/api_key_manager.dir/main.cc.o runner/CMakeFiles/api_key_manager.dir/my_application.cc.o runner/CMakeFiles/api_key_manager.dir/__/flutter/generated_plugin_registrant.cc.o | plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so /usr/lib/x86_64-linux-gnu/libgtk-3.so /usr/lib/x86_64-linux-gnu/libgdk-3.so /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so /usr/lib/x86_64-linux-gnu/libpango-1.0.so /usr/lib/x86_64-linux-gnu/libharfbuzz.so /usr/lib/x86_64-linux-gnu/libatk-1.0.so /usr/lib/x86_64-linux-gnu/libcairo-gobject.so /usr/lib/x86_64-linux-gnu/libcairo.so /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so /usr/lib/x86_64-linux-gnu/libgio-2.0.so /usr/lib/x86_64-linux-gnu/libgobject-2.0.so /usr/lib/x86_64-linux-gnu/libglib-2.0.so || flutter/flutter_assemble plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so
+build intermediates_do_not_run/api_key_manager: CXX_EXECUTABLE_LINKER__api_key_manager_Release runner/CMakeFiles/api_key_manager.dir/main.cc.o runner/CMakeFiles/api_key_manager.dir/my_application.cc.o runner/CMakeFiles/api_key_manager.dir/__/flutter/generated_plugin_registrant.cc.o | plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so plugins/screen_retriever/libscreen_retriever_plugin.so plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so plugins/window_manager/libwindow_manager_plugin.so /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so /usr/lib/x86_64-linux-gnu/libgtk-3.so /usr/lib/x86_64-linux-gnu/libgdk-3.so /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so /usr/lib/x86_64-linux-gnu/libpango-1.0.so /usr/lib/x86_64-linux-gnu/libharfbuzz.so /usr/lib/x86_64-linux-gnu/libatk-1.0.so /usr/lib/x86_64-linux-gnu/libcairo-gobject.so /usr/lib/x86_64-linux-gnu/libcairo.so /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so /usr/lib/x86_64-linux-gnu/libgio-2.0.so /usr/lib/x86_64-linux-gnu/libgobject-2.0.so /usr/lib/x86_64-linux-gnu/libglib-2.0.so || flutter/flutter_assemble plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so plugins/screen_retriever/libscreen_retriever_plugin.so plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so plugins/window_manager/libwindow_manager_plugin.so
   DEP_FILE = runner/CMakeFiles/api_key_manager.dir/link.d
   FLAGS = -O3 -DNDEBUG
   LINK_FLAGS = -Xlinker --dependency-file=runner/CMakeFiles/api_key_manager.dir/link.d
-  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux:/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs:/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral:  plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so  plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so  /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux:/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever:/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs:/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager:/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral:  plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so  plugins/screen_retriever/libscreen_retriever_plugin.so  plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so  plugins/window_manager/libwindow_manager_plugin.so  -lflutter_linux_gtk  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_PATH = -L/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral
   OBJECT_DIR = runner/CMakeFiles/api_key_manager.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -361,7 +362,8 @@ build plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugi
   DEP_FILE = plugins/flutter_secure_storage_linux/CMakeFiles/flutter_secure_storage_linux_plugin.dir/link.d
   LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG
   LINK_FLAGS = -Xlinker --dependency-file=plugins/flutter_secure_storage_linux/CMakeFiles/flutter_secure_storage_linux_plugin.dir/link.d
-  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral  /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libsecret-1.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral  -lflutter_linux_gtk  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libsecret-1.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_PATH = -L/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral
   OBJECT_DIR = plugins/flutter_secure_storage_linux/CMakeFiles/flutter_secure_storage_linux_plugin.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -442,6 +444,118 @@ build plugins/flutter_secure_storage_linux/install/strip: phony plugins/flutter_
 # =============================================================================
 
 # =============================================================================
+# Object build statements for SHARED_LIBRARY target screen_retriever_plugin
+
+
+#############################################
+# Order-only phony target for screen_retriever_plugin
+
+build cmake_object_order_depends_target_screen_retriever_plugin: phony || flutter/flutter_assemble
+
+build plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir/screen_retriever_plugin.cc.o: CXX_COMPILER__screen_retriever_plugin_unscanned_Release /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/screen_retriever/linux/screen_retriever_plugin.cc || cmake_object_order_depends_target_screen_retriever_plugin
+  DEFINES = -DFLUTTER_PLUGIN_IMPL -DNDEBUG -Dscreen_retriever_plugin_EXPORTS
+  DEP_FILE = plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir/screen_retriever_plugin.cc.o.d
+  FLAGS = -O3 -DNDEBUG -fPIC -fvisibility=hidden -Wall -Werror -O3 -pthread
+  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  OBJECT_DIR = plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir
+  OBJECT_FILE_DIR = plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir
+  TARGET_COMPILE_PDB = plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir/
+  TARGET_PDB = plugins/screen_retriever/libscreen_retriever_plugin.pdb
+
+
+# =============================================================================
+# Link build statements for SHARED_LIBRARY target screen_retriever_plugin
+
+
+#############################################
+# Link the shared library plugins/screen_retriever/libscreen_retriever_plugin.so
+
+build plugins/screen_retriever/libscreen_retriever_plugin.so: CXX_SHARED_LIBRARY_LINKER__screen_retriever_plugin_Release plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir/screen_retriever_plugin.cc.o | /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so /usr/lib/x86_64-linux-gnu/libgtk-3.so /usr/lib/x86_64-linux-gnu/libgdk-3.so /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so /usr/lib/x86_64-linux-gnu/libpango-1.0.so /usr/lib/x86_64-linux-gnu/libharfbuzz.so /usr/lib/x86_64-linux-gnu/libatk-1.0.so /usr/lib/x86_64-linux-gnu/libcairo-gobject.so /usr/lib/x86_64-linux-gnu/libcairo.so /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so /usr/lib/x86_64-linux-gnu/libgio-2.0.so /usr/lib/x86_64-linux-gnu/libgobject-2.0.so /usr/lib/x86_64-linux-gnu/libglib-2.0.so || flutter/flutter_assemble
+  DEP_FILE = plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir/link.d
+  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG
+  LINK_FLAGS = -Xlinker --dependency-file=plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir/link.d
+  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral  -lflutter_linux_gtk  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_PATH = -L/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral
+  OBJECT_DIR = plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  SONAME = libscreen_retriever_plugin.so
+  SONAME_FLAG = -Wl,-soname,
+  TARGET_COMPILE_PDB = plugins/screen_retriever/CMakeFiles/screen_retriever_plugin.dir/
+  TARGET_FILE = plugins/screen_retriever/libscreen_retriever_plugin.so
+  TARGET_PDB = plugins/screen_retriever/libscreen_retriever_plugin.pdb
+
+
+#############################################
+# Utility command for edit_cache
+
+build plugins/screen_retriever/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build plugins/screen_retriever/edit_cache: phony plugins/screen_retriever/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build plugins/screen_retriever/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever && /usr/bin/cmake --regenerate-during-build -S/home/curryman/Websites/APIKeyManager/frontend/linux -B/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build plugins/screen_retriever/rebuild_cache: phony plugins/screen_retriever/CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build plugins/screen_retriever/list_install_components: phony
+
+
+#############################################
+# Utility command for install
+
+build plugins/screen_retriever/CMakeFiles/install.util: CUSTOM_COMMAND plugins/screen_retriever/all
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever && /usr/bin/cmake -P cmake_install.cmake
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build plugins/screen_retriever/install: phony plugins/screen_retriever/CMakeFiles/install.util
+
+
+#############################################
+# Utility command for install/local
+
+build plugins/screen_retriever/CMakeFiles/install/local.util: CUSTOM_COMMAND plugins/screen_retriever/all
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build plugins/screen_retriever/install/local: phony plugins/screen_retriever/CMakeFiles/install/local.util
+
+
+#############################################
+# Utility command for install/strip
+
+build plugins/screen_retriever/CMakeFiles/install/strip.util: CUSTOM_COMMAND plugins/screen_retriever/all
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+  DESC = Installing the project stripped...
+  pool = console
+  restat = 1
+
+build plugins/screen_retriever/install/strip: phony plugins/screen_retriever/CMakeFiles/install/strip.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/generated_plugins.cmake
+# =============================================================================
+
+# =============================================================================
 # Object build statements for SHARED_LIBRARY target sqlite3_flutter_libs_plugin
 
 
@@ -482,7 +596,8 @@ build plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so: CXX_SHARED
   DEP_FILE = plugins/sqlite3_flutter_libs/CMakeFiles/sqlite3_flutter_libs_plugin.dir/link.d
   LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG
   LINK_FLAGS = -Xlinker --dependency-file=plugins/sqlite3_flutter_libs/CMakeFiles/sqlite3_flutter_libs_plugin.dir/link.d
-  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral  /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral  -lflutter_linux_gtk  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_PATH = -L/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral
   OBJECT_DIR = plugins/sqlite3_flutter_libs/CMakeFiles/sqlite3_flutter_libs_plugin.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -558,6 +673,118 @@ build plugins/sqlite3_flutter_libs/CMakeFiles/install/strip.util: CUSTOM_COMMAND
 build plugins/sqlite3_flutter_libs/install/strip: phony plugins/sqlite3_flutter_libs/CMakeFiles/install/strip.util
 
 # =============================================================================
+# Write statements declared in CMakeLists.txt:
+# /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/generated_plugins.cmake
+# =============================================================================
+
+# =============================================================================
+# Object build statements for SHARED_LIBRARY target window_manager_plugin
+
+
+#############################################
+# Order-only phony target for window_manager_plugin
+
+build cmake_object_order_depends_target_window_manager_plugin: phony || flutter/flutter_assemble
+
+build plugins/window_manager/CMakeFiles/window_manager_plugin.dir/window_manager_plugin.cc.o: CXX_COMPILER__window_manager_plugin_unscanned_Release /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux/window_manager_plugin.cc || cmake_object_order_depends_target_window_manager_plugin
+  DEFINES = -DFLUTTER_PLUGIN_IMPL -DNDEBUG -Dwindow_manager_plugin_EXPORTS
+  DEP_FILE = plugins/window_manager/CMakeFiles/window_manager_plugin.dir/window_manager_plugin.cc.o.d
+  FLAGS = -O3 -DNDEBUG -fPIC -fvisibility=hidden -Wall -Werror -O3 -pthread
+  INCLUDES = -I/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral -isystem /usr/include/gtk-3.0 -isystem /usr/include/pango-1.0 -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/harfbuzz -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/libmount -isystem /usr/include/blkid -isystem /usr/include/fribidi -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/gdk-pixbuf-2.0 -isystem /usr/include/webp -isystem /usr/include/gio-unix-2.0 -isystem /usr/include/cloudproviders -isystem /usr/include/atk-1.0 -isystem /usr/include/at-spi2-atk/2.0 -isystem /usr/include/at-spi-2.0 -isystem /usr/include/dbus-1.0 -isystem /usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  OBJECT_DIR = plugins/window_manager/CMakeFiles/window_manager_plugin.dir
+  OBJECT_FILE_DIR = plugins/window_manager/CMakeFiles/window_manager_plugin.dir
+  TARGET_COMPILE_PDB = plugins/window_manager/CMakeFiles/window_manager_plugin.dir/
+  TARGET_PDB = plugins/window_manager/libwindow_manager_plugin.pdb
+
+
+# =============================================================================
+# Link build statements for SHARED_LIBRARY target window_manager_plugin
+
+
+#############################################
+# Link the shared library plugins/window_manager/libwindow_manager_plugin.so
+
+build plugins/window_manager/libwindow_manager_plugin.so: CXX_SHARED_LIBRARY_LINKER__window_manager_plugin_Release plugins/window_manager/CMakeFiles/window_manager_plugin.dir/window_manager_plugin.cc.o | /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so /usr/lib/x86_64-linux-gnu/libgtk-3.so /usr/lib/x86_64-linux-gnu/libgdk-3.so /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so /usr/lib/x86_64-linux-gnu/libpango-1.0.so /usr/lib/x86_64-linux-gnu/libharfbuzz.so /usr/lib/x86_64-linux-gnu/libatk-1.0.so /usr/lib/x86_64-linux-gnu/libcairo-gobject.so /usr/lib/x86_64-linux-gnu/libcairo.so /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so /usr/lib/x86_64-linux-gnu/libgio-2.0.so /usr/lib/x86_64-linux-gnu/libgobject-2.0.so /usr/lib/x86_64-linux-gnu/libglib-2.0.so || flutter/flutter_assemble
+  DEP_FILE = plugins/window_manager/CMakeFiles/window_manager_plugin.dir/link.d
+  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG
+  LINK_FLAGS = -Xlinker --dependency-file=plugins/window_manager/CMakeFiles/window_manager_plugin.dir/link.d
+  LINK_LIBRARIES = -Wl,-rpath,/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral  -lflutter_linux_gtk  /usr/lib/x86_64-linux-gnu/libgtk-3.so  /usr/lib/x86_64-linux-gnu/libgdk-3.so  /usr/lib/x86_64-linux-gnu/libz.so  /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so  /usr/lib/x86_64-linux-gnu/libpango-1.0.so  /usr/lib/x86_64-linux-gnu/libharfbuzz.so  /usr/lib/x86_64-linux-gnu/libatk-1.0.so  /usr/lib/x86_64-linux-gnu/libcairo-gobject.so  /usr/lib/x86_64-linux-gnu/libcairo.so  /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so  /usr/lib/x86_64-linux-gnu/libgio-2.0.so  /usr/lib/x86_64-linux-gnu/libgobject-2.0.so  /usr/lib/x86_64-linux-gnu/libglib-2.0.so
+  LINK_PATH = -L/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral
+  OBJECT_DIR = plugins/window_manager/CMakeFiles/window_manager_plugin.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  SONAME = libwindow_manager_plugin.so
+  SONAME_FLAG = -Wl,-soname,
+  TARGET_COMPILE_PDB = plugins/window_manager/CMakeFiles/window_manager_plugin.dir/
+  TARGET_FILE = plugins/window_manager/libwindow_manager_plugin.so
+  TARGET_PDB = plugins/window_manager/libwindow_manager_plugin.pdb
+
+
+#############################################
+# Utility command for edit_cache
+
+build plugins/window_manager/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build plugins/window_manager/edit_cache: phony plugins/window_manager/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build plugins/window_manager/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager && /usr/bin/cmake --regenerate-during-build -S/home/curryman/Websites/APIKeyManager/frontend/linux -B/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build plugins/window_manager/rebuild_cache: phony plugins/window_manager/CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build plugins/window_manager/list_install_components: phony
+
+
+#############################################
+# Utility command for install
+
+build plugins/window_manager/CMakeFiles/install.util: CUSTOM_COMMAND plugins/window_manager/all
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager && /usr/bin/cmake -P cmake_install.cmake
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build plugins/window_manager/install: phony plugins/window_manager/CMakeFiles/install.util
+
+
+#############################################
+# Utility command for install/local
+
+build plugins/window_manager/CMakeFiles/install/local.util: CUSTOM_COMMAND plugins/window_manager/all
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build plugins/window_manager/install/local: phony plugins/window_manager/CMakeFiles/install/local.util
+
+
+#############################################
+# Utility command for install/strip
+
+build plugins/window_manager/CMakeFiles/install/strip.util: CUSTOM_COMMAND plugins/window_manager/all
+  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+  DESC = Installing the project stripped...
+  pool = console
+  restat = 1
+
+build plugins/window_manager/install/strip: phony plugins/window_manager/CMakeFiles/install/strip.util
+
+# =============================================================================
 # Target aliases.
 
 build api_key_manager: phony intermediates_do_not_run/api_key_manager
@@ -568,9 +795,17 @@ build flutter_secure_storage_linux_plugin: phony plugins/flutter_secure_storage_
 
 build libflutter_secure_storage_linux_plugin.so: phony plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so
 
+build libscreen_retriever_plugin.so: phony plugins/screen_retriever/libscreen_retriever_plugin.so
+
 build libsqlite3_flutter_libs_plugin.so: phony plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so
 
+build libwindow_manager_plugin.so: phony plugins/window_manager/libwindow_manager_plugin.so
+
+build screen_retriever_plugin: phony plugins/screen_retriever/libscreen_retriever_plugin.so
+
 build sqlite3_flutter_libs_plugin: phony plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so
+
+build window_manager_plugin: phony plugins/window_manager/libwindow_manager_plugin.so
 
 # =============================================================================
 # Folder targets.
@@ -580,7 +815,7 @@ build sqlite3_flutter_libs_plugin: phony plugins/sqlite3_flutter_libs/libsqlite3
 #############################################
 # Folder: /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release
 
-build all: phony flutter/all runner/all plugins/flutter_secure_storage_linux/all plugins/sqlite3_flutter_libs/all
+build all: phony flutter/all runner/all plugins/flutter_secure_storage_linux/all plugins/screen_retriever/all plugins/sqlite3_flutter_libs/all plugins/window_manager/all
 
 # =============================================================================
 
@@ -599,9 +834,23 @@ build plugins/flutter_secure_storage_linux/all: phony plugins/flutter_secure_sto
 # =============================================================================
 
 #############################################
+# Folder: /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever
+
+build plugins/screen_retriever/all: phony plugins/screen_retriever/libscreen_retriever_plugin.so
+
+# =============================================================================
+
+#############################################
 # Folder: /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs
 
 build plugins/sqlite3_flutter_libs/all: phony plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so
+
+# =============================================================================
+
+#############################################
+# Folder: /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager
+
+build plugins/window_manager/all: phony plugins/window_manager/libwindow_manager_plugin.so
 
 # =============================================================================
 
@@ -617,14 +866,14 @@ build runner/all: phony intermediates_do_not_run/api_key_manager
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/curryman/Websites/APIKeyManager/frontend/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/generated_config.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/generated_plugins.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/runner/CMakeLists.txt /usr/share/cmake-3.31/Modules/CMakeCCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCCompilerABI.c /usr/share/cmake-3.31/Modules/CMakeCInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake-3.31/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.31/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerSupport.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineSystem.cmake /usr/share/cmake-3.31/Modules/CMakeFindBinUtils.cmake /usr/share/cmake-3.31/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.31/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.31/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.31/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake-3.31/Modules/CMakeSystem.cmake.in /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.31/Modules/CMakeTestCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake-3.31/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-C.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX-CXXImportStd.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-FindBinUtils.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CrayClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OrangeC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TIClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/ExternalProject/shared_internal_commands.cmake /usr/share/cmake-3.31/Modules/FetchContent.cmake /usr/share/cmake-3.31/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.31/Modules/FindPackageMessage.cmake /usr/share/cmake-3.31/Modules/FindPkgConfig.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCXXLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCommonLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeDetermineLinkerId.cmake /usr/share/cmake-3.31/Modules/Internal/FeatureTesting.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-C.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.31/Modules/Platform/Linux.cmake /usr/share/cmake-3.31/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.31.6/CMakeCCompiler.cmake CMakeFiles/3.31.6/CMakeCXXCompiler.cmake CMakeFiles/3.31.6/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /home/curryman/Websites/APIKeyManager/frontend/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/screen_retriever/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/generated_config.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/generated_plugins.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/runner/CMakeLists.txt /usr/share/cmake-3.31/Modules/CMakeCCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCCompilerABI.c /usr/share/cmake-3.31/Modules/CMakeCInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake-3.31/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.31/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerSupport.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineSystem.cmake /usr/share/cmake-3.31/Modules/CMakeFindBinUtils.cmake /usr/share/cmake-3.31/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.31/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.31/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.31/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake-3.31/Modules/CMakeSystem.cmake.in /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.31/Modules/CMakeTestCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake-3.31/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-C.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX-CXXImportStd.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-FindBinUtils.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CrayClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OrangeC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TIClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/ExternalProject/shared_internal_commands.cmake /usr/share/cmake-3.31/Modules/FetchContent.cmake /usr/share/cmake-3.31/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.31/Modules/FindPackageMessage.cmake /usr/share/cmake-3.31/Modules/FindPkgConfig.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCXXLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCommonLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeDetermineLinkerId.cmake /usr/share/cmake-3.31/Modules/Internal/FeatureTesting.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-C.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.31/Modules/Platform/Linux.cmake /usr/share/cmake-3.31/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.31.6/CMakeCCompiler.cmake CMakeFiles/3.31.6/CMakeCXXCompiler.cmake CMakeFiles/3.31.6/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/curryman/Websites/APIKeyManager/frontend/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/generated_config.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/generated_plugins.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/runner/CMakeLists.txt /usr/share/cmake-3.31/Modules/CMakeCCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCCompilerABI.c /usr/share/cmake-3.31/Modules/CMakeCInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake-3.31/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.31/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerSupport.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineSystem.cmake /usr/share/cmake-3.31/Modules/CMakeFindBinUtils.cmake /usr/share/cmake-3.31/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.31/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.31/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.31/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake-3.31/Modules/CMakeSystem.cmake.in /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.31/Modules/CMakeTestCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake-3.31/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-C.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX-CXXImportStd.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-FindBinUtils.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CrayClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OrangeC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TIClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/ExternalProject/shared_internal_commands.cmake /usr/share/cmake-3.31/Modules/FetchContent.cmake /usr/share/cmake-3.31/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.31/Modules/FindPackageMessage.cmake /usr/share/cmake-3.31/Modules/FindPkgConfig.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCXXLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCommonLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeDetermineLinkerId.cmake /usr/share/cmake-3.31/Modules/Internal/FeatureTesting.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-C.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.31/Modules/Platform/Linux.cmake /usr/share/cmake-3.31/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.31.6/CMakeCCompiler.cmake CMakeFiles/3.31.6/CMakeCXXCompiler.cmake CMakeFiles/3.31.6/CMakeSystem.cmake: phony
+build /home/curryman/Websites/APIKeyManager/frontend/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/flutter_secure_storage_linux/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/screen_retriever/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/sqlite3_flutter_libs/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux/CMakeLists.txt /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/generated_config.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/generated_plugins.cmake /home/curryman/Websites/APIKeyManager/frontend/linux/runner/CMakeLists.txt /usr/share/cmake-3.31/Modules/CMakeCCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCCompilerABI.c /usr/share/cmake-3.31/Modules/CMakeCInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake-3.31/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake-3.31/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.31/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.31/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineCompilerSupport.cmake /usr/share/cmake-3.31/Modules/CMakeDetermineSystem.cmake /usr/share/cmake-3.31/Modules/CMakeFindBinUtils.cmake /usr/share/cmake-3.31/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.31/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.31/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.31/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake-3.31/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake-3.31/Modules/CMakeSystem.cmake.in /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.31/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.31/Modules/CMakeTestCCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake-3.31/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake-3.31/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-C.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX-CXXImportStd.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang-FindBinUtils.cmake /usr/share/cmake-3.31/Modules/Compiler/Clang.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/CrayClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/GNU.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/OrangeC-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TIClang-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake-3.31/Modules/ExternalProject/shared_internal_commands.cmake /usr/share/cmake-3.31/Modules/FetchContent.cmake /usr/share/cmake-3.31/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.31/Modules/FindPackageMessage.cmake /usr/share/cmake-3.31/Modules/FindPkgConfig.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCXXLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeCommonLinkerInformation.cmake /usr/share/cmake-3.31/Modules/Internal/CMakeDetermineLinkerId.cmake /usr/share/cmake-3.31/Modules/Internal/FeatureTesting.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-C.cmake /usr/share/cmake-3.31/Modules/Linker/GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linker/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.31/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.31/Modules/Platform/Linux.cmake /usr/share/cmake-3.31/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.31.6/CMakeCCompiler.cmake CMakeFiles/3.31.6/CMakeCXXCompiler.cmake CMakeFiles/3.31.6/CMakeSystem.cmake: phony
 
 
 #############################################
