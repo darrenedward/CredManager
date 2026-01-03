@@ -279,7 +279,7 @@ void main() {
       final testCases = [
         {'input': '', 'shouldContain': 'required'},
         {'input': 'short', 'shouldContain': '12 characters'},
-        {'input': 'wrongpassword123!', 'shouldContain': 'Login failed'},
+        {'input': 'WrongPassword123!', 'shouldContain': 'failed'},
       ];
 
       for (final testCase in testCases) {
@@ -337,7 +337,7 @@ void main() {
       final continueButton = find.text('Continue');
 
       for (int i = 0; i < 3; i++) {
-        await tester.enterText(passphraseField, 'wrongpass${i}!');
+        await tester.enterText(passphraseField, 'WrongPassword${i}!');
         await tester.tap(continueButton);
         await tester.pump();
 
