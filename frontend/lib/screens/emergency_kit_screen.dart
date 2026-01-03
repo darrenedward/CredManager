@@ -116,12 +116,9 @@ class _EmergencyKitScreenState extends State<EmergencyKitScreen> {
     });
 
     try {
-      final authState = Provider.of<AuthState>(context, listen: false);
-      final username = authState.user?.username;
-
       final path = await _pdfService.saveEmergencyKitPdf(
         backupCode: _generatedBackupCode!,
-        username: username,
+        username: null,
       );
 
       setState(() {
@@ -175,12 +172,9 @@ class _EmergencyKitScreenState extends State<EmergencyKitScreen> {
     });
 
     try {
-      final authState = Provider.of<AuthState>(context, listen: false);
-      final username = authState.user?.username;
-
       await _pdfService.printEmergencyKitPdf(
         backupCode: _generatedBackupCode!,
-        username: username,
+        username: null,
       );
 
       setState(() {
@@ -344,7 +338,7 @@ class _EmergencyKitScreenState extends State<EmergencyKitScreen> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: Colors.amber900,
+                                  color: Colors.orange.shade900,
                                 ),
                               ),
                               SizedBox(height: 4),

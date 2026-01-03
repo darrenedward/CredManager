@@ -1061,7 +1061,7 @@ class _SetupScreenState extends State<SetupScreen> {
                   children: [
                     Icon(Icons.check_circle, color: Colors.green[700], size: 24),
                     const SizedBox(width: 10),
-                    const Text(
+                    Text(
                       'Emergency Kit Generated!',
                       style: TextStyle(
                         fontSize: 16,

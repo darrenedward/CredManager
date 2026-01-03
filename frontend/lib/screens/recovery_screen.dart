@@ -422,7 +422,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with SingleTickerProvid
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Icon(Icons.verify),
+                  : const Icon(Icons.verified_user),
               label: const Text('Verify Backup Code'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
