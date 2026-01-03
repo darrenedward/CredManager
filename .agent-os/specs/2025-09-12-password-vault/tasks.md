@@ -109,16 +109,16 @@
 - [x] ST050: Implement _showDeletePasswordEntryDialog ✅ *COMPLETED*
 
 ### PT009: UI - Password Generator Integration
-**Status:** [ ] PENDING ⚠️
+**Status:** [x] COMPLETE ✅
 **Effort:** S (1-2 days)
 **Description:** Integrate password generator into entry creation/editing UI
 
 **Subtasks:**
-- [ ] ST051: Add "Generate Password" button to _AddPasswordEntryDialog
-- [ ] ST052: Create password generator options bottom sheet
-- [ ] ST053: Show password strength indicator when generating
-- [ ] ST054: Copy generated password to clipboard with feedback
-- [ ] ST055: Integrate password generator into edit mode
+- [x] ST051: Add "Generate Password" button to _AddPasswordEntryDialog ✅ *COMPLETED*
+- [x] ST052: Create password generator options bottom sheet ✅ *COMPLETED*
+- [x] ST053: Show password strength indicator when generating ✅ *COMPLETED*
+- [x] ST054: Copy generated password to clipboard with feedback ✅ *COMPLETED*
+- [x] ST055: Integrate password generator into edit mode ✅ *COMPLETED*
 
 ### PT010: Testing and Validation
 **Status:** [ ] PENDING ⚠️
@@ -160,12 +160,26 @@
 ## Summary
 
 **Total Parent Tasks**: 10
-**Completed Parent Tasks**: 8 (80%)
-**Pending Parent Tasks**: 2 (PT009: UI Generator Integration, PT010: Testing)
+**Completed Parent Tasks**: 9 (90%)
+**Pending Parent Tasks**: 1 (PT010: Testing)
 
 **Key Remaining Work**:
-1. **Password Generator UI Integration** - Add generator button/options to entry dialogs
-2. **Testing** - Comprehensive test suite for all password vault functionality
+1. **Testing** - Comprehensive test suite for all password vault functionality
+
+**Completed Features**:
+- ✅ Password Vault CRUD operations
+- ✅ Password Entry CRUD with encryption
+- ✅ Password Generator with configurable options
+- ✅ Password Strength Analysis (0-100 score)
+- ✅ Full UI for vault and entry management
+- ✅ Password Generator Integration in create mode
+- ✅ **NEW**: Password Regenerate in edit/view mode
 
 **Bug Fixed**:
 - PasswordVault.fromMap() now accepts entries parameter (was causing entries to not load)
+
+**Recent Additions**:
+- Added "Regenerate Password" button in PasswordEntryDetailsSheet
+- Full dialog with generator options for password regeneration
+- Copy to clipboard functionality with haptic feedback
+- Real-time password strength display in regeneration dialog

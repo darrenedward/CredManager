@@ -4263,6 +4263,214 @@ class _PasswordEntryDetailsSheetState extends State<_PasswordEntryDetailsSheet> 
     }
   }
 
+  Future<void> _showRegeneratePasswordDialog(BuildContext context) async {
+    int passwordLength = 16;
+    bool includeUppercase = true;
+    bool includeLowercase = true;
+    bool includeNumbers = true;
+    bool includeSymbols = true;
+    String? generatedPassword;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Regenerate Password'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AdaptiveText(
+                  'Generate a new secure password for ${widget.entry.name}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    AdaptiveText('Length: $passwordLength'),
+                    Expanded(
+                      child: Slider(
+                        value: passwordLength.toDouble(),
+                        min: 8,
+                        max: 32,
+                        divisions: 24,
+                        label: passwordLength.toString(),
+                        onChanged: (value) {
+                          setDialogState(() {
+                            passwordLength = value.toInt();
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                CheckboxListTile(
+                  title: const AdaptiveText('Uppercase (A-Z)'),
+                  value: includeUppercase,
+                  onChanged: (value) => setDialogState(() => includeUppercase = value ?? false),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: const AdaptiveText('Lowercase (a-z)'),
+                  value: includeLowercase,
+                  onChanged: (value) => setDialogState(() => includeLowercase = value ?? false),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: const AdaptiveText('Numbers (0-9)'),
+                  value: includeNumbers,
+                  onChanged: (value) => setDialogState(() => includeNumbers = value ?? false),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: const AdaptiveText('Symbols (!@#\$%)'),
+                  value: includeSymbols,
+                  onChanged: (value) => setDialogState(() => includeSymbols = value ?? false),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                if (generatedPassword != null) ...[
+                  const SizedBox(height: 16),
+                  Builder(
+                    builder: (context) {
+                      final strengthScore = widget.passwordGenerator.calculateStrength(generatedPassword!);
+                      final strengthLabel = widget.passwordGenerator.getStrengthLabel(strengthScore);
+                      final strengthColorHex = widget.passwordGenerator.getStrengthColor(strengthScore);
+                      final strengthColor = Color(int.parse(strengthColorHex.replaceFirst('#', '0xFF')));
+
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppConstants.primaryColor),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AdaptiveText(
+                              'Generated Password:',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: AdaptiveText(
+                                    generatedPassword!,
+                                    style: const TextStyle(
+                                      fontFamily: 'monospace',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.content_copy),
+                                  onPressed: () async {
+                                    await Clipboard.setData(ClipboardData(text: generatedPassword!));
+                                    if (dialogContext.mounted) {
+                                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Password copied to clipboard'),
+                                          duration: Duration(seconds: 1),
+                                        ),
+                                      );
+                                    }
+                                    ResponsiveService.triggerLightHaptic();
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AdaptiveText(
+                                  'Strength: $strengthLabel',
+                                  style: TextStyle(
+                                    color: strengthColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                AdaptiveText(
+                                  '$strengthScore/100',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            LinearProgressIndicator(
+                              value: strengthScore / 100,
+                              backgroundColor: Colors.grey[300],
+                              valueColor: AlwaysStoppedAnimation<Color>(strengthColor),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                final newPassword = widget.passwordGenerator.generatePassword(
+                  length: passwordLength,
+                  includeUppercase: includeUppercase,
+                  includeLowercase: includeLowercase,
+                  includeNumbers: includeNumbers,
+                  includeSymbols: includeSymbols,
+                );
+                setDialogState(() {
+                  generatedPassword = newPassword;
+                });
+                ResponsiveService.triggerLightHaptic();
+              },
+              icon: const Icon(Icons.autorenew),
+              label: const AdaptiveText('Generate'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppConstants.primaryColor,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            if (generatedPassword != null)
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(dialogContext);
+                  // Update the password entry
+                  final updatedEntry = widget.entry.copyWith(
+                    value: generatedPassword,
+                    updatedAt: DateTime.now(),
+                  );
+                  await widget.dashboardState.updatePasswordEntry(updatedEntry);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Password updated successfully')),
+                    );
+                    Navigator.pop(context); // Close the details sheet
+                  }
+                },
+                child: const Text('Save Password'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final entry = widget.entry;
@@ -4358,6 +4566,11 @@ class _PasswordEntryDetailsSheetState extends State<_PasswordEntryDetailsSheet> 
                             IconButton(
                               icon: const Icon(Icons.content_copy),
                               onPressed: () => _copyToClipboard(entry.value, 'Password'),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.autorenew),
+                              tooltip: 'Regenerate Password',
+                              onPressed: () => _showRegeneratePasswordDialog(context),
                             ),
                           ],
                         ),
