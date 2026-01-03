@@ -40,7 +40,7 @@ void main() {
       // Set passphrase for database access
       await DatabaseService.setPassphrase(testPassphrase);
 
-      // Create test user
+      // Create test user (this also logs them in with JWT)
       await authService.createPassphrase(
         testPassphrase,
         [
@@ -49,6 +49,17 @@ void main() {
           {'question': 'What city were you born in?', 'answer': 'Paris'},
         ],
       );
+    });
+
+    tearDown(() async {
+      // Close database connection after each test to ensure clean state
+      try {
+        await databaseService.close();
+      } catch (e) {
+        // Ignore if already closed
+      }
+      // Reset passphrase for next test
+      await DatabaseService.setPassphrase(testPassphrase);
     });
 
     /// Helper function to build the app
@@ -74,21 +85,13 @@ void main() {
       );
     }
 
-    /// Helper function to login
+    /// Helper function to login (user is already created, just verify session)
     Future<void> login(WidgetTester tester) async {
-      // Find passphrase field and enter test passphrase
-      final passphraseField = find.byType(TextField);
-      expect(passphraseField, findsOneWidget);
-
-      await tester.enterText(passphraseField, testPassphrase);
+      // Since setUp() creates the user and logs them in, the app should
+      // go directly to dashboard when pumped
       await tester.pumpAndSettle();
 
-      // Tap continue/login button
-      final continueButton = find.text('Continue');
-      await tester.tap(continueButton);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
-
-      // Verify dashboard is visible
+      // Verify dashboard is visible (user should be auto-logged in)
       expect(find.text('Dashboard'), findsOneWidget);
     }
 
@@ -110,14 +113,9 @@ void main() {
       await tester.pumpWidget(buildTestApp());
       await tester.pumpAndSettle();
 
-      // Verify login screen
-      expect(find.text('Welcome back'), findsOneWidget);
-
-      // Login
+      // Verify dashboard loaded (user auto-logged in from setUp)
       await login(tester);
 
-      // Verify dashboard loaded
-      expect(find.text('Dashboard'), findsOneWidget);
       expect(find.text('Quick Actions'), findsOneWidget);
 
       // Navigate to Password Vault
