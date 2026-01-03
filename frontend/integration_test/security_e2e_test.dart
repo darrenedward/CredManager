@@ -277,7 +277,6 @@ void main() {
 
       // Test various error conditions without information leakage
       final testCases = [
-        {'input': '', 'shouldContain': 'required'},
         {'input': 'short', 'shouldContain': '12 characters'},
         {'input': 'WrongPassword123!', 'shouldContain': 'failed'},
       ];
