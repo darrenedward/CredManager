@@ -7,23 +7,30 @@ import 'encryption_service.dart';
 class CredentialStorageService {
   final DatabaseService _db = DatabaseService.instance;
   final EncryptionService _encryption = EncryptionService();
-  
+
   String? _currentPassphrase;
-  
+
+  /// Callback for security failures (e.g., passphrase not set)
+  /// Should be set to trigger logout
+  VoidCallback? onSecurityFailure;
+
   /// Sets the current user's passphrase for encryption/decryption
   void setPassphrase(String passphrase) {
     _currentPassphrase = passphrase;
   }
-  
+
   /// Clears the current passphrase and encryption cache
   void clearPassphrase() {
     _currentPassphrase = null;
     _encryption.clearKeyCache();
   }
-  
+
   /// Validates that a passphrase is set
+  /// Triggers onSecurityFailure callback if passphrase is not set
   void _validatePassphrase() {
     if (_currentPassphrase == null) {
+      // Trigger security failure callback instead of throwing
+      onSecurityFailure?.call();
       throw StateError('Passphrase not set. Call setPassphrase() first.');
     }
   }

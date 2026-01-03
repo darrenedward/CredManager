@@ -51,6 +51,12 @@ class AuthState extends ChangeNotifier {
   final CredentialStorageService _credentialStorage = CredentialStorageService();
 
   AuthState() {
+    // Set up security failure callback to trigger logout when passphrase not set
+    _credentialStorage.onSecurityFailure = () {
+      print('DEBUG: Security failure detected - logging out');
+      logout();
+    };
+
     _startInactivityMonitoring();
     // Don't call _loadAuthState here - let AuthWrapper handle it
   }
