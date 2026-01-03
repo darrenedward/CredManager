@@ -115,6 +115,46 @@ jobs:
           path: release/cred-manager_1.0.0_amd64.deb
           retention-days: 30
 
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Flutter desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build Windows release
+        working-directory: frontend
+        run: flutter build windows --release
+
+      - name: Package Windows App
+        run: |
+          mkdir release\windows
+          Copy-Item -Path frontend\build\windows\x64\runner\Release\* -Destination release\windows -Recurse
+
+      - name: Create Windows zip archive
+        run: |
+          Compress-Archive -Path release\windows\* -Destination release\cred-manager-windows-x64.zip
+
+      - name: Upload Windows zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-windows-zip
+          path: release/cred-manager-windows-x64.zip
+          retention-days: 30
+
   build-android:
     runs-on: ubuntu-latest
     steps:
