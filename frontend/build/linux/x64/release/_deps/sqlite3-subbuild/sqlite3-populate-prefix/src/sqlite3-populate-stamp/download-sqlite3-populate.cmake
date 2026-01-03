@@ -22,14 +22,14 @@ function(check_file_hash has_hash hash_is_good)
   set("${has_hash}" TRUE PARENT_SCOPE)
 
   message(VERBOSE "verifying file...
-       file='/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'")
+       file='/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'")
 
-  file("" "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz" actual_value)
+  file("" "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz" actual_value)
 
   if(NOT "${actual_value}" STREQUAL "")
     set("${hash_is_good}" FALSE PARENT_SCOPE)
     message(VERBOSE " hash of
-    /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz
+    /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz
   does not match expected value
     expected: ''
       actual: '${actual_value}'")
@@ -71,32 +71,32 @@ function(sleep_before_download attempt)
   execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep "${sleep_seconds}")
 endfunction()
 
-if(EXISTS "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
+if(EXISTS "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
   check_file_hash(has_hash hash_is_good)
   if(has_hash)
     if(hash_is_good)
       message(VERBOSE "File already exists and hash match (skip download):
-  file='/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'
+  file='/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'
   =''"
       )
       return()
     else()
       message(VERBOSE "File already exists but hash mismatch. Removing...")
-      file(REMOVE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
+      file(REMOVE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
     endif()
   else()
     message(VERBOSE "File already exists but no hash specified (use URL_HASH):
-  file='/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'
+  file='/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'
 Old file will be removed and new file downloaded from URL."
     )
-    file(REMOVE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
+    file(REMOVE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
   endif()
 endif()
 
 set(retry_number 5)
 
 message(VERBOSE "Downloading...
-   dst='/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'
+   dst='/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz'
    timeout='none'
    inactivity timeout='none'"
 )
@@ -119,7 +119,7 @@ foreach(i RANGE ${retry_number})
 
       file(
         DOWNLOAD
-        "${url}" "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz"
+        "${url}" "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz"
         SHOW_PROGRESS
         # no TIMEOUT
         # no INACTIVITY_TIMEOUT
@@ -136,7 +136,7 @@ foreach(i RANGE ${retry_number})
         check_file_hash(has_hash hash_is_good)
         if(has_hash AND NOT hash_is_good)
           message(VERBOSE "Hash mismatch, removing...")
-          file(REMOVE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
+          file(REMOVE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz")
         else()
           message(VERBOSE "Downloading... done")
           return()

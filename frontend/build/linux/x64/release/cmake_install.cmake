@@ -1,8 +1,8 @@
-# Install script for directory: /home/curryman/Websites/APIKeyManager/frontend/linux
+# Install script for directory: /home/curryman/Websites/CredManager/frontend/linux
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle")
+  set(CMAKE_INSTALL_PREFIX "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -44,167 +44,192 @@ endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   
-  file(REMOVE_RECURSE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/")
+  file(REMOVE_RECURSE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/")
   
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
-  if(EXISTS "$ENV{DESTDIR}/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager")
+  if(EXISTS "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager")
     file(RPATH_CHECK
-         FILE "$ENV{DESTDIR}/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager"
+         FILE "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager"
          RPATH "$ORIGIN/lib")
   endif()
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle" TYPE EXECUTABLE FILES "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/intermediates_do_not_run/api_key_manager")
-  if(EXISTS "$ENV{DESTDIR}/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle" TYPE EXECUTABLE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/intermediates_do_not_run/api_key_manager")
+  if(EXISTS "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager")
     file(RPATH_CHANGE
-         FILE "$ENV{DESTDIR}/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager"
-         OLD_RPATH "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux:/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever:/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs:/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager:/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral:"
+         FILE "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager"
+         OLD_RPATH "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux:/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/printing:/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/screen_retriever:/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs:/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/window_manager:/home/curryman/Websites/CredManager/frontend/linux/flutter/ephemeral:/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/pdfium-src/lib:"
          NEW_RPATH "$ORIGIN/lib")
     if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/api_key_manager")
+      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/api_key_manager")
     endif()
   endif()
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/data/icudtl.dat")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/data/icudtl.dat")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/data" TYPE FILE FILES "/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/icudtl.dat")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/data" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/linux/flutter/ephemeral/icudtl.dat")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib/libflutter_linux_gtk.so")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libflutter_linux_gtk.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/linux/flutter/ephemeral/libflutter_linux_gtk.so")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib/libflutter_secure_storage_linux_plugin.so")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libflutter_secure_storage_linux_plugin.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib/libscreen_retriever_plugin.so")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libprinting_plugin.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/libscreen_retriever_plugin.so")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/printing/libprinting_plugin.so")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib/libsqlite3_flutter_libs_plugin.so")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libpdfium.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/pdfium-src/lib/libpdfium.so")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib/libwindow_manager_plugin.so")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libscreen_retriever_plugin.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/libwindow_manager_plugin.so")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/screen_retriever/libscreen_retriever_plugin.so")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib/")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libsqlite3_flutter_libs_plugin.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib" TYPE DIRECTORY FILES "/home/curryman/Websites/APIKeyManager/frontend/build/native_assets/linux/")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/libsqlite3_flutter_libs_plugin.so")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libwindow_manager_plugin.so")
+  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/window_manager/libwindow_manager_plugin.so")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/")
+  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE DIRECTORY FILES "/home/curryman/Websites/CredManager/frontend/build/native_assets/linux/")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   
-  file(REMOVE_RECURSE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/data/flutter_assets")
+  file(REMOVE_RECURSE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/data/flutter_assets")
   
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/data/flutter_assets")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/data/flutter_assets")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/data" TYPE DIRECTORY FILES "/home/curryman/Websites/APIKeyManager/frontend/build//flutter_assets")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/data" TYPE DIRECTORY FILES "/home/curryman/Websites/CredManager/frontend/build//flutter_assets")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib/libapp.so")
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib/libapp.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/APIKeyManager/frontend/build/lib/libapp.so")
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/lib/libapp.so")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/flutter/cmake_install.cmake")
-  include("/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/runner/cmake_install.cmake")
-  include("/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux/cmake_install.cmake")
-  include("/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/screen_retriever/cmake_install.cmake")
-  include("/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/cmake_install.cmake")
-  include("/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/flutter/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/runner/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/flutter_secure_storage_linux/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/printing/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/screen_retriever/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/sqlite3_flutter_libs/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/window_manager/cmake_install.cmake")
 
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/install_local_manifest.txt"
+  file(WRITE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -220,6 +245,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

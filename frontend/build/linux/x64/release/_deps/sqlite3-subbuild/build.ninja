@@ -34,7 +34,7 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/
+cmake_ninja_workdir = /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/
 
 #############################################
 # Utility command for sqlite3-populate
@@ -46,7 +46,7 @@ build sqlite3-populate: phony CMakeFiles/sqlite3-populate CMakeFiles/sqlite3-pop
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
   DESC = No interactive CMake dialog available...
   restat = 1
 
@@ -57,7 +57,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake --regenerate-during-build -S/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild -B/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake --regenerate-during-build -S/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild -B/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -75,7 +75,7 @@ build CMakeFiles/sqlite3-populate | ${cmake_ninja_workdir}CMakeFiles/sqlite3-pop
 # Custom command for CMakeFiles/sqlite3-populate-complete
 
 build CMakeFiles/sqlite3-populate-complete sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-done | ${cmake_ninja_workdir}CMakeFiles/sqlite3-populate-complete ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-done: CUSTOM_COMMAND sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E make_directory /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/CMakeFiles && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/CMakeFiles/sqlite3-populate-complete && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-done
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E make_directory /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/CMakeFiles && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/CMakeFiles/sqlite3-populate-complete && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-done
   DESC = Completed 'sqlite3-populate'
   restat = 1
 
@@ -84,7 +84,7 @@ build CMakeFiles/sqlite3-populate-complete sqlite3-populate-prefix/src/sqlite3-p
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build: CUSTOM_COMMAND sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build
   DESC = No build step for 'sqlite3-populate'
   restat = 1
 
@@ -93,7 +93,7 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build 
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure: CUSTOM_COMMAND sqlite3-populate-prefix/tmp/sqlite3-populate-cfgcmd.txt sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure
   DESC = No configure step for 'sqlite3-populate'
   restat = 1
 
@@ -102,7 +102,7 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-config
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download: CUSTOM_COMMAND sqlite3-populate-prefix/src/sqlite3-populate-stamp/download-sqlite3-populate.cmake sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-urlinfo.txt sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps && /usr/bin/cmake -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/download-sqlite3-populate.cmake && /usr/bin/cmake -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/verify-sqlite3-populate.cmake && /usr/bin/cmake -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/extract-sqlite3-populate.cmake && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps && /usr/bin/cmake -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/download-sqlite3-populate.cmake && /usr/bin/cmake -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/verify-sqlite3-populate.cmake && /usr/bin/cmake -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/extract-sqlite3-populate.cmake && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download
   DESC = Performing download step (download, verify and extract) for 'sqlite3-populate'
   pool = console
   restat = 1
@@ -112,7 +112,7 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-downlo
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install: CUSTOM_COMMAND sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install
   DESC = No install step for 'sqlite3-populate'
   restat = 1
 
@@ -121,7 +121,7 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-instal
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir: CUSTOM_COMMAND
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -Dcfgdir= -P /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/tmp/sqlite3-populate-mkdirs.cmake && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -Dcfgdir= -P /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/tmp/sqlite3-populate-mkdirs.cmake && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir
   DESC = Creating directories for 'sqlite3-populate'
   restat = 1
 
@@ -130,7 +130,7 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir 
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch: CUSTOM_COMMAND sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch-info.txt sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch
   DESC = No patch step for 'sqlite3-populate'
   pool = console
   restat = 1
@@ -140,7 +140,7 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch 
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test: CUSTOM_COMMAND sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-build && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test
   DESC = No test step for 'sqlite3-populate'
   restat = 1
 
@@ -149,7 +149,7 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test |
 # Custom command for sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update
 
 build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update | ${cmake_ninja_workdir}sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update: CUSTOM_COMMAND sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update-info.txt sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download
-  COMMAND = cd /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update
+  COMMAND = cd /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild && /usr/bin/cmake -E echo_append && /usr/bin/cmake -E touch /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update
   DESC = No update step for 'sqlite3-populate'
   pool = console
   restat = 1
@@ -163,14 +163,14 @@ build sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update
 # =============================================================================
 
 #############################################
-# Folder: /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild
+# Folder: /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild
 
 build codegen: phony
 
 # =============================================================================
 
 #############################################
-# Folder: /home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild
+# Folder: /home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild
 
 build all: phony sqlite3-populate
 

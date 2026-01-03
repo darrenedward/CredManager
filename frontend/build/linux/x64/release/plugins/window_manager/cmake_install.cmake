@@ -1,8 +1,8 @@
-# Install script for directory: /home/curryman/Websites/APIKeyManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux
+# Install script for directory: /home/curryman/Websites/CredManager/frontend/linux/flutter/ephemeral/.plugin_symlinks/window_manager/linux
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/bundle")
+  set(CMAKE_INSTALL_PREFIX "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/bundle")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -45,6 +45,6 @@ endif()
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/plugins/window_manager/install_local_manifest.txt"
+  file(WRITE "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/plugins/window_manager/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

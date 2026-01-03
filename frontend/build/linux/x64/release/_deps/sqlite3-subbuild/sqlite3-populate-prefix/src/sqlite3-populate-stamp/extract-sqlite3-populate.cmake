@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION ${CMAKE_VERSION}) # this file comes with cmake
 
 # Make file names absolute:
 #
-get_filename_component(filename "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz" ABSOLUTE)
-get_filename_component(directory "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-src" ABSOLUTE)
+get_filename_component(filename "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3500400.tar.gz" ABSOLUTE)
+get_filename_component(directory "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-src" ABSOLUTE)
 
 message(VERBOSE "extracting...
      src='${filename}'

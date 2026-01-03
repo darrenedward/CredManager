@@ -6,22 +6,22 @@ cmake_minimum_required(VERSION ${CMAKE_VERSION}) # this file comes with cmake
 # If CMAKE_DISABLE_SOURCE_CHANGES is set to true and the source directory is an
 # existing directory in our source tree, calling file(MAKE_DIRECTORY) on it
 # would cause a fatal error, even though it would be a no-op.
-if(NOT EXISTS "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-src")
-  file(MAKE_DIRECTORY "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-src")
+if(NOT EXISTS "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-src")
+  file(MAKE_DIRECTORY "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-src")
 endif()
 file(MAKE_DIRECTORY
-  "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-build"
-  "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix"
-  "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/tmp"
-  "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp"
-  "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src"
-  "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp"
+  "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-build"
+  "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix"
+  "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/tmp"
+  "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp"
+  "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src"
+  "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/${subDir}")
+    file(MAKE_DIRECTORY "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "/home/curryman/Websites/APIKeyManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "/home/curryman/Websites/CredManager/frontend/build/linux/x64/release/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp${cfgdir}") # cfgdir has leading slash
 endif()
