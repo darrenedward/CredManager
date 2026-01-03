@@ -148,7 +148,7 @@ void main() {
       final nameField = find.widgetWithText(TextField, 'Vault Name');
       await tester.enterText(nameField, 'Personal Accounts');
 
-      final descField = find.widgetWithText(TextField, 'Description (optional)');
+      final descField = find.widgetWithText(TextField, 'Description (Optional)');
       await tester.enterText(descField, 'My personal login credentials');
 
       // Save vault
@@ -488,7 +488,7 @@ void main() {
       await tester.tap(find.text('Create Password Vault'));
       await tester.pumpAndSettle();
       await tester.enterText(find.widgetWithText(TextField, 'Vault Name'), 'My Passwords');
-      await tester.enterText(find.widgetWithText(TextField, 'Description (optional)'), 'My personal and work passwords');
+      await tester.enterText(find.widgetWithText(TextField, 'Description (Optional)'), 'My personal and work passwords');
       await tester.tap(find.text('Create'));
       await tester.pumpAndSettle();
 
