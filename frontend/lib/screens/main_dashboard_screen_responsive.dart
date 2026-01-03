@@ -46,19 +46,27 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
 
   /// Build responsive app bar
   PreferredSizeWidget _buildResponsiveAppBar(BuildContext context, bool shouldUseDrawer) {
+    // On desktop/tablet (with sidebar), use minimal AppBar
+    // On mobile (drawer), use full AppBar with logout
+    if (!shouldUseDrawer) {
+      return AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        toolbarHeight: 0, // Essentially hide the AppBar on desktop
+      );
+    }
+
     return AppBar(
       backgroundColor: AppConstants.primaryColor,
       foregroundColor: Colors.white,
       elevation: 0,
-      leading: shouldUseDrawer ? null : Container(), // Let Scaffold handle drawer button
       title: Row(
         children: [
           Icon(
             Icons.security,
             color: AppConstants.accentColor,
-            size: ResponsiveService.isMobile(context) ? 28 : 42,
+            size: 28,
           ),
-          // Removed app name and tagline for cleaner UI
         ],
       ),
       actions: [
@@ -230,6 +238,19 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
                   }
                 },
               ),
+              const SizedBox(height: 16),
+              // Logout button at bottom
+              _buildNavigationItem(
+                context,
+                icon: Icons.logout,
+                title: 'Logout',
+                subtitle: 'Sign out securely',
+                isSelected: false,
+                onTap: () {
+                  final authState = Provider.of<AuthState>(context, listen: false);
+                  authState.logout();
+                },
+              ),
             ],
           ),
         ),
@@ -319,21 +340,38 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Welcome section
-          AdaptiveText(
-            'Welcome to ${AppConstants.appName}',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppConstants.primaryColor,
-            ),
-          ),
-          const SizedBox(height: 8),
-          AdaptiveText(
-            'Your secure, offline-first credential manager',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.grey[600],
-              fontStyle: FontStyle.italic,
-            ),
+          // Welcome section with icon
+          Row(
+            children: [
+              Icon(
+                Icons.security,
+                size: 40,
+                color: AppConstants.accentColor,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AdaptiveText(
+                      'Welcome to ${AppConstants.appName}',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppConstants.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    AdaptiveText(
+                      'Your secure, offline-first credential manager',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
 
