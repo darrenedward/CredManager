@@ -62,7 +62,7 @@ void main() {
 
   group('AuthState Basic Tests', () {
     test('should initialize in unauthenticated state', () {
-      expect(authState.isAuthenticated, isFalse, reason: 'Should not be authenticated initially');
+      expect(authState.isLoggedIn, isFalse, reason: 'Should not be authenticated initially');
       expect(authState.user, isNull, reason: 'User should be null initially');
       expect(authState.token, isNull, reason: 'Token should be null initially');
     });
@@ -72,7 +72,7 @@ void main() {
       await authState.logout();
 
       // Verify state is still clean
-      expect(authState.isAuthenticated, isFalse, reason: 'Should remain unauthenticated');
+      expect(authState.isLoggedIn, isFalse, reason: 'Should remain unauthenticated');
       expect(authState.user, isNull, reason: 'User should remain null');
       expect(authState.token, isNull, reason: 'Token should remain null');
     });

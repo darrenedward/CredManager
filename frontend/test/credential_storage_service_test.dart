@@ -67,8 +67,8 @@ void main() {
     databaseService = DatabaseService.instance;
     encryptionService = EncryptionService();
 
-    // Initialize database
-    await databaseService.initDatabase();
+    // Initialize database (triggers lazy initialization via getter)
+    await databaseService.database;
   });
 
   tearDown(() async {

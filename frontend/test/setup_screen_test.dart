@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:api_key_manager/screens/setup_screen.dart';
-import 'package:api_key_manager/models/auth_state.dart';
+import 'package:cred_manager/screens/setup_screen.dart';
+import 'package:cred_manager/models/auth_state.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

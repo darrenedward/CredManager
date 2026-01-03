@@ -91,7 +91,7 @@ void main() {
 
     test('should validate biometric authentication flow', () async {
       // Test when biometric is not enabled
-      final result = await biometricService.authenticateWithBiometrics();
+      final result = await biometricService.authenticateForQuickUnlock();
       expect(result.success, isFalse);
       expect(result.errorType, equals(BiometricAuthError.notEnabled));
     });

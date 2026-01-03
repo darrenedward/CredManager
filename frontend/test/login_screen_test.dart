@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:api_key_manager/screens/login_screen.dart';
-import 'package:api_key_manager/models/auth_state.dart';
+import 'package:cred_manager/screens/login_screen.dart';
+import 'package:cred_manager/models/auth_state.dart';
 
 void main() {
   testWidgets('LoginScreen displays correctly', (WidgetTester tester) async {
