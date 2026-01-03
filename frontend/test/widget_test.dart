@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
-import 'package:api_key_manager/main.dart';
-import 'package:api_key_manager/models/auth_state.dart';
-import 'package:api_key_manager/utils/constants.dart';
+import 'package:cred_manager/main.dart';
+import 'package:cred_manager/models/auth_state.dart';
+import 'package:cred_manager/utils/constants.dart';
 
 // Mock AuthState that doesn't start timers
 class MockAuthState extends ChangeNotifier {

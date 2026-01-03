@@ -80,7 +80,7 @@ void main() async {
     for (int i = 0; i < storedQuestions.length; i++) {
       print('  ${i+1}. ${storedQuestions[i]['question']}');
     }
-    print();
+    print('');
     
     // Your answers
     final userAnswers = [
@@ -93,7 +93,7 @@ void main() async {
     for (int i = 0; i < userAnswers.length; i++) {
       print('  ${i+1}. ${userAnswers[i]['answer']}');
     }
-    print();
+    print('');
     
     // Test verification
     final authService = TestAuthService();
