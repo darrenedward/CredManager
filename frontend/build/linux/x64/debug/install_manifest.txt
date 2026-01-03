@@ -2,6 +2,8 @@
 /home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/data/icudtl.dat
 /home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libflutter_linux_gtk.so
 /home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libflutter_secure_storage_linux_plugin.so
+/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libprinting_plugin.so
+/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libpdfium.so
 /home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libscreen_retriever_plugin.so
 /home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libsqlite3_flutter_libs_plugin.so
 /home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libwindow_manager_plugin.so

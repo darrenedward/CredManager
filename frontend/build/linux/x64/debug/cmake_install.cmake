@@ -68,7 +68,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
      NOT IS_SYMLINK "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/api_key_manager")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/api_key_manager"
-         OLD_RPATH "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/flutter_secure_storage_linux:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/screen_retriever:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/sqlite3_flutter_libs:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/window_manager:/home/curryman/Websites/CredManager/frontend/linux/flutter/ephemeral:"
+         OLD_RPATH "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/flutter_secure_storage_linux:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/printing:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/screen_retriever:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/sqlite3_flutter_libs:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/window_manager:/home/curryman/Websites/CredManager/frontend/linux/flutter/ephemeral:/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/pdfium-src/lib:"
          NEW_RPATH "$ORIGIN/lib")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/api_key_manager")
@@ -110,6 +110,30 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/flutter_secure_storage_linux/libflutter_secure_storage_linux_plugin.so")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libprinting_plugin.so")
+  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/printing/libprinting_plugin.so")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib/libpdfium.so")
+  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  file(INSTALL DESTINATION "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/bundle/lib" TYPE FILE FILES "/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/pdfium-src/lib/libpdfium.so")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Runtime" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -183,6 +207,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/flutter/cmake_install.cmake")
   include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/runner/cmake_install.cmake")
   include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/flutter_secure_storage_linux/cmake_install.cmake")
+  include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/printing/cmake_install.cmake")
   include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/screen_retriever/cmake_install.cmake")
   include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/sqlite3_flutter_libs/cmake_install.cmake")
   include("/home/curryman/Websites/CredManager/frontend/build/linux/x64/debug/plugins/window_manager/cmake_install.cmake")
