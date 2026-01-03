@@ -70,6 +70,16 @@ web/
 *.env
 .env.*
 
+# Platform builds (platforms/ directory)
+platforms/*/binaries/
+platforms/*/builds/
+platforms/*/releases/
+platforms/linux/*.deb
+platforms/windows/*.msi
+platforms/windows/*.exe
+platforms/macos/*.dmg
+platforms/macos/*.zip
+
 # Test coverage
 coverage/
 test_coverage/

@@ -2,11 +2,11 @@ name: Build Flutter Desktop App
 
 on:
   push:
-    branches: [ main, develop, auth-security-overhaul ]
+    branches: [ main ]
     tags:
       - 'v*'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:

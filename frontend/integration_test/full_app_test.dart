@@ -7,7 +7,6 @@ import 'package:cred_manager/main.dart';
 import 'package:cred_manager/models/auth_state.dart';
 import 'package:cred_manager/models/dashboard_state.dart';
 import 'package:cred_manager/services/theme_service.dart';
-import 'package:cred_manager/utils/constants.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

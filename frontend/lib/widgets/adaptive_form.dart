@@ -414,7 +414,7 @@ class _BiometricAuthPromptState extends State<BiometricAuthPrompt> {
     });
 
     try {
-      final result = await _biometricService.authenticateWithBiometrics(
+      final result = await _biometricService.testBiometricAuthentication(
         localizedReason: widget.subtitle,
       );
 

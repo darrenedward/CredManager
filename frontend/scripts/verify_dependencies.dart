@@ -1,7 +1,6 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
-import 'dart:convert';
 
 /// Dependency verification script for API Key Manager
 /// Validates that all required packages and platform libraries are available
