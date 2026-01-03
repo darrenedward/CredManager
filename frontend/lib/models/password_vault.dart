@@ -21,7 +21,7 @@ class PasswordVault {
   });
 
   /// Create a PasswordVault from a map (database row)
-  factory PasswordVault.fromMap(Map<String, dynamic> map) {
+  factory PasswordVault.fromMap(Map<String, dynamic> map, {List<PasswordEntry>? entries}) {
     return PasswordVault(
       id: map['id'] as String,
       name: map['name'] as String,
@@ -29,6 +29,7 @@ class PasswordVault {
       icon: map['icon'] as String?,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+      entries: entries ?? const [],
     );
   }
 

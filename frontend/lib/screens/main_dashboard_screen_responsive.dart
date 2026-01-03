@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import '../models/auth_state.dart';
 import '../models/dashboard_state.dart';
 import '../models/project.dart';
 import '../models/ai_service.dart';
+import '../models/password_vault.dart';
 import '../services/theme_service.dart';
 import '../services/biometric_auth_service.dart';
+import '../services/password_generator_service.dart';
 import '../utils/constants.dart';
 import '../services/responsive_service.dart';
 import '../widgets/adaptive_card.dart';
@@ -21,7 +25,8 @@ class MainDashboardScreenResponsive extends StatefulWidget {
 
 class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenResponsive> {
   final BiometricAuthService _biometricService = BiometricAuthService();
-  
+  final PasswordGeneratorService _passwordGenerator = PasswordGeneratorService();
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<AuthState, DashboardState>(
@@ -3657,9 +3662,73 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
 
   /// Show edit password vault dialog
   void _showEditPasswordVaultDialog(BuildContext context, dynamic vault, DashboardState dashboardState) {
-    // TODO: Implement edit vault dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit vault dialog - Coming soon')),
+    final nameController = TextEditingController(text: vault.name);
+    final descriptionController = TextEditingController(text: vault.description ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Password Vault'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Vault Name',
+                hintText: 'e.g., Personal, Work, Social Media',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description (Optional)',
+                hintText: 'Brief description of this vault',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (nameController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a vault name')),
+                );
+                return;
+              }
+
+              final updatedVault = vault.copyWith(
+                name: nameController.text.trim(),
+                description: descriptionController.text.trim().isEmpty ? null : descriptionController.text.trim(),
+              );
+
+              final success = await dashboardState.updatePasswordVault(updatedVault);
+              if (success && context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Password vault updated')),
+                );
+                ResponsiveService.triggerLightHaptic();
+              } else if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to update vault'), backgroundColor: Colors.red),
+                );
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -3725,108 +3794,28 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
 
   /// Show add password entry dialog
   void _showAddPasswordEntryDialog(BuildContext context, dynamic vault, DashboardState dashboardState) {
-    // TODO: Implement full add password entry dialog with password generator
-    final nameController = TextEditingController();
-    final usernameController = TextEditingController();
-    final passwordController = TextEditingController();
-    final urlController = TextEditingController();
-    final notesController = TextEditingController();
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Password'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  hintText: 'e.g., Gmail, Netflix, Bank',
-                  border: OutlineInputBorder(),
-                ),
-                autofocus: true,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username/Email',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: urlController,
-                decoration: const InputDecoration(
-                  labelText: 'URL (Optional)',
-                  hintText: 'https://example.com',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes (Optional)',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter name and password')),
-                );
-                return;
-              }
-              Navigator.pop(context);
-              await dashboardState.createPasswordEntry(
-                vaultId: vault.id,
-                name: nameController.text.trim(),
-                value: passwordController.text.trim(),
-                username: usernameController.text.trim().isEmpty ? null : usernameController.text.trim(),
-                url: urlController.text.trim().isEmpty ? null : urlController.text.trim(),
-                notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
-              );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Password saved')),
-                );
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
+      builder: (context) => _AddPasswordEntryDialog(
+        vault: vault,
+        dashboardState: dashboardState,
+        passwordGenerator: _passwordGenerator,
       ),
     );
   }
 
   /// Show password entry details
   void _showPasswordEntryDetails(BuildContext context, dynamic entry, dynamic vault, DashboardState dashboardState) {
-    // TODO: Implement full password entry details view with show/hide password
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Password details - Coming soon')),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _PasswordEntryDetailsSheet(
+        entry: entry,
+        vault: vault,
+        dashboardState: dashboardState,
+        passwordGenerator: _passwordGenerator,
+      ),
     );
   }
 
@@ -3872,11 +3861,28 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
   }
 
   /// Copy password to clipboard
-  void _copyPasswordToClipboard(BuildContext context, dynamic entry) {
-    // TODO: Implement actual clipboard copy
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Password for "${entry.name}" copied to clipboard')),
-    );
+  Future<void> _copyPasswordToClipboard(BuildContext context, dynamic entry) async {
+    try {
+      await Clipboard.setData(ClipboardData(text: entry.value));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Password for "${entry.name}" copied to clipboard'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        ResponsiveService.triggerLightHaptic();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to copy password: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   /// Show delete password entry dialog
@@ -3907,5 +3913,633 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
         ],
       ),
     );
+  }
+}
+
+/// Dialog for adding a new password entry with strength indicator and generator
+class _AddPasswordEntryDialog extends StatefulWidget {
+  final dynamic vault;
+  final DashboardState dashboardState;
+  final PasswordGeneratorService passwordGenerator;
+
+  const _AddPasswordEntryDialog({
+    Key? key,
+    required this.vault,
+    required this.dashboardState,
+    required this.passwordGenerator,
+  }) : super(key: key);
+
+  @override
+  State<_AddPasswordEntryDialog> createState() => _AddPasswordEntryDialogState();
+}
+
+class _AddPasswordEntryDialogState extends State<_AddPasswordEntryDialog> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _urlController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _showGeneratorOptions = false;
+  int _passwordLength = 16;
+  bool _includeUppercase = true;
+  bool _includeLowercase = true;
+  bool _includeNumbers = true;
+  bool _includeSymbols = true;
+
+  int get _passwordStrength {
+    if (_passwordController.text.isEmpty) return 0;
+    return widget.passwordGenerator.calculateStrength(_passwordController.text);
+  }
+
+  String get _passwordStrengthLabel {
+    return widget.passwordGenerator.getStrengthLabel(_passwordStrength);
+  }
+
+  Color get _passwordStrengthColor {
+    final colorHex = widget.passwordGenerator.getStrengthColor(_passwordStrength);
+    return Color(int.parse(colorHex.replaceFirst('#', '0xFF')));
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _urlController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  void _generatePassword() {
+    final password = widget.passwordGenerator.generatePassword(
+      length: _passwordLength,
+      includeUppercase: _includeUppercase,
+      includeLowercase: _includeLowercase,
+      includeNumbers: _includeNumbers,
+      includeSymbols: _includeSymbols,
+    );
+    setState(() {
+      _passwordController.text = password;
+    });
+    ResponsiveService.triggerLightHaptic();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Add Password'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                hintText: 'e.g., Gmail, Netflix, Bank',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Username/Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: const OutlineInputBorder(),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.autorenew),
+                      tooltip: 'Generate Password',
+                      onPressed: () {
+                        setState(() {
+                          _showGeneratorOptions = !_showGeneratorOptions;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              obscureText: _obscurePassword,
+              onChanged: (value) => setState(() {}),
+            ),
+            if (_passwordController.text.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      AdaptiveText(
+                        'Strength: $_passwordStrengthLabel',
+                        style: TextStyle(
+                          color: _passwordStrengthColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      AdaptiveText(
+                        '$_passwordStrength/100',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  LinearProgressIndicator(
+                    value: _passwordStrength / 100,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(_passwordStrengthColor),
+                  ),
+                ],
+              ),
+            ],
+            if (_showGeneratorOptions) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AdaptiveText(
+                      'Password Generator Options',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        AdaptiveText('Length: $_passwordLength'),
+                        Expanded(
+                          child: Slider(
+                            value: _passwordLength.toDouble(),
+                            min: 8,
+                            max: 32,
+                            divisions: 24,
+                            label: _passwordLength.toString(),
+                            onChanged: (value) {
+                              setState(() {
+                                _passwordLength = value.toInt();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    CheckboxListTile(
+                      title: const AdaptiveText('Uppercase (A-Z)'),
+                      value: _includeUppercase,
+                      onChanged: (value) => setState(() => _includeUppercase = value ?? false),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    CheckboxListTile(
+                      title: const AdaptiveText('Lowercase (a-z)'),
+                      value: _includeLowercase,
+                      onChanged: (value) => setState(() => _includeLowercase = value ?? false),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    CheckboxListTile(
+                      title: const AdaptiveText('Numbers (0-9)'),
+                      value: _includeNumbers,
+                      onChanged: (value) => setState(() => _includeNumbers = value ?? false),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    CheckboxListTile(
+                      title: const AdaptiveText('Symbols (!@#\$%)'),
+                      value: _includeSymbols,
+                      onChanged: (value) => setState(() => _includeSymbols = value ?? false),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      onPressed: _generatePassword,
+                      icon: const Icon(Icons.autorenew),
+                      label: const AdaptiveText('Generate Password'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppConstants.primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            TextField(
+              controller: _urlController,
+              decoration: const InputDecoration(
+                labelText: 'URL (Optional)',
+                hintText: 'https://example.com',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _notesController,
+              decoration: const InputDecoration(
+                labelText: 'Notes (Optional)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (_nameController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please enter name and password')),
+              );
+              return;
+            }
+            Navigator.pop(context);
+            await widget.dashboardState.createPasswordEntry(
+              vaultId: widget.vault.id,
+              name: _nameController.text.trim(),
+              value: _passwordController.text.trim(),
+              username: _usernameController.text.trim().isEmpty ? null : _usernameController.text.trim(),
+              url: _urlController.text.trim().isEmpty ? null : _urlController.text.trim(),
+              notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+            );
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Password saved')),
+              );
+            }
+          },
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Bottom sheet for displaying password entry details
+class _PasswordEntryDetailsSheet extends StatefulWidget {
+  final dynamic entry;
+  final dynamic vault;
+  final DashboardState dashboardState;
+  final PasswordGeneratorService passwordGenerator;
+
+  const _PasswordEntryDetailsSheet({
+    Key? key,
+    required this.entry,
+    required this.vault,
+    required this.dashboardState,
+    required this.passwordGenerator,
+  }) : super(key: key);
+
+  @override
+  State<_PasswordEntryDetailsSheet> createState() => _PasswordEntryDetailsSheetState();
+}
+
+class _PasswordEntryDetailsSheetState extends State<_PasswordEntryDetailsSheet> {
+  bool _obscurePassword = true;
+
+  int get _passwordStrength {
+    return widget.passwordGenerator.calculateStrength(widget.entry.value);
+  }
+
+  String get _passwordStrengthLabel {
+    return widget.passwordGenerator.getStrengthLabel(_passwordStrength);
+  }
+
+  Color get _passwordStrengthColor {
+    final colorHex = widget.passwordGenerator.getStrengthColor(_passwordStrength);
+    return Color(int.parse(colorHex.replaceFirst('#', '0xFF')));
+  }
+
+  Future<void> _copyToClipboard(String text, String label) async {
+    try {
+      await Clipboard.setData(ClipboardData(text: text));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$label copied to clipboard'), duration: const Duration(seconds: 1)),
+        );
+        ResponsiveService.triggerLightHaptic();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to copy: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final entry = widget.entry;
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      builder: (context, scrollController) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.vpn_key, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AdaptiveText(
+                          entry.name,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        if (entry.username != null)
+                          AdaptiveText(
+                            entry.username!,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            // Content
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Password section
+                  _buildDetailSection(
+                    context,
+                    icon: Icons.lock,
+                    title: 'Password',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: AdaptiveText(
+                                _obscurePassword ? '••••••••' : entry.value,
+                                style: const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                                ResponsiveService.triggerLightHaptic();
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.content_copy),
+                              onPressed: () => _copyToClipboard(entry.value, 'Password'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        // Strength indicator
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            AdaptiveText(
+                              'Strength: $_passwordStrengthLabel',
+                              style: TextStyle(
+                                color: _passwordStrengthColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            AdaptiveText(
+                              '$_passwordStrength/100',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        LinearProgressIndicator(
+                          value: _passwordStrength / 100,
+                          backgroundColor: Colors.grey[300],
+                          valueColor: AlwaysStoppedAnimation<Color>(_passwordStrengthColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Username section
+                  if (entry.username != null)
+                    _buildDetailSection(
+                      context,
+                      icon: Icons.person,
+                      title: 'Username',
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AdaptiveText(entry.username!),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.content_copy),
+                            onPressed: () => _copyToClipboard(entry.username!, 'Username'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  // Email section
+                  if (entry.email != null)
+                    _buildDetailSection(
+                      context,
+                      icon: Icons.email,
+                      title: 'Email',
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AdaptiveText(entry.email!),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.content_copy),
+                            onPressed: () => _copyToClipboard(entry.email!, 'Email'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  // URL section
+                  if (entry.url != null)
+                    _buildDetailSection(
+                      context,
+                      icon: Icons.link,
+                      title: 'URL',
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                final url = entry.url!;
+                                if (await canLaunchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url));
+                                }
+                              },
+                              child: AdaptiveText(
+                                entry.url!,
+                                style: const TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.content_copy),
+                            onPressed: () => _copyToClipboard(entry.url!, 'URL'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  // Notes section
+                  if (entry.notes != null)
+                    _buildDetailSection(
+                      context,
+                      icon: Icons.note,
+                      title: 'Notes',
+                      child: AdaptiveText(entry.notes!),
+                    ),
+                  // Tags section
+                  if (entry.tags != null && entry.tags!.isNotEmpty)
+                    _buildDetailSection(
+                      context,
+                      icon: Icons.local_offer,
+                      title: 'Tags',
+                      child: Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: entry.tagList.map((tag) {
+                          return Chip(
+                            label: AdaptiveText(tag, style: const TextStyle(fontSize: 12)),
+                            backgroundColor: AppConstants.primaryColor.withValues(alpha: 0.1),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  // Metadata section
+                  _buildDetailSection(
+                    context,
+                    icon: Icons.info_outline,
+                    title: 'Information',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMetadataRow('Created', _formatDate(entry.createdAt)),
+                        const SizedBox(height: 4),
+                        _buildMetadataRow('Updated', _formatDate(entry.updatedAt)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailSection(BuildContext context, {required IconData icon, required String title, required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: Colors.grey[600]),
+              const SizedBox(width: 8),
+              AdaptiveText(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetadataRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        AdaptiveText(label, style: const TextStyle(color: Colors.grey)),
+        AdaptiveText(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
