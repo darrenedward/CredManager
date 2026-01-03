@@ -29,7 +29,8 @@ jobs:
           sudo apt-get install -y \
             clang cmake ninja-build pkg-config \
             libgtk-3-dev liblzma-dev \
-            libstdc++-12-dev
+            libstdc++-12-dev \
+            dpkg fakeroot
 
       - name: Setup Flutter desktop
         run: flutter config --enable-linux-desktop
@@ -52,11 +53,65 @@ jobs:
           cd release/linux
           tar czf ../cred-manager-linux-x64.tar.gz .
 
-      - name: Upload Linux artifact
+      - name: Create Debian package
+        run: |
+          mkdir -p debian-package/cred-manager/usr/local/bin
+          mkdir -p debian-package/cred-manager/DEBIAN
+          mkdir -p debian-package/cred-manager/usr/share/applications
+          mkdir -p debian-package/cred-manager/usr/share/pixmaps
+
+          # Copy application files
+          cp -r frontend/build/linux/x64/release/bundle/* debian-package/cred-manager/usr/local/bin/
+
+          # Create desktop entry
+          cat > debian-package/cred-manager/usr/share/applications/cred-manager.desktop << 'EOF'
+          [Desktop Entry]
+          Name=Cred Manager
+          Comment=Secure credential management application
+          Exec=/usr/local/bin/api_key_manager
+          Icon=cred-manager
+          Type=Application
+          Categories=Utility;Security;
+          Terminal=false
+          EOF
+
+          # Copy icon if exists
+          if [ -f frontend/assets/icons/shield_icon.svg ]; then
+            cp frontend/assets/icons/shield_icon.svg debian-package/cred-manager/usr/share/pixmaps/cred-manager.svg
+          fi
+
+          # Create control file
+          cat > debian-package/cred-manager/DEBIAN/control << 'EOF'
+          Package: cred-manager
+          Version: 1.0.0
+          Architecture: amd64
+          Maintainer: Darren Edward <darrenedward@users.noreply.github.com>
+          Description: Cred Manager - Secure credential management
+           A cross-platform credential manager with encrypted storage,
+           biometric authentication, and emergency backup recovery.
+          Depends: libgtk-3-0, liblzma5
+          EOF
+
+          # Set permissions
+          chmod -R 755 debian-package/cred-manager/usr
+          chmod 644 debian-package/cred-manager/DEBIAN/control
+
+          # Build the package
+          dpkg-deb --build debian-package/cred-manager
+          mv debian-package/cred-manager.deb release/cred-manager_1.0.0_amd64.deb
+
+      - name: Upload Linux tarball artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cred-manager-linux
+          name: cred-manager-linux-tarball
           path: release/cred-manager-linux-x64.tar.gz
+          retention-days: 30
+
+      - name: Upload Debian package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-linux-deb
+          path: release/cred-manager_1.0.0_amd64.deb
           retention-days: 30
 
   build-windows:
@@ -92,11 +147,109 @@ jobs:
         run: |
           Compress-Archive -Path release\* -DestinationPath cred-manager-windows-x64.zip
 
-      - name: Upload Windows artifact
+      - name: Install WiX Toolset
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip" -OutFile wix311-binaries.zip
+          Expand-Archive -Path wix311-binaries.zip -DestinationPath wix-tools -Force
+
+      - name: Install Inno Setup
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile innosetup.exe
+          .\innosetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+
+      - name: Create WiX MSI installer
+        run: |
+          # Generate WiX heat to harvest all files from release directory
+          .\wix-tools\heat.exe dir release -cg ProductComponents -gg -sfrag -out components.wxs
+
+          # Create main WiX file with shortcuts
+          @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+            <Product Id="*" Name="Cred Manager" Version="1.0.0" Manufacturer="Darren Edward" UpgradeCode="YOUR-GUID-PLACEHOLDER">
+              <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine"/>
+              <MajorUpgrade DowngradeErrorMessage="A newer version is already installed."/>
+              <MediaTemplate EmbedCab="yes"/>
+
+              <Feature Id="ProductFeature" Title="Cred Manager" Level="1">
+                <ComponentGroupRef Id="ProductComponents"/>
+                <ComponentRef Id="ApplicationShortcut"/>
+              </Feature>
+
+              <Directory Id="TARGETDIR" Name="SourceDir">
+                <Directory Id="ProgramFilesFolder">
+                  <Directory Id="INSTALLFOLDER" Name="Cred Manager"/>
+                </Directory>
+                <Directory Id="ProgramMenuFolder">
+                  <Directory Id="ApplicationProgramsFolder" Name="Cred Manager"/>
+                </Directory>
+              </Directory>
+
+              <DirectoryRef Id="ApplicationProgramsFolder">
+                <Component Id="ApplicationShortcut" Guid="*">
+                  <Shortcut Id="AppShortcut" Name="Cred Manager" Description="Secure credential manager" Target="[INSTALLFOLDER]api_key_manager.exe" WorkingDirectory="INSTALLFOLDER"/>
+                  <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                  <RegistryValue Root="HKCU" Key="Software\CredManager" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+                </Component>
+              </DirectoryRef>
+            </Product>
+          </Wix>
+          "@ | Out-File -FilePath installer.wxs -Encoding UTF8
+
+          # Build MSI
+          .\wix-tools\candle.exe components.wxs installer.wxs
+          .\wix-tools\light.exe components.wixobj installer.wixobj -out cred-manager-windows-x64.msi
+
+      - name: Create Inno Setup EXE installer
+        run: |
+          # Create Inno Setup script
+          @"
+          [Setup]
+          AppName=Cred Manager
+          AppVersion=1.0.0
+          AppPublisher=Darren Edward
+          DefaultDirName={pf}\Cred Manager
+          DefaultGroupName=Cred Manager
+          AllowNoIcons=yes
+          OutputDir=.
+          OutputBaseFilename=cred-manager-windows-x64-setup
+          Compression=lzma2
+          SolidCompression=yes
+          WizardStyle=modern
+
+          [Files]
+          Source: "release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+          [Icons]
+          Name: "{group}\Cred Manager"; Filename: "{app}\api_key_manager.exe"
+          Name: "{commondesktop}\Cred Manager"; Filename: "{app}\api_key_manager.exe"
+
+          [Run]
+          Filename: "{app}\api_key_manager.exe"; Description: "Launch Cred Manager"; Flags: nowait postinstall skipifsilent
+          "@ | Out-File -FilePath setup.iss -Encoding ASCII
+
+          # Build EXE using Inno Setup
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+
+      - name: Upload Windows zip artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cred-manager-windows
+          name: cred-manager-windows-zip
           path: cred-manager-windows-x64.zip
+          retention-days: 30
+
+      - name: Upload Windows MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-windows-msi
+          path: cred-manager-windows-x64.msi
+          retention-days: 30
+
+      - name: Upload Windows EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cred-manager-windows-exe
+          path: cred-manager-windows-x64-setup.exe
           retention-days: 30
 
   build-macos:
