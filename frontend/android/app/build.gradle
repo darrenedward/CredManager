@@ -1,9 +1,6 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The flutter-gradle plugin will be applied by the flutter plugin loader
-    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
 }
 
 def localProperties = new Properties()
