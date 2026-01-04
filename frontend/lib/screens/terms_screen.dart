@@ -74,7 +74,8 @@ class TermsScreen extends StatelessWidget {
                   _buildBullet('Organize credentials into projects and vaults'),
                   _buildBullet('Generate strong passwords using the built-in generator'),
                   _buildBullet('Backup and restore your encrypted data'),
-                  _buildBullet('Use the app for personal or business purposes'),
+                  _buildBullet('Use the app for personal use (free)'),
+                  _buildText('For commercial or business use, please apply for a license at darren-edward@hotmail.com'),
                 ],
               ),
 
@@ -86,11 +87,11 @@ class TermsScreen extends StatelessWidget {
                 Icons.block,
                 [
                   _buildText('To protect everyone, you agree NOT to:'),
+                  _buildBullet('Use for commercial or business purposes without a license'),
                   _buildBullet('Reverse engineer the app to bypass security features'),
                   _buildBullet('Remove or obscure copyright and license notices'),
                   _buildBullet('Use the app for illegal activities of any kind'),
                   _buildBullet('Attempt to exploit security vulnerabilities'),
-                  _buildBullet('Distribute modified versions without proper attribution'),
                   _buildBullet('Hold the developer liable for data loss or security issues'),
                 ],
               ),

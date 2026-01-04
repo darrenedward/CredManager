@@ -71,14 +71,13 @@ SOFTWARE.
 ''';
   static const String licenseText = '''
 Cred Manager v1.0.0
-An open-source credential management application
+A credential management application
 
-This software is free to use, modify, and distribute under the terms
-of the permissive open source license shown above.
+This software is licensed under the terms shown above.
 
 Key Points:
-• Free for both personal and commercial use
-• Source code is available for review and modification
+• Free for personal use
+• Commercial use requires a license - apply at darren-edward@hotmail.com
 • No warranty provided - use at your own risk
 • You retain full ownership of your data
 • All data is stored locally on your device
