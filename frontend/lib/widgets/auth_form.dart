@@ -36,6 +36,7 @@ class _AuthFormState extends State<AuthForm> {
           controller: widget.controller,
           obscureText: _isObscure,
           enabled: !widget.isLoading,
+          enableInteractiveSelection: true,
           decoration: InputDecoration(
             labelText: widget.title,
             border: const OutlineInputBorder(),
@@ -59,6 +60,7 @@ class _AuthFormState extends State<AuthForm> {
             controller: widget.confirmController,
             obscureText: _isObscure,
             enabled: !widget.isLoading,
+            enableInteractiveSelection: true,
             decoration: const InputDecoration(
               labelText: 'Confirm Passphrase',
               border: OutlineInputBorder(),
