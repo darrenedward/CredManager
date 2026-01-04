@@ -281,11 +281,12 @@ class _RecoveryScreenState extends State<RecoveryScreen> with SingleTickerProvid
   }
 
   Widget _buildSecurityQuestionsTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
           Icon(
             Icons.security,
             size: 80,
@@ -332,15 +333,17 @@ class _RecoveryScreenState extends State<RecoveryScreen> with SingleTickerProvid
           ),
         ],
       ),
+      ),
     );
   }
 
   Widget _buildBackupCodeTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
           Icon(
             Icons.vpn_key,
             size: 80,
@@ -477,6 +480,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with SingleTickerProvid
             child: const Text('Back to Login'),
           ),
         ],
+      ),
       ),
     );
   }
