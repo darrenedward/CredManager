@@ -75,7 +75,6 @@ class TermsScreen extends StatelessWidget {
                   _buildBullet('Generate strong passwords using the built-in generator'),
                   _buildBullet('Backup and restore your encrypted data'),
                   _buildBullet('Use the app for personal or business purposes'),
-                  _buildBullet('View and modify the source code (it\'s open source)'),
                 ],
               ),
 
@@ -204,25 +203,9 @@ class TermsScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // 10. Open Source
+              // 10. Third-Party Services
               _buildSectionCard(
-                '10. Open Source',
-                Icons.code,
-                [
-                  _buildText('Cred Manager is open source software:'),
-                  _buildBullet('Source code is available for review'),
-                  _buildBullet('You can modify the code for your needs'),
-                  _buildBullet('You can distribute the software under the license terms'),
-                  _buildBullet('Click the copyright notice in the footer for full license text'),
-                  _buildText('Contributions are welcome! See the GitHub repository for details.'),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // 11. Third-Party Services
-              _buildSectionCard(
-                '11. Third-Party Services',
+                '10. Third-Party Services',
                 Icons.extension,
                 [
                   _buildText('Cred Manager uses open-source libraries:'),
@@ -236,9 +219,9 @@ class TermsScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // 12. No Warranty
+              // 11. No Warranty
               _buildSectionCard(
-                '12. No Warranty',
+                '11. No Warranty',
                 Icons.info_outline,
                 [
                   _buildText('Cred Manager is provided "as is" without warranties of any kind.'),
@@ -253,9 +236,9 @@ class TermsScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // 13. Support
+              // 12. Getting Help
               _buildSectionCard(
-                '13. Getting Help',
+                '12. Getting Help',
                 Icons.help,
                 [
                   _buildText('Need help? Check out these resources:'),
@@ -379,7 +362,7 @@ class TermsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Cred Manager is an open source project. For questions, bug reports, or contributions, visit our GitHub repository.',
+              'For questions, bug reports, or feedback, visit our GitHub repository.',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[700],
@@ -398,6 +381,27 @@ class TermsScreen extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Text(
+              'Interested in contributing to the project? Email to apply:',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _launchEmail('mailto:darren-edward@hotmail.com'),
+              child: Text(
+                'darren-edward@hotmail.com',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.blue[700],
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -408,6 +412,13 @@ class TermsScreen extends StatelessWidget {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _launchEmail(String email) async {
+    final uri = Uri.parse(email);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
   }
 
