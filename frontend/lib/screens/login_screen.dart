@@ -7,7 +7,6 @@ import '../services/biometric_auth_service.dart';
 import '../models/auth_state.dart';
 import '../models/user_model.dart';
 import '../utils/constants.dart';
-import '../utils/validation.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? autoLoginToken;
@@ -155,10 +154,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    // Validate passphrase using validation utility
-    final validationError = validatePassphraseError(_passphraseController.text);
-    if (validationError != null) {
-      _showError(validationError);
+    // Only validate that passphrase is not empty (format validation is for setup only)
+    if (_passphraseController.text.isEmpty) {
+      _showError('Passphrase is required');
       return;
     }
 
