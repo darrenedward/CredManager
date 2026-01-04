@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:local_auth/error_codes.dart' as auth_error;
 import 'database_service.dart';
 import 'encryption_service.dart';
 
@@ -100,11 +99,9 @@ class BiometricAuthService {
       // Perform authentication
       final bool didAuthenticate = await _localAuth.authenticate(
         localizedReason: localizedReason,
-        options: AuthenticationOptions(
-          useErrorDialogs: useErrorDialogs,
-          stickyAuth: stickyAuth,
-          biometricOnly: true,
-        ),
+        biometricOnly: true,
+        persistAcrossBackgrounding: false,
+        sensitiveTransaction: true,
       );
 
       if (didAuthenticate) {
@@ -153,11 +150,9 @@ class BiometricAuthService {
       // Perform test authentication
       final bool didAuthenticate = await _localAuth.authenticate(
         localizedReason: localizedReason,
-        options: AuthenticationOptions(
-          useErrorDialogs: useErrorDialogs,
-          stickyAuth: stickyAuth,
-          biometricOnly: true,
-        ),
+        biometricOnly: true,
+        persistAcrossBackgrounding: false,
+        sensitiveTransaction: true,
       );
 
       if (didAuthenticate) {
@@ -188,42 +183,48 @@ class BiometricAuthService {
 
   /// Handle platform exceptions and convert to BiometricAuthResult
   BiometricAuthResult _handlePlatformException(PlatformException e) {
+    // In local_auth 3.0.0, error codes are plain strings
     switch (e.code) {
-      case auth_error.notAvailable:
+      case 'not_available':
+      case 'NotAvailable':
         return BiometricAuthResult(
           success: false,
           errorType: BiometricAuthError.notAvailable,
           errorMessage: 'Biometric authentication is not available',
         );
-      case auth_error.notEnrolled:
+      case 'not_enrolled':
+      case 'NotEnrolled':
         return BiometricAuthResult(
           success: false,
           errorType: BiometricAuthError.notEnrolled,
           errorMessage: 'No biometrics enrolled on this device',
         );
-      case auth_error.lockedOut:
+      case 'locked_out':
+      case 'LockedOut':
         return BiometricAuthResult(
           success: false,
           errorType: BiometricAuthError.lockedOut,
           errorMessage: 'Biometric authentication is temporarily locked',
         );
-      case auth_error.permanentlyLockedOut:
+      case 'permanently_locked_out':
+      case 'PermanentlyLockedOut':
         return BiometricAuthResult(
           success: false,
           errorType: BiometricAuthError.permanentlyLockedOut,
           errorMessage: 'Biometric authentication is permanently locked',
         );
-      case auth_error.biometricOnlyNotSupported:
+      case 'other':
+        // Generic error in local_auth 3.0.0
         return BiometricAuthResult(
           success: false,
-          errorType: BiometricAuthError.notSupported,
-          errorMessage: 'Biometric-only authentication is not supported',
+          errorType: BiometricAuthError.unknown,
+          errorMessage: e.message ?? 'Unknown biometric authentication error',
         );
       default:
         return BiometricAuthResult(
           success: false,
           errorType: BiometricAuthError.unknown,
-          errorMessage: e.message ?? 'Unknown biometric authentication error',
+          errorMessage: e.message ?? 'Unknown biometric authentication error: ${e.code}',
         );
     }
   }
