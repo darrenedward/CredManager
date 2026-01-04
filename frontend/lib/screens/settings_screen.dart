@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:io';
 import '../models/auth_state.dart';
 import '../models/dashboard_state.dart';
-import '../services/theme_service.dart';
 import '../services/biometric_auth_service.dart';
 import '../services/emergency_backup_service.dart';
 import '../utils/constants.dart';
@@ -54,7 +53,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _backupCodeUsed = false;
 
   // UI Settings
-  bool _darkMode = false;
   bool _showWelcomeScreen = true;
 
   // User Experience
@@ -167,7 +165,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           'enableBackupPhrase': _enableBackupPhrase,
           'autoBackup': _autoBackup,
           'backupFrequency': _backupFrequency,
-          'darkMode': _darkMode,
           'showWelcomeScreen': _showWelcomeScreen,
           'autoCopyPasswords': _autoCopyPasswords,
           'showPasswordStrength': _showPasswordStrength,
@@ -292,7 +289,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _enableBackupPhrase = settings['enableBackupPhrase'] ?? _enableBackupPhrase;
         _autoBackup = settings['autoBackup'] ?? _autoBackup;
         _backupFrequency = settings['backupFrequency'] ?? _backupFrequency;
-        _darkMode = settings['darkMode'] ?? _darkMode;
         _showWelcomeScreen = settings['showWelcomeScreen'] ?? _showWelcomeScreen;
         _autoCopyPasswords = settings['autoCopyPasswords'] ?? _autoCopyPasswords;
         _showPasswordStrength = settings['showPasswordStrength'] ?? _showPasswordStrength;
@@ -585,18 +581,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Icons.palette,
               AppConstants.supportIconColor4,
               [
-                Consumer<ThemeService>(
-                  builder: (context, themeService, child) => _buildSwitchSetting(
-                    'Dark Mode',
-                    'Use dark theme for the interface',
-                    themeService.isDarkMode,
-                    (value) async {
-                      await themeService.setDarkMode(value);
-                      setState(() => _darkMode = value);
-                    },
-                  ),
-                ),
-                const Divider(),
                 _buildSwitchSetting(
                   'Show Welcome Screen',
                   'Display welcome screen on startup',
