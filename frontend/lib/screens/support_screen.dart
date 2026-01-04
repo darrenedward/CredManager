@@ -386,7 +386,12 @@ class SupportScreen extends StatelessWidget {
                           Icons.auto_awesome_outlined,
                         ),
                         _buildGettingStartedStep(
-                          '4. Configure Security',
+                          '4. Use Password Vault',
+                          'Access the Password Vault tab to store website passwords, application credentials, PIN codes, and other sensitive login information. Organize them into vaults for easy management.',
+                          Icons.password_outlined,
+                        ),
+                        _buildGettingStartedStep(
+                          '5. Configure Security',
                           'Go to Settings to adjust auto-lock timeout, enable biometric authentication, and configure backup preferences.',
                           Icons.security_outlined,
                         ),
@@ -621,6 +626,92 @@ class SupportScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
+              // Password Vault
+              Card(
+                elevation: 2,
+                color: AppConstants.surfaceColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppConstants.surfaceColor,
+                        AppConstants.surfaceColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.password,
+                              color: Colors.purple,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Password Vault',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildCredentialManagementItem(
+                          'What is Password Vault?',
+                          'The Password Vault is a dedicated feature for storing all your login credentials - website passwords, application passwords, PIN codes, and any other sensitive authentication data. Keep all your passwords organized and secure in one place.',
+                          Icons.info_outline,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Creating Vaults',
+                          'Create vaults to organize your passwords by category (e.g., "Social Media", "Banking", "Work", "Shopping"). Each vault can contain unlimited password entries.',
+                          Icons.create_new_folder,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Adding Password Entries',
+                          'Click "Add Entry" in a vault, enter the name (e.g., "Gmail Account"), your username/email, and password. Use the built-in password generator for secure passwords.',
+                          Icons.add_circle,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Password Strength Indicator',
+                          'When creating passwords, the app shows a strength indicator (Weak, Medium, Strong, Very Strong) to help you choose secure passwords.',
+                          Icons.verified_user,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Quick Copy & Auto-Clear',
+                          'Click the copy icon to copy passwords to clipboard. The clipboard automatically clears after 30 seconds (configurable in Settings) for security.',
+                          Icons.content_copy,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Vault Security',
+                          'All vaults and password entries are encrypted with your master passphrase. Vault data never leaves your device unless you export it.',
+                          Icons.lock,
+                        ),
+                        _buildCredentialManagementItem(
+                          'Editing & Deleting',
+                          'Edit any password entry to update credentials. Delete entries or entire vaults when no longer needed. Warning: Deletion is permanent.',
+                          Icons.edit_note,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
               // Security & Privacy
               Card(
                 elevation: 2,
@@ -836,6 +927,7 @@ class SupportScreen extends StatelessWidget {
       children: [
         _buildFeature('🔐 Secure Storage', 'All credentials encrypted with your passphrase'),
         _buildFeature('📁 Project Organization', 'Group credentials by project or service'),
+        _buildFeature('🗄️ Password Vault', 'Store website passwords, PIN codes, and login credentials'),
         _buildFeature('🤖 AI Service Integration', 'Built-in support for popular AI platforms'),
         _buildFeature('🔄 Password Generator', 'Create strong, secure passwords'),
         _buildFeature('📋 One-Click Copy', 'Quick access to your credentials'),

@@ -15,6 +15,7 @@ import '../utils/constants.dart';
 import '../services/responsive_service.dart';
 import '../widgets/adaptive_card.dart';
 import 'settings_screen.dart';
+import 'terms_screen.dart';
 
 class MainDashboardScreenResponsive extends StatefulWidget {
   const MainDashboardScreenResponsive({super.key});
@@ -1512,7 +1513,7 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
     if (ResponsiveService.isMobile(context)) {
       return const SizedBox.shrink(); // Hide footer on mobile
     }
-    
+
     return Container(
       height: 60,
       color: AppConstants.primaryColor,
@@ -1520,16 +1521,35 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-            onTap: () => _showLicenseDialog(context),
-            child: Text(
-              AppConstants.copyright,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                decoration: TextDecoration.underline,
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _showLicenseDialog(context),
+                child: Text(
+                  AppConstants.copyright,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: 16),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TermsScreen()),
+                ),
+                child: const Text(
+                  'Terms & Conditions',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
           ),
           Text(
             'Version ${AppConstants.appVersion}',
