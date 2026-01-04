@@ -88,7 +88,7 @@ class TermsScreen extends StatelessWidget {
                   _buildBullet('Unauthorized access to or alteration of your data or device'),
                   _buildBullet('Damages arising from security breaches, data loss, or credential exposure'),
                   _buildBullet('Damages exceeding the amount you paid (if any) for the Application'),
-                  _buildText('In no event shall the total liability exceed USD $100.00.'),
+                  _buildText('In no event shall the total liability exceed USD \$100.00.'),
                 ],
               ),
 
