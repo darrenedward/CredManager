@@ -6,6 +6,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr/qr.dart';
+import 'package:file_selector/file_selector.dart' as file_selector;
 
 /// Service for generating Emergency Backup Kit PDFs
 ///
@@ -114,10 +115,32 @@ class EmergencyKitPdfService {
       includeQrCode: true,
     );
 
-    // Get the downloads directory
-    final directory = await getDownloadsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final filename = 'emergency_kit_$timestamp.pdf';
+
+    // Use file selector on desktop platforms for save dialog
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      final result = await file_selector.getSaveLocation(
+        acceptedTypeGroups: [
+          file_selector.XTypeGroup(
+            label: 'PDF Files',
+            extensions: ['pdf'],
+          ),
+        ],
+        suggestedName: filename,
+      );
+
+      if (result == null) {
+        throw Exception('No file selected - save cancelled by user');
+      }
+
+      final file = File(result.path);
+      await file.writeAsBytes(pdfBytes);
+      return file.path;
+    }
+
+    // For mobile platforms, save to downloads directory directly
+    final directory = await getDownloadsDirectory();
     final file = File('${directory?.path}/$filename');
     await file.writeAsBytes(pdfBytes);
 

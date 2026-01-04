@@ -141,6 +141,11 @@ class _EmergencyKitScreenState extends State<EmergencyKitScreen> {
         _isLoading = false;
       });
 
+      // Silently ignore if user cancelled the save dialog
+      if (e.toString().contains('save cancelled')) {
+        return;
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
