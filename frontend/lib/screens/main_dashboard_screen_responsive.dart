@@ -1578,7 +1578,7 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
                 color: AppConstants.primaryColor,
               ),
               const SizedBox(width: 8),
-              const Text('License Information'),
+              const Text('License & Copyright'),
             ],
           ),
           content: SingleChildScrollView(
@@ -1591,6 +1591,14 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppConstants.copyrightNotice,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'monospace',
                   ),
                 ),
                 const SizedBox(height: 16),

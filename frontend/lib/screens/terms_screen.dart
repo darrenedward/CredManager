@@ -5,8 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// Terms & Conditions Screen
 ///
-/// This screen displays the terms of use, privacy policy, and legal
-/// disclaimers for Cred Manager.
+/// This screen displays the terms of use for Cred Manager.
+/// For copyright and license information, see the License dialog.
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
 
@@ -41,246 +41,228 @@ class TermsScreen extends StatelessWidget {
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 30),
-
-              // Disclaimer
-              _buildWarningCard(),
-
+              const SizedBox(height: 16),
+              Text(
+                'For copyright and license information, click the copyright notice in the app footer.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
               const SizedBox(height: 30),
 
               // 1. Acceptance of Terms
               _buildSectionCard(
                 '1. Acceptance of Terms',
-                Icons.gavel,
+                Icons.how_to_reg,
                 [
-                  _buildText('By accessing, downloading, installing, or using Cred Manager ("the Application"), you agree to be bound by these Terms & Conditions. If you do not agree to these terms, please do not use the Application.'),
-                  _buildText('Cred Manager is provided "as is" without any warranties, express or implied. By using this Application, you assume full responsibility for its use and any consequences resulting from such use.'),
+                  _buildText('By using Cred Manager, you agree to these terms. If you don\'t agree, please don\'t use the app.'),
+                  _buildText('These terms may be updated occasionally. Continued use after changes means you accept the new terms.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 2. Disclaimer of Warranties
+              // 2. What You Can Do
               _buildSectionCard(
-                '2. Disclaimer of Warranties',
-                Icons.warning_amber_rounded,
+                '2. What You Can Do',
+                Icons.check_circle,
                 [
-                  _buildText('Cred Manager is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind, either express or implied.'),
-                  _buildText('The developers, contributors, and distributors of Cred Manager expressly disclaim all warranties, including but not limited to:'),
-                  _buildBullet('Merchantability and fitness for a particular purpose'),
-                  _buildBullet('Non-infringement of third-party rights'),
-                  _buildBullet('Accuracy, reliability, or availability of the Application'),
-                  _buildBullet('Security or uninterrupted operation of the Application'),
-                  _buildText('No oral or written information or advice given by the developers shall create a warranty.'),
+                  _buildText('With Cred Manager, you can:'),
+                  _buildBullet('Store and manage your API keys, passwords, and other credentials'),
+                  _buildBullet('Organize credentials into projects and vaults'),
+                  _buildBullet('Generate strong passwords using the built-in generator'),
+                  _buildBullet('Backup and restore your encrypted data'),
+                  _buildBullet('Use the app for personal or business purposes'),
+                  _buildBullet('View and modify the source code (it\'s open source)'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 3. Limitation of Liability
+              // 3. What You Cannot Do
               _buildSectionCard(
-                '3. Limitation of Liability',
-                Icons.shield,
+                '3. What You Cannot Do',
+                Icons.block,
                 [
-                  _buildText('To the maximum extent permitted by applicable law, the developers, contributors, and distributors of Cred Manager shall not be liable for:'),
-                  _buildBullet('Any indirect, incidental, special, consequential, or punitive damages'),
-                  _buildBullet('Loss of data, revenue, profits, or business opportunities'),
-                  _buildBullet('Unauthorized access to or alteration of your data or device'),
-                  _buildBullet('Damages arising from security breaches, data loss, or credential exposure'),
-                  _buildBullet('Damages exceeding the amount you paid (if any) for the Application'),
-                  _buildText('In no event shall the total liability exceed USD \$100.00.'),
+                  _buildText('To protect everyone, you agree NOT to:'),
+                  _buildBullet('Reverse engineer the app to bypass security features'),
+                  _buildBullet('Remove or obscure copyright and license notices'),
+                  _buildBullet('Use the app for illegal activities of any kind'),
+                  _buildBullet('Attempt to exploit security vulnerabilities'),
+                  _buildBullet('Distribute modified versions without proper attribution'),
+                  _buildBullet('Hold the developer liable for data loss or security issues'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 4. Security & Data Protection
+              // 4. Your Responsibilities
               _buildSectionCard(
-                '4. Security & Data Protection',
-                Icons.security,
-                [
-                  _buildText('While Cred Manager implements industry-standard security measures, including:'),
-                  _buildBullet('End-to-end encryption using military-grade algorithms'),
-                  _buildBullet('Local-only storage (no data transmission to external servers)'),
-                  _buildBullet('Secure passphrase protection with Argon2 key derivation'),
-                  _buildBullet('Secure memory handling and automatic clipboard clearing'),
-                  _buildText('You acknowledge that:'),
-                  _buildBullet('No security system is completely impenetrable'),
-                  _buildBullet('You are solely responsible for maintaining the confidentiality of your passphrase'),
-                  _buildBullet('Weak or compromised passphrases can compromise your data'),
-                  _buildBullet('You are responsible for backing up your data regularly'),
-                  _buildBullet('The developers cannot recover your data if your passphrase is lost or forgotten'),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // 5. User Responsibilities
-              _buildSectionCard(
-                '5. User Responsibilities',
+                '4. Your Responsibilities',
                 Icons.person,
                 [
-                  _buildText('You agree to:'),
-                  _buildBullet('Keep your master passphrase secure and confidential'),
-                  _buildBullet('Use strong, unique passphrases that meet the security requirements'),
-                  _buildBullet('Not share your passphrase with anyone'),
-                  _buildBullet('Back up your data regularly to secure locations'),
-                  _buildBullet('Update the Application when security updates are released'),
-                  _buildBullet('Report security vulnerabilities responsibly through appropriate channels'),
-                  _buildText('You acknowledge that failure to follow these security practices may result in unauthorized access to your credentials and data.'),
+                  _buildText('To keep your data secure, you should:'),
+                  _buildBullet('Choose a strong, unique master passphrase'),
+                  _buildBullet('Never share your master passphrase with anyone'),
+                  _buildBullet('Keep your passphrase in a secure location'),
+                  _buildBullet('Regularly backup your data to safe locations'),
+                  _buildBullet('Keep the app updated with security patches'),
+                  _buildBullet('Use the emergency backup feature wisely'),
+                  _buildText('Remember: If you forget your passphrase, your data cannot be recovered. This is by design for your security.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 6. No Recovery Mechanism
+              // 5. Security Features
               _buildSectionCard(
-                '6. No Recovery Mechanism',
-                Icons.lock_reset,
+                '5. Security Features',
+                Icons.security,
                 [
-                  _buildText('Due to the security architecture of Cred Manager:'),
-                  _buildBullet('There is NO "forgot password" or recovery mechanism'),
-                  _buildBullet('If you forget your master passphrase, your data CANNOT be recovered'),
-                  _buildBullet('Lost passphrases result in permanent loss of access to stored data'),
-                  _buildText('This is by design for security - the developers cannot access your data even if they wanted to.'),
+                  _buildText('Cred Manager includes these security features:'),
+                  _buildBullet('All data encrypted with your passphrase'),
+                  _buildBullet('Data stored locally on your device (no cloud servers)'),
+                  _buildBullet('Automatic clipboard clearing after copying passwords'),
+                  _buildBullet('Automatic lock after periods of inactivity'),
+                  _buildBullet('Optional biometric authentication on supported devices'),
+                  _buildBullet('Emergency backup code for account recovery'),
+                  _buildText('However, no security system is perfect. You are responsible for keeping your passphrase safe and backing up your data.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 7. Emergency Backup Code
+              // 6. Emergency Backup Code
               _buildSectionCard(
-                '7. Emergency Backup Code',
+                '6. Emergency Backup Code',
                 Icons.vpn_key,
                 [
-                  _buildText('The emergency backup code feature:'),
-                  _buildBullet('Can only be used ONCE to recover access'),
-                  _buildBullet('Must be stored securely and never shared with untrusted parties'),
-                  _buildBullet('Should be regenerated after each use'),
-                  _buildText('The developers are not responsible for lost or compromised backup codes.'),
+                  _buildText('The emergency backup code allows you to recover your account if you forget your passphrase:'),
+                  _buildBullet('It can only be used ONCE - after use, generate a new one'),
+                  _buildBullet('Store it securely (safe, lockbox, or with trusted person)'),
+                  _buildBullet('Never share it with untrusted individuals'),
+                  _buildBullet('Don\'t store it unencrypted in cloud storage'),
+                  _buildBullet('Regenerate it after each use for ongoing protection'),
+                  _buildText('The developer cannot recover your account without this code.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 8. Password Vault Feature
+              // 7. Data & Privacy
               _buildSectionCard(
-                '8. Password Vault Feature',
-                Icons.password,
-                [
-                  _buildText('The Password Vault feature allows you to store:'),
-                  _buildBullet('Website passwords and login credentials'),
-                  _buildBullet('Application passwords'),
-                  _buildBullet('PIN codes and access codes'),
-                  _buildBullet('Any other sensitive text-based credentials'),
-                  _buildText('You acknowledge that:'),
-                  _buildBullet('The Password Vault does not auto-fill credentials into websites or applications'),
-                  _buildBullet('You must manually copy and paste credentials'),
-                  _buildBullet('Clipboard auto-clear is a security feature, not a guarantee'),
-                  _buildBullet('You are responsible for ensuring clipboard is cleared'),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // 9. Privacy & Data Collection
-              _buildSectionCard(
-                '9. Privacy & Data Collection',
+                '7. Data & Privacy',
                 Icons.privacy_tip,
                 [
-                  _buildText('Cred Manager is designed as a privacy-focused application:'),
-                  _buildBullet('All data is stored locally on your device'),
-                  _buildBullet('NO data is transmitted to external servers'),
-                  _buildBullet('NO analytics, telemetry, or usage data is collected'),
-                  _buildBullet('NO user registration or account creation is required'),
-                  _buildBullet('NO internet connection is required for core functionality'),
-                  _buildText('However, third-party services (if enabled) may have their own policies:'),
-                  _buildBullet('Biometric authentication uses your device\'s secure hardware'),
-                  _buildBullet('File operations (backup/restore) are handled by your operating system'),
+                  _buildText('Cred Manager is privacy-focused:'),
+                  _buildBullet('All your data is stored locally on your device'),
+                  _buildBullet('NO data is sent to external servers'),
+                  _buildBullet('NO analytics, telemetry, or usage tracking'),
+                  _buildBullet('NO user accounts or registration required'),
+                  _buildBullet('NO internet connection required for core features'),
+                  _buildText('Your credentials never leave your device unless you explicitly export them. You are always in control of your data.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 10. Open Source License
+              // 8. Password Vault
               _buildSectionCard(
-                '10. Open Source License',
+                '8. Password Vault',
+                Icons.password,
+                [
+                  _buildText('The Password Vault feature lets you store:'),
+                  _buildBullet('Website and application passwords'),
+                  _buildBullet('PIN codes and access codes'),
+                  _buildBullet('Username and email combinations'),
+                  _buildText('Usage notes:'),
+                  _buildBullet('The app does NOT auto-fill credentials - you copy them manually'),
+                  _buildBullet('Clipboard clears automatically for security'),
+                  _buildBullet('Organize passwords into vaults (e.g., Banking, Shopping, Social)'),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // 9. Backup & Restore
+              _buildSectionCard(
+                '9. Backup & Restore',
+                Icons.backup,
+                [
+                  _buildText('You can backup your entire database:'),
+                  _buildBullet('Go to Dashboard → Quick Actions → Backup Data'),
+                  _buildBullet('Choose a secure location to save the encrypted backup'),
+                  _buildBullet('Store multiple backup copies in different locations'),
+                  _buildText('To restore:'),
+                  _buildBullet('Import your backup file on any device'),
+                  _buildBullet('Enter your master passphrase to decrypt'),
+                  _buildText('Test your backups periodically to ensure they work!'),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // 10. Open Source
+              _buildSectionCard(
+                '10. Open Source',
                 Icons.code,
                 [
-                  _buildText('Cred Manager is copyrighted software owned by its developer. It is made available under the following terms:'),
-                  _buildText('You are free to:'),
-                  _buildBullet('Use the software for any purpose (personal or commercial)'),
-                  _buildBullet('View and study the source code'),
-                  _buildBullet('Modify the source code for your needs'),
-                  _buildBullet('Distribute the original or modified software'),
-                  _buildText('Subject to the following conditions:'),
-                  _buildBullet('Include the original copyright notice in all copies'),
-                  _buildBullet('The software is provided "as is" without any warranty'),
-                  _buildBullet('The developer is not liable for any damages arising from use'),
-                  _buildText('This is permissive open source software - you can do almost anything with it, as long as you include the copyright notice and understand that the software comes without warranties of any kind.'),
+                  _buildText('Cred Manager is open source software:'),
+                  _buildBullet('Source code is available for review'),
+                  _buildBullet('You can modify the code for your needs'),
+                  _buildBullet('You can distribute the software under the license terms'),
+                  _buildBullet('Click the copyright notice in the footer for full license text'),
+                  _buildText('Contributions are welcome! See the GitHub repository for details.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 11. Third-Party Libraries
+              // 11. Third-Party Services
               _buildSectionCard(
-                '11. Third-Party Libraries',
-                Icons.apps,
+                '11. Third-Party Services',
+                Icons.extension,
                 [
-                  _buildText('Cred Manager uses the following open-source libraries:'),
-                  _buildBullet('Flutter - UI Framework (BSD 3-Clause)'),
-                  _buildBullet('sqflite_sqlcipher - Encrypted database (BSD)'),
-                  _buildBullet('cryptography - Encryption algorithms (Apache 2.0)'),
-                  _buildBullet('provider - State management (MIT)'),
-                  _buildText('Each library has its own license terms which are included in the application.'),
+                  _buildText('Cred Manager uses open-source libraries:'),
+                  _buildBullet('Flutter - UI Framework'),
+                  _buildBullet('sqflite_sqlcipher - Encrypted database'),
+                  _buildBullet('cryptography - Encryption algorithms'),
+                  _buildBullet('provider - State management'),
+                  _buildText('Each library has its own license. These are included in the application and documented on GitHub.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 12. Export Controls
+              // 12. No Warranty
               _buildSectionCard(
-                '12. Export Controls',
-                Icons.public,
+                '12. No Warranty',
+                Icons.info_outline,
                 [
-                  _buildText('You acknowledge that:'),
-                  _buildBullet('Encryption software may be subject to export and import regulations'),
-                  _buildBullet('You are responsible for complying with local laws'),
-                  _buildBullet('Developers are not responsible for unauthorized use in restricted jurisdictions'),
+                  _buildText('Cred Manager is provided "as is" without warranties of any kind.'),
+                  _buildText('The developer is not responsible for:'),
+                  _buildBullet('Lost or forgotten passphrases (cannot be recovered by design)'),
+                  _buildBullet('Data loss from not backing up regularly'),
+                  _buildBullet('Security breaches from weak or compromised passphrases'),
+                  _buildBullet('Hardware failure, theft, or device damage'),
+                  _buildText('For full copyright and license terms, including disclaimers, click the copyright notice in the app footer.'),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // 13. Modifications to Terms
+              // 13. Support
               _buildSectionCard(
-                '13. Modifications to Terms',
-                Icons.update,
+                '13. Getting Help',
+                Icons.help,
                 [
-                  _buildText('The developers reserve the right to modify these terms at any time. Continued use of the Application after changes constitutes acceptance of the new terms.'),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // 14. Severability
-              _buildSectionCard(
-                '14. Severability',
-                Icons.content_cut,
-                [
-                  _buildText('If any provision of these terms is found to be unenforceable, the remaining provisions shall remain in full force and effect.'),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // 15. Governing Law
-              _buildSectionCard(
-                '15. Governing Law',
-                Icons.gavel,
-                [
-                  _buildText('These terms shall be governed by the laws of the jurisdiction in which you reside. Any disputes shall be resolved in accordance with applicable local laws.'),
+                  _buildText('Need help? Check out these resources:'),
+                  _buildBullet('Support section - Click "Support" in the app sidebar'),
+                  _buildBullet('GitHub repository - Report bugs and request features'),
+                  _buildBullet('Documentation - Built into the Support screen'),
+                  _buildText('For security issues, please report them responsibly through GitHub\'s private vulnerability reporting (if available) or contact the developer directly.'),
                 ],
               ),
 
@@ -293,51 +275,6 @@ class TermsScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildWarningCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.red[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red[300]!, width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.red[700], size: 32),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'IMPORTANT DISCLAIMER',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red[700],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Cred Manager is provided FREE OF CHARGE and WITHOUT ANY WARRANTY. '
-            'USE THIS APPLICATION AT YOUR OWN RISK. THE DEVELOPERS ARE NOT '
-            'RESPONSIBLE FOR ANY DATA LOSS, SECURITY BREACHES, OR DAMAGES '
-            'RESULTING FROM ITS USE.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.red[900],
-              height: 1.5,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -414,23 +351,6 @@ class TermsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLink(String url) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
-        onTap: () => _launchUrl(url),
-        child: Text(
-          url,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.blue[700],
-            decoration: TextDecoration.underline,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildContactCard() {
     return Card(
       elevation: 2,
@@ -448,7 +368,7 @@ class TermsScreen extends StatelessWidget {
                 Icon(Icons.contact_mail, color: AppConstants.primaryColor, size: 24),
                 const SizedBox(width: 12),
                 Text(
-                  'Questions or Concerns?',
+                  'Questions?',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -459,9 +379,7 @@ class TermsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Cred Manager is an open source project. For questions, bug reports, '
-              'or contributions, please visit our GitHub repository or review '
-              'the source code.',
+              'Cred Manager is an open source project. For questions, bug reports, or contributions, visit our GitHub repository.',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[700],

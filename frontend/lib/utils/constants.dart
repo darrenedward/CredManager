@@ -48,16 +48,40 @@ class AppConstants {
   // 📄 **Footer Information**
   static const String appVersion = '1.0.0';
   static const String copyright = '© 2025 Darren Edward House of Jones';
+  static const String copyrightNotice = '''
+Copyright (c) 2025 Darren Edward House of Jones
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+''';
   static const String licenseText = '''
-Cred Manager - Free Open Source Software
+Cred Manager v1.0.0
+An open-source credential management application
 
-This software is provided "as is" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement.
+This software is free to use, modify, and distribute under the terms
+of the permissive open source license shown above.
 
-In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use or other dealings in the software.
-
-Users of this application do so at their own risk. The developers assume no responsibility for any loss of data, security breaches, or any other issues that may arise from the use of this application.
-
-This software is free to use and distribute under the MIT License.
+Key Points:
+• Free for both personal and commercial use
+• Source code is available for review and modification
+• No warranty provided - use at your own risk
+• You retain full ownership of your data
+• All data is stored locally on your device
 ''';
 
 }
