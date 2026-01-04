@@ -1521,20 +1521,21 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // Copyright on the left
+          GestureDetector(
+            onTap: () => _showLicenseDialog(context),
+            child: Text(
+              AppConstants.copyright,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+          // Terms and Version on the right
           Row(
             children: [
-              GestureDetector(
-                onTap: () => _showLicenseDialog(context),
-                child: Text(
-                  AppConstants.copyright,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
@@ -1549,14 +1550,15 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
                   ),
                 ),
               ),
+              const SizedBox(width: 16),
+              Text(
+                'Version ${AppConstants.appVersion}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
             ],
-          ),
-          Text(
-            'Version ${AppConstants.appVersion}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-            ),
           ),
         ],
       ),
