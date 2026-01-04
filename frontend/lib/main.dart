@@ -63,8 +63,7 @@ class ApiKeyManagerApp extends StatelessWidget {
         return MaterialApp(
           title: AppConstants.appName,
           theme: themeService.lightTheme,
-          darkTheme: themeService.darkTheme,
-          themeMode: themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          themeMode: ThemeMode.light,
           home: const AuthWrapper(),
           routes: {
             '/setup': (context) => const SetupScreen(),

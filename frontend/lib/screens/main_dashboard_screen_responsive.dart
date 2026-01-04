@@ -656,18 +656,6 @@ class _MainDashboardScreenResponsiveState extends State<MainDashboardScreenRespo
                 title: 'Appearance & Experience',
                 description: 'Customize the app look and behavior.',
                 children: [
-                  Consumer<ThemeService>(
-                    builder: (context, themeService, child) => _buildSwitchSetting(
-                      context,
-                      'Dark Mode',
-                      'Use dark theme for the interface',
-                      themeService.isDarkMode,
-                      (value) async {
-                        await themeService.setDarkMode(value);
-                      },
-                    ),
-                  ),
-                  const Divider(),
                   Consumer<AuthState>(
                     builder: (context, authState, child) => _buildSwitchSetting(
                       context,
